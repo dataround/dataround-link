@@ -1,0 +1,36 @@
+server:
+  port: 5600
+  servlet:
+    context-path: /datalink
+spring:
+  application:
+    name: datalink
+  
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://10.8.0.1:5432/dataround_link?currentSchema=public"
+    username: postgres
+    password: "dataround.io"
+    sql:
+      init:
+        schema-locations: classpath:init_pg_schema.sql
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-handlers-package: io.dataround.link.typehandler
+
+dataround:
+  link:
+    scheduler:
+      threadPoolSize: 10
+  seatunnel:
+    api:
+      base-url: http://10.8.0.1:8080
+
+logging:
+  level:
+    io.dataround.link: debug

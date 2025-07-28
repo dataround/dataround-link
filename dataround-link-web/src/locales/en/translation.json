@@ -1,0 +1,499 @@
+{
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "notFound": "Not Found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "badRequest": "Bad Request",
+    "serverError": "Internal Server Error",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading..."
+  },
+  "menu": {
+    "dataIntegration": "Data Integration",
+    "doc": "Document",
+    "structuredData": "Structured Data",
+    "unstructuredData": "Unstructured Data",
+    "connectionManagement": "Connection Management",
+    "batchJob": "Batch Job",
+    "batchInstance": "Batch Instance",
+    "streamJob": "Stream Job",
+    "streamInstance": "Stream Instance",
+    "virtualTable": "Virtual Table",
+    "createVirtualTable": "Create Virtual Table",
+    "fileSync": "File Sync",
+    "fileSyncInstance": "File Sync Instance",
+    "hdfsSync": "HDFS Sync",
+    "objectStorageSync": "Object Storage Sync",
+    "createConnection": "Create Connection"
+  },
+  "job": {
+    "list": {
+      "title": "Job List",
+      "newBatchJob": "New Batch Job",
+      "newStreamJob": "New Stream Job",
+      "newFileSyncJob": "New File Sync Job",
+      "search": "Search",
+      "jobId": "Job ID",
+      "jobName": "Job Name",
+      "source": "Source",
+      "target": "Target",
+      "scheduleType": "Schedule Type",
+      "updateUser": "Updated By",
+      "updateTime": "Update Time",
+      "operation": "Operation",
+      "execute": "Execute",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this job?",
+      "executeSuccess": "Job submitted successfully",
+      "deleteSuccess": "Job deleted successfully",
+      "scheduleTypes": {
+        "immediate": "Execute Immediately",
+        "periodic": "Periodic Execution",
+        "none": "No Execution"
+      },
+      "periodicInfo": {
+        "title": "Periodic Execution Info",
+        "cron": "CRON",
+        "validPeriod": "Valid Period",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "infinite": "+∞"
+      },
+      "waitingExec": {
+        "label": "Waiting Execution",
+        "tooltip": "Periodic jobs that are still within their validity period"
+      }
+    },
+    "edit": {
+      "steps": {
+        "source": "Data Source",
+        "mapping": "Field Mapping",
+        "save": "Save & Execute"
+      },
+      "buttons": {
+        "prev": "Previous",
+        "next": "Next",
+        "save": "Save"
+      },
+      "message": {
+        "saveSuccess": "Saved successfully!"
+      },
+      "source": {
+        "tabs": {
+          "source": "Data Source",
+          "target": "Destination",
+          "mapping": "Table Mapping"
+        },
+        "form": {
+          "sourceType": "Source Type",
+          "sourceConnection": "Connection Name",
+          "sourceDatabase": "Database Name",
+          "targetType": "Target Type",
+          "targetConnection": "Connection Name",
+          "targetDatabase": "Database Name"
+        },
+        "placeholder": {
+          "selectType": "Please select",
+          "selectConnection": "Please select connection name",
+          "selectDatabase": "Please select database name"
+        },
+        "table": {
+          "sourceDb": "Source Database",
+          "sourceTable": "Source Table",
+          "targetDb": "Target Database",
+          "targetTable": "Target Table",
+          "filter": "Filter Condition",
+          "operation": "Operation"
+        },
+        "list": {
+          "selectAll": "Select All"
+        },
+        "modal": {
+          "deleteConfirm": "Are you sure you want to delete this mapping?"
+        }
+      },
+      "mapping": {
+        "form": {
+          "writeType": "Data Write Method",
+          "matchMethod": "Field Match Method"
+        },
+        "writeType": {
+          "insert": "Insert",
+          "upsert": "Upsert"
+        },
+        "matchMethod": {
+          "byName": "Match by Field Name",
+          "byOrder": "Match by Field Order"
+        },
+        "table": {
+          "sourceFieldName": "Source Field Name",
+          "sourceFieldType": "Source Field Type",
+          "sourcePrimaryKey": "Source Primary Key",
+          "targetFieldName": "Target Field Name",
+          "targetFieldType": "Target Field Type",
+          "targetPrimaryKey": "Target Primary Key",
+          "operation": "Operation"
+        },
+        "modal": {
+          "deleteConfirm": "Are you sure you want to delete this field mapping?"
+        },
+        "message": {
+          "targetDbRequired": "Please set target database in the previous step",
+          "targetTableRequired": "Please set target table in the previous step"
+        }
+      },
+      "save": {
+        "form": {
+          "name": "Job Name",
+          "description": "Job Description",
+          "scheduleType": "Execution Method",
+          "validPeriod": "Valid Period"
+        },
+        "placeholder": {
+          "name": "Please enter job name",
+          "description": "Please enter job description"
+        },
+        "scheduleType": {
+          "immediate": "Execute Immediately",
+          "periodic": "Periodic Execution",
+          "none": "No Execution"
+        },
+        "validPeriod": {
+          "to": "to"
+        },
+        "message": {
+          "nameRequired": "Job name is required",
+          "scheduleTypeRequired": "Please select execution method"
+        }
+      },
+      "cron": {
+        "form": {
+          "frequency": "Execution Frequency",
+          "frequencyRequired": "Please select execution frequency"
+        },
+        "frequency": {
+          "perMinute": "Per Minute",
+          "perHour": "Per Hour",
+          "perDay": "Per Day",
+          "perWeek": "Per Week",
+          "perMonth": "Per Month"
+        },
+        "unit": {
+          "second": "second",
+          "minute": "minute",
+          "hour": "hour",
+          "day": "day"
+        },
+        "weekday": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        },
+        "placeholder": {
+          "select": "Please select"
+        }
+      }
+    }
+  },
+  "user": {
+    "login": {
+      "success": "Login successful",
+      "failed": "Login failed",
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?"
+    },
+    "profile": {
+      "title": "Profile",
+      "changePassword": "Change Password",
+      "logout": "Logout"
+    }
+  },
+  "link": {
+    "create": {
+      "success": "Link created successfully",
+      "title": "Create Link"
+    },
+    "update": {
+      "success": "Link updated successfully",
+      "title": "Update Link"
+    },
+    "delete": {
+      "success": "Link deleted successfully",
+      "confirm": "Are you sure you want to delete this link?"
+    },
+    "notFound": "Link not found",
+    "invalid": "Invalid link",
+    "expired": "Link has expired"
+  },
+  "language": {
+    "en": "English",
+    "zh": "Chinese"
+  },
+  "instance": {
+    "title": "Running Instance",
+    "search": {
+      "instanceId": "Instance ID",
+      "jobName": "Job Name",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "search": "Search"
+    },
+    "table": {
+      "instanceId": "Instance ID",
+      "jobName": "Job Name",
+      "readCount": "Read Count",
+      "writeCount": "Write Count",
+      "readQps": "Read QPS",
+      "writeQps": "Write QPS",
+      "readBytes": "Read Bytes",
+      "writeBytes": "Write Bytes",
+      "status": "Status",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "duration": "Duration(s)",
+      "operation": "Operation",
+      "log": "Log",
+      "stop": "Stop",
+      "delete": "Delete"
+    },
+    "status": {
+      "waiting": "Waiting",
+      "submitted": "Submitted",
+      "running": "Running",
+      "success": "Success",
+      "failure": "Failure",
+      "canceled": "Canceled"
+    },
+    "modal": {
+      "logTitle": "Running Log",
+      "stopConfirm": "Are you sure you want to stop this job?",
+      "deleteConfirm": "Are you sure you want to delete this running record?"
+    },
+    "message": {
+      "stopSuccess": "Job stopped successfully",
+      "deleteSuccess": "Job deleted successfully"
+    }
+  },
+  "virtualTable": {
+    "title": "Virtual Table List",
+    "new": "New Virtual Table",
+    "table": {
+      "id": "ID",
+      "tableName": "Table Name",
+      "database": "Database",
+      "connectionName": "Connection Name",
+      "fields": "Fields",
+      "description": "Description",
+      "createUser": "Created By",
+      "createTime": "Create Time",
+      "operation": "Operation",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "modal": {
+      "deleteConfirm": "Are you sure you want to delete this virtual table?"
+    },
+    "message": {
+      "deleteSuccess": "Virtual table deleted successfully",
+      "deleteFailed": "Failed to delete virtual table"
+    },
+    "create": {
+      "title": "Create Virtual Table",
+      "basicInfo": "Basic Information",
+      "fieldInfo": "Field Information",
+      "form": {
+        "connectionType": "Connection Type",
+        "connectionName": "Connection Name",
+        "databaseName": "Database Name",
+        "tableName": "Table Name",
+        "description": "Description",
+        "topic": "Topic",
+        "sourceFormat": "Source Format",
+        "delimiter": "Delimiter",
+        "fieldName": "Field Name",
+        "fieldType": "Field Type",
+        "nullable": "Nullable",
+        "primaryKey": "Primary Key",
+        "fieldDescription": "Field Description",
+        "defaultValue": "Default Value",
+        "operation": "Operation"
+      },
+      "format": {
+        "json": "JSON String",
+        "text": "Delimiter"
+      },
+      "placeholder": {
+        "selectConnection": "Please select connection",
+        "enterDatabase": "Please enter database name",
+        "enterTable": "Please enter table name",
+        "enterDescription": "Please enter description",
+        "enterTopic": "Please enter Topic",
+        "enterFieldName": "Please enter field name",
+        "selectFieldType": "Please select field type",
+        "enterFieldDescription": "Please enter field description",
+        "enterDefaultValue": "Please enter default value"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "message": {
+        "saveSuccess": "Saved successfully"
+      }
+    }
+  },
+  "connection": {
+    "title": "Connection Management",
+    "new": "New Connection",
+    "tabs": {
+      "database": "Database JDBC",
+      "cdc": "CDC Connection",
+      "nonstructural": "Unstructured Data"
+    },
+    "table": {
+      "name": "Connection Name",
+      "type": "Connection Type",
+      "host": "Host",
+      "port": "Port",
+      "username": "Username",
+      "password": "Password",
+      "otherParams": "Other Parameters",
+      "description": "Description",
+      "createUser": "Created By",
+      "createTime": "Create Time",
+      "operation": "Operation",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "modal": {
+      "deleteConfirm": "Are you sure you want to delete this connection?"
+    },
+    "message": {
+      "deleteSuccess": "Connection deleted successfully",
+      "deleteFailed": "Failed to delete connection"
+    },
+    "create": {
+      "form": {
+        "name": "Connection Name",
+        "type": "Connection Type",
+        "description": "Description",
+        "host": "Host",
+        "port": "Port",
+        "database": "Database",
+        "jdbcUrl": "JDBC URL",
+        "username": "Username",
+        "password": "Password",
+        "broker": "Broker Address",
+        "kafkaConfig": "Kafka Configuration",
+        "metastoreUri": "Metastore URI",
+        "hdfsSite": "HDFS Site",
+        "hiveSite": "Hive Site",
+        "kerberosPrincipal": "Kerberos Principal",
+        "kerberosKeytab": "Kerberos Keytab",
+        "kerberosKrb5Conf": "Kerberos krb5.conf",
+        "timezone": "Database Server Timezone",
+        "svcType": "Service Name or SID",
+        "svcName": "Service Name",
+        "sid": "SID",
+        "extraParams": "Extra Parameters",
+        "timeout": "Timeout",
+        "endpoint": "Endpoint",
+        "accessKey": "Access Key",
+        "secretKey": "Secret Key",
+        "bucket": "Bucket",
+        "region": "Region",
+        "pathStyleAccess": "Path Style Access"
+      },
+      "placeholder": {
+        "name": "Please enter connection name",
+        "selectType": "Please select connection type",
+        "description": "Please enter description",
+        "host": "Please enter hostname or IP",
+        "port": "Please enter port",
+        "database": "Please enter database name",
+        "username": "Please enter username",
+        "password": "Please enter password",
+        "broker": "Please enter broker address: host1:9092,host2:9092",
+        "kafkaConfig": "Please enter Kafka extra configuration",
+        "paramName": "Parameter Name",
+        "paramValue": "Parameter Value",
+        "timeout": "Please enter timeout in seconds, e.g: 30",
+        "endpoint": "Please enter S3 endpoint, e.g: https://s3.amazonaws.com",
+        "accessKey": "Please enter access key ID",
+        "secretKey": "Please enter secret access key",
+        "bucket": "Please enter bucket name",
+        "region": "Please select region or enter custom region name",
+        "pathStyleAccess": "Please select path style access"
+      },
+      "option": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "button": {
+        "test": "Test Connection",
+        "cancel": "Cancel",
+        "save": "Save",
+        "upload": "Click to Upload"
+      },
+      "message": {
+        "saveSuccess": "Saved successfully",
+        "saveFailed": "Failed to save",
+        "testSuccess": "Connection successful",
+        "testFailed": "Connection failed"
+      }
+    }
+  },
+  "fileSync": {
+    "message": {
+      "saveSuccess": "Saved successfully",
+      "saveFailed": "Failed to save"
+    },
+    "create": {
+      "sourceConfig": "Source Configuration",
+      "targetConfig": "Target Configuration",
+      "jobConfig": "Job Configuration",
+      "form": {
+        "sourceConnection": "Source Connection",
+        "sourcePath": "Source Path",
+        "filePattern": "File Pattern",
+        "includeSubdirectories": "Include Subdirectories",
+        "targetConnection": "Target Connection",
+        "targetPath": "Target Path"
+      },
+      "placeholder": {
+        "sourcePath": "Please enter source path, e.g: /data/logs",
+        "filePattern": "Please enter file pattern, e.g: *.log",
+        "targetPath": "Please enter target path, e.g: /backup/logs",
+        "selectSourceConnection": "Please select source connection",
+        "selectTargetConnection": "Please select target connection"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "message": {
+        "sourceConnectionRequired": "Please select source connection",
+        "sourcePathRequired": "Please enter source path",
+        "filePatternRequired": "Please enter file pattern",
+        "targetConnectionRequired": "Please select target connection",
+        "targetPathRequired": "Please enter target path"
+      }
+    }
+  }
+} 

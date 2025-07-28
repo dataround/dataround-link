@@ -1,0 +1,499 @@
+{
+  "common": {
+    "success": "成功",
+    "error": "错误",
+    "notFound": "未找到",
+    "unauthorized": "未授权",
+    "forbidden": "禁止访问",
+    "badRequest": "请求错误",
+    "serverError": "服务器错误",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "loading": "加载中..."
+  },
+  "menu": {
+    "dataIntegration": "数据集成",
+    "doc": "文档中心",
+    "structuredData": "结构化数据",
+    "unstructuredData": "非结构化数据",
+    "connectionManagement": "连接管理",
+    "batchJob": "批处理作业",
+    "batchInstance": "批处理实例",
+    "streamJob": "流处理作业",
+    "streamInstance": "流处理实例",
+    "virtualTable": "虚拟表",
+    "createVirtualTable": "创建虚拟表",
+    "fileSync": "文件同步",
+    "fileSyncInstance": "文件同步实例",
+    "hdfsSync": "HDFS同步",
+    "objectStorageSync": "对象存储同步",
+    "createConnection": "创建连接"
+  },
+  "job": {
+    "list": {
+      "title": "作业列表",
+      "newBatchJob": "新建批处理作业",
+      "newStreamJob": "新建流处理作业",
+      "newFileSyncJob": "新建文件同步作业",
+      "search": "搜索",
+      "jobId": "作业ID",
+      "jobName": "作业名称",
+      "source": "数据源",
+      "target": "目标",
+      "scheduleType": "调度类型",
+      "updateUser": "更新人",
+      "updateTime": "更新时间",
+      "operation": "操作",
+      "execute": "执行",
+      "edit": "编辑",
+      "delete": "删除",
+      "deleteConfirm": "确定要删除此作业吗？",
+      "executeSuccess": "作业提交成功",
+      "deleteSuccess": "作业删除成功",
+      "scheduleTypes": {
+        "immediate": "立即执行",
+        "periodic": "周期执行",
+        "none": "不执行"
+      },
+      "periodicInfo": {
+        "title": "周期执行信息",
+        "cron": "CRON表达式",
+        "validPeriod": "有效期",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "infinite": "+∞"
+      },
+      "waitingExec": {
+        "label": "待执行",
+        "tooltip": "仍在有效期内的周期作业"
+      }
+    },
+    "edit": {
+      "steps": {
+        "source": "数据源",
+        "mapping": "字段映射",
+        "save": "保存执行"
+      },
+      "buttons": {
+        "prev": "上一步",
+        "next": "下一步",
+        "save": "保存"
+      },
+      "message": {
+        "saveSuccess": "保存成功!"
+      },
+      "source": {
+        "tabs": {
+          "source": "数据源",
+          "target": "目的地",
+          "mapping": "表关联"
+        },
+        "form": {
+          "sourceType": "源类型",
+          "sourceConnection": "连接名",
+          "sourceDatabase": "数据库名",
+          "targetType": "目标类型",
+          "targetConnection": "连接名",
+          "targetDatabase": "数据库名"
+        },
+        "placeholder": {
+          "selectType": "请选择",
+          "selectConnection": "请选择连接名",
+          "selectDatabase": "请选择数据库名"
+        },
+        "table": {
+          "sourceDb": "源库名",
+          "sourceTable": "源表名",
+          "targetDb": "目标库",
+          "targetTable": "目标表",
+          "filter": "条件过滤",
+          "operation": "操作"
+        },
+        "list": {
+          "selectAll": "全选"
+        },
+        "modal": {
+          "deleteConfirm": "确认删除？"
+        }
+      },
+      "mapping": {
+        "form": {
+          "writeType": "数据写入方式",
+          "matchMethod": "字段匹配方式"
+        },
+        "writeType": {
+          "insert": "Insert",
+          "upsert": "Upsert"
+        },
+        "matchMethod": {
+          "byName": "按字段名匹配",
+          "byOrder": "按字段顺序匹配"
+        },
+        "table": {
+          "sourceFieldName": "源字段名",
+          "sourceFieldType": "源类型",
+          "sourcePrimaryKey": "源表主键",
+          "targetFieldName": "目标字段名",
+          "targetFieldType": "目标类型",
+          "targetPrimaryKey": "目标表主键",
+          "operation": "操作"
+        },
+        "modal": {
+          "deleteConfirm": "确认删除？"
+        },
+        "message": {
+          "targetDbRequired": "请在上一步设置目标库",
+          "targetTableRequired": "请在上一步设置目标表"
+        }
+      },
+      "save": {
+        "form": {
+          "name": "任务名",
+          "description": "任务描述",
+          "scheduleType": "执行方式",
+          "validPeriod": "有效期"
+        },
+        "placeholder": {
+          "name": "请输入任务名",
+          "description": "请输入任务描述"
+        },
+        "scheduleType": {
+          "immediate": "立即执行",
+          "periodic": "周期性执行",
+          "none": "暂不执行"
+        },
+        "validPeriod": {
+          "to": "到"
+        },
+        "message": {
+          "nameRequired": "任务名不能为空",
+          "scheduleTypeRequired": "请选择执行方式"
+        }
+      },
+      "cron": {
+        "form": {
+          "frequency": "执行频率",
+          "frequencyRequired": "请选择执行频率"
+        },
+        "frequency": {
+          "perMinute": "每分钟",
+          "perHour": "每小时",
+          "perDay": "每天",
+          "perWeek": "每周",
+          "perMonth": "每月"
+        },
+        "unit": {
+          "second": "秒",
+          "minute": "分",
+          "hour": "时",
+          "day": "日"
+        },
+        "weekday": {
+          "monday": "星期一",
+          "tuesday": "星期二",
+          "wednesday": "星期三",
+          "thursday": "星期四",
+          "friday": "星期五",
+          "saturday": "星期六",
+          "sunday": "星期日"
+        },
+        "placeholder": {
+          "select": "请选择"
+        }
+      }
+    }
+  },
+  "user": {
+    "login": {
+      "success": "登录成功",
+      "failed": "登录失败",
+      "title": "登录",
+      "username": "用户名",
+      "password": "密码",
+      "rememberMe": "记住我",
+      "forgotPassword": "忘记密码？"
+    },
+    "profile": {
+      "title": "个人资料",
+      "changePassword": "修改密码",
+      "logout": "退出登录"
+    }
+  },
+  "link": {
+    "create": {
+      "success": "链接创建成功",
+      "title": "创建链接"
+    },
+    "update": {
+      "success": "链接更新成功",
+      "title": "更新链接"
+    },
+    "delete": {
+      "success": "链接删除成功",
+      "confirm": "确定要删除此链接吗？"
+    },
+    "notFound": "链接未找到",
+    "invalid": "无效的链接",
+    "expired": "链接已过期"
+  },
+  "language": {
+    "en": "英文",
+    "zh": "简体中文"
+  },
+  "instance": {
+    "title": "运行实例",
+    "search": {
+      "instanceId": "实例ID",
+      "jobName": "任务名",
+      "status": "状态",
+      "startDate": "开始日期",
+      "endDate": "截止日期",
+      "search": "查询"
+    },
+    "table": {
+      "instanceId": "实例ID",
+      "jobName": "任务名",
+      "readCount": "已读取(条)",
+      "writeCount": "已写入(条)",
+      "readQps": "读取QPS",
+      "writeQps": "写入QPS",
+      "readBytes": "读取字节数",
+      "writeBytes": "写入字节数",
+      "status": "状态",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "duration": "持续时间(秒)",
+      "operation": "操作",
+      "log": "日志",
+      "stop": "停止",
+      "delete": "删除"
+    },
+    "status": {
+      "waiting": "等待中",
+      "submitted": "已提交",
+      "running": "运行中",
+      "success": "成功",
+      "failure": "失败",
+      "canceled": "已取消"
+    },
+    "modal": {
+      "logTitle": "运行日志",
+      "stopConfirm": "确定要停止此作业吗？",
+      "deleteConfirm": "确定要删除此运行记录吗？"
+    },
+    "message": {
+      "stopSuccess": "任务停止成功",
+      "deleteSuccess": "任务删除成功"
+    }
+  },
+  "virtualTable": {
+    "title": "虚拟表列表",
+    "new": "新建虚拟表",
+    "table": {
+      "id": "Id",
+      "tableName": "表名",
+      "database": "库名",
+      "connectionName": "连接名",
+      "fields": "字段",
+      "description": "描述",
+      "createUser": "创建人",
+      "createTime": "创建时间",
+      "operation": "操作",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "modal": {
+      "deleteConfirm": "确定要删除此虚拟表吗？"
+    },
+    "message": {
+      "deleteSuccess": "虚拟表删除成功",
+      "deleteFailed": "虚拟表删除失败"
+    },
+    "create": {
+      "title": "创建虚拟表",
+      "basicInfo": "基本信息",
+      "fieldInfo": "字段信息",
+      "form": {
+        "connectionType": "连接类型",
+        "connectionName": "连接名称",
+        "databaseName": "数据库名称",
+        "tableName": "表名",
+        "description": "描述",
+        "topic": "Topic",
+        "sourceFormat": "源格式",
+        "delimiter": "分隔符",
+        "fieldName": "字段名",
+        "fieldType": "字段类型",
+        "nullable": "可空",
+        "primaryKey": "主键",
+        "fieldDescription": "字段描述",
+        "defaultValue": "默认值",
+        "operation": "操作"
+      },
+      "format": {
+        "json": "JSON字符串",
+        "text": "分隔符"
+      },
+      "placeholder": {
+        "selectConnection": "请选择连接",
+        "enterDatabase": "请输入数据库名称",
+        "enterTable": "请输入表名",
+        "enterDescription": "请输入描述",
+        "enterTopic": "请输入Topic",
+        "enterFieldName": "请输入字段名",
+        "selectFieldType": "请选择字段类型",
+        "enterFieldDescription": "请输入字段描述",
+        "enterDefaultValue": "请输入默认值"
+      },
+      "button": {
+        "cancel": "取消",
+        "save": "保存"
+      },
+      "message": {
+        "saveSuccess": "保存成功"
+      }
+    }
+  },
+  "connection": {
+    "title": "连接管理",
+    "new": "新建连接",
+    "tabs": {
+      "database": "数据库JDBC",
+      "cdc": "CDC连接",
+      "nonstructural": "非结构化数据"
+    },
+    "table": {
+      "name": "连接名称",
+      "type": "连接类型",
+      "host": "主机",
+      "port": "端口",
+      "username": "用户名",
+      "password": "密码",
+      "otherParams": "其他参数",
+      "description": "描述",
+      "createUser": "创建人",
+      "createTime": "创建时间",
+      "operation": "操作",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "modal": {
+      "deleteConfirm": "确定要删除此连接吗？"
+    },
+    "message": {
+      "deleteSuccess": "连接删除成功",
+      "deleteFailed": "连接删除失败"
+    },
+    "create": {
+      "form": {
+        "name": "连接名",
+        "type": "连接类型",
+        "description": "描述",
+        "host": "主机",
+        "port": "端口",
+        "database": "数据库名",
+        "jdbcUrl": "JDBC连接Url",
+        "username": "用户名",
+        "password": "密码",
+        "broker": "连接地址",
+        "kafkaConfig": "Kafka配置信息",
+        "metastoreUri": "metastore地址",
+        "hdfsSite": "hdfs site",
+        "hiveSite": "hive site",
+        "kerberosPrincipal": "kerberos principal",
+        "kerberosKeytab": "kerberos keytab",
+        "kerberosKrb5Conf": "kerberos krb5 conf",
+        "timezone": "数据库服务器会话时区",
+        "svcType": "服务名或SID",
+        "svcName": "服务名",
+        "sid": "SID",
+        "extraParams": "其他参数",
+        "timeout": "超时时间",
+        "endpoint": "端点地址",
+        "accessKey": "访问密钥",
+        "secretKey": "安全密钥",
+        "bucket": "存储桶",
+        "region": "区域",
+        "pathStyleAccess": "路径样式访问"
+      },
+      "placeholder": {
+        "name": "请输入连接名",
+        "selectType": "请选择",
+        "description": "请输入描述信息",
+        "host": "请输入主机名或IP",
+        "port": "请输入端口",
+        "database": "请输入数据库名",
+        "username": "请输入用户名",
+        "password": "请输入密码",
+        "broker": "请输入broker地址: host1:9092,host2:9092",
+        "kafkaConfig": "请输入Kafka额外配置",
+        "paramName": "参数名",
+        "paramValue": "参数值",
+        "timeout": "请输入超时时间(秒)，如: 30",
+        "endpoint": "请输入S3端点地址，如: https://s3.amazonaws.com",
+        "accessKey": "请输入访问密钥ID",
+        "secretKey": "请输入安全访问密钥",
+        "bucket": "请输入存储桶名称",
+        "region": "请选择区域或直接输入自定义区域名称",
+        "pathStyleAccess": "请选择路径样式访问方式"
+      },
+      "option": {
+        "enabled": "启用",
+        "disabled": "禁用"
+      },
+      "button": {
+        "test": "测试连接",
+        "cancel": "取消",
+        "save": "保存信息",
+        "upload": "Click to Upload"
+      },
+      "message": {
+        "saveSuccess": "保存成功",
+        "saveFailed": "保存失败",
+        "testSuccess": "连接成功",
+        "testFailed": "连接失败"
+      }
+    }
+  },
+  "fileSync": {
+    "message": {
+      "saveSuccess": "保存成功",
+      "saveFailed": "保存失败"
+    },
+    "create": {
+      "sourceConfig": "源配置",
+      "targetConfig": "目标配置",
+      "jobConfig": "作业配置",
+      "form": {
+        "sourceConnection": "源连接",
+        "sourcePath": "源路径",
+        "filePattern": "文件筛选规则",
+        "includeSubdirectories": "包含子目录",
+        "targetConnection": "目标连接",
+        "targetPath": "目标路径"
+      },
+      "placeholder": {
+        "sourcePath": "请输入源路径，如: /data/logs",
+        "filePattern": "请输入文件过滤规则，如: *.log",
+        "targetPath": "请输入目标路径，如: /backup/logs",
+        "selectSourceConnection": "请选择源连接",
+        "selectTargetConnection": "请选择目标连接"
+      },
+      "button": {
+        "cancel": "取消",
+        "save": "保存"
+      },
+      "message": {
+        "sourceConnectionRequired": "请选择源连接",
+        "sourcePathRequired": "请输入源路径",
+        "filePatternRequired": "请输入文件过滤规则",
+        "targetConnectionRequired": "请选择目标连接",
+        "targetPathRequired": "请输入目标路径"
+      }
+    }
+  }
+} 

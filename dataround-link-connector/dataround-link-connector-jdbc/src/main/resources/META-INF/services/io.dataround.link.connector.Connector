@@ -1,0 +1,5 @@
+io.dataround.link.connector.MySQLJdbcConnector
+io.dataround.link.connector.PostgresJdbcConnector
+io.dataround.link.connector.OracleJdbcConnector
+io.dataround.link.connector.SQLServerJdbcConnector
+io.dataround.link.connector.TidbJdbcConnector

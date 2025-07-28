@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2025 yuehan124@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+ /**
+ * 
+ * @auth: tiandengji
+ * @date: 2025/5/15
+ **/
+.layout-header{
+    .ant-menu-item {
+        color: rgba(255, 255, 255, 0.7);
+    }    
+    .ant-menu-item-active {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    .ant-menu-item-selected {
+        color: rgba(255, 255, 255) !important;
+    }
+    // default rgba(255, 255, 255, 0.7)
+    .ant-menu-submenu-title {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    // selected > submenu-title: rgba(255, 255, 255)
+    .ant-menu-submenu-selected >.ant-menu-submenu-title {
+        color: rgba(255, 255, 255);
+    }
+    // hover
+    .ant-menu-submenu-title:hover:not(.ant-menu-item-selected):not(.ant-menu-submenu-selected) {
+        color: rgba(255, 255, 255, 0.8);
+    }
+}

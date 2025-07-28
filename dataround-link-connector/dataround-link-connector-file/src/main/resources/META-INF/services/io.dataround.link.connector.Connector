@@ -1,0 +1,3 @@
+io.dataround.link.connector.file.LocalFileConnector
+io.dataround.link.connector.file.FtpConnector
+io.dataround.link.connector.file.SftpConnector
