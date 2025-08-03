@@ -19,6 +19,7 @@ package io.dataround.link.utils;
 
 import io.dataround.link.common.connector.Param;
 import io.dataround.link.entity.Connection;
+import io.dataround.link.entity.Connector;
 
 /**
  * Param parser, parse the connection entity to Param.
@@ -28,7 +29,7 @@ import io.dataround.link.entity.Connection;
  */
 public class ParamParser {
 
-    public static Param from(Connection connection) {
+    public static Param from(Connection connection, Connector connector) {
         Param param = new Param();
         param.setName(connection.getConnector());
         param.setType(connection.getType());
@@ -37,6 +38,9 @@ public class ParamParser {
         param.setUser(connection.getUser());
         param.setPassword(connection.getPasswd());
         param.setConfig(connection.getConfig());
+        if (connector != null) {
+            param.setLibDir(connector.getLibDir());
+        }
         return param;
     }
 }

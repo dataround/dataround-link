@@ -76,7 +76,8 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
 
     @Override
     public boolean testConnection(Connection connection) {
-        Param param = ParamParser.from(connection);
+        Connector connector = connectorService.getConnector(connection.getConnector());
+        Param param = ParamParser.from(connection, connector);
         try {
             return ConnectorFactory.createConnector(param).testConnectivity();
         } catch (Throwable e) {
@@ -94,7 +95,7 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
         Connection connection = connectionMapper.selectById(connectionId);
         Connector connector = connectorService.getConnector(connection.getConnector());
         if (!connector.getVirtualTable()) {
-            Param param = ParamParser.from(connection);
+            Param param = ParamParser.from(connection, connector);
             // if classLoaderRestore() not execute, strange error msg: load class is error
             return ConnectorFactory.createTableConnector(param).getDatabases();
         }
@@ -109,7 +110,7 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
         Connection connection = connectionMapper.selectById(connectionId);
         Connector connector = connectorService.getConnector(connection.getConnector());
         if (!connector.getVirtualTable()) {
-            Param param = ParamParser.from(connection);
+            Param param = ParamParser.from(connection, connector);
             // if (size != null) {
             //     configMap.put("size", size.toString());
             // }
@@ -125,7 +126,7 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
         Connection connection = connectionMapper.selectById(connectionId);
         Connector connector = connectorService.getConnector(connection.getConnector());
         if (!connector.getVirtualTable()) {
-            Param param = ParamParser.from(connection);
+            Param param = ParamParser.from(connection, connector);
             return ConnectorFactory.createTableConnector(param).getTableFields(databaseName, tableName);
         }
         VirtualTable virtualTable = virtualTableMapper.getVirtualTable(connectionId, databaseName, tableName);

@@ -78,6 +78,7 @@ const S: FC<IProps> = () => {
     let host = values.host;
     let port = Number.parseInt(values.port);
     const database = values.database;
+    const svcType = values.svcType;
     const user = values.user;
     const passwd = values.passwd;
     const url = values.url;
@@ -95,7 +96,7 @@ const S: FC<IProps> = () => {
     const kerberosPrincipal = values.kerberosPrincipal;
     const kerberosKeytab = values.kerberosKeytab;
     const kerberosKrb5Conf = values.kerberosKrb5Conf;
-    const config = { database, url, broker, metastore_uri, hdfsSite, hiveSite, kerberosPrincipal, kerberosKeytab, kerberosKrb5Conf };
+    const config = { database, svcType, url, broker, metastore_uri, hdfsSite, hiveSite, kerberosPrincipal, kerberosKeytab, kerberosKrb5Conf };
     const type = connectionStore.getValues().type;
     const conn = { id, connector, name, description, host, port, user, passwd, config, type };
     return conn;

@@ -31,13 +31,14 @@ import io.dataround.link.common.connector.Param;
 import io.dataround.link.connector.ConnectorFactory;
 import io.dataround.link.connector.FileConnector;
 import io.dataround.link.entity.Connection;
+import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.JobInstance;
 import io.dataround.link.entity.enums.JobInstanceStatusEnum;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.service.ConnectionService;
+import io.dataround.link.service.ConnectorService;
 import io.dataround.link.service.FileSyncService;
 import io.dataround.link.service.JobInstanceService;
-import io.dataround.link.service.JobService;
 import io.dataround.link.utils.ParamParser;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,7 +55,7 @@ public class FileSyncServiceImpl implements FileSyncService {
     @Autowired
     private ConnectionService connectionService;
     @Autowired
-    private JobService jobService;
+    private ConnectorService connectorService;
     @Autowired
     private JobInstanceService jobInstanceService;
 
@@ -72,9 +73,11 @@ public class FileSyncServiceImpl implements FileSyncService {
         // Initialize the connector with properties
         Connection sourceConn = connectionService.getById(sourceConnId);
         Connection targetConn = connectionService.getById(targetConnId);
+        Connector sourceDbConnector = connectorService.getConnector(sourceConn.getConnector());
+        Connector targetDbConnector = connectorService.getConnector(targetConn.getConnector());
         // Find the connector with matching name
-        Param sourceParam = ParamParser.from(sourceConn);
-        Param targetParam = ParamParser.from(targetConn);
+        Param sourceParam = ParamParser.from(sourceConn, sourceDbConnector);
+        Param targetParam = ParamParser.from(targetConn, targetDbConnector);
         FileConnector sourceConnector = ConnectorFactory.createFileConnector(sourceParam);
         FileConnector targetConnector = ConnectorFactory.createFileConnector(targetParam);
         List<String> files = sourceConnector.getFiles(sourcePath, filePattern);

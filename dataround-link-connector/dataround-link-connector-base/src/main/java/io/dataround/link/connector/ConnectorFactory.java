@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ConnectorFactory
+ * 
  * @author yuehan124@gmail.com
  * @date 2025-06-09
  */
@@ -44,6 +45,7 @@ public class ConnectorFactory {
 
     /**
      * Create a connector instance based on the type of the connector
+     * 
      * @param param connector parameters
      * @return instance of the specified Connector type
      */
@@ -58,9 +60,10 @@ public class ConnectorFactory {
 
     /**
      * Generic method to create an instance of a specified Connector type
-     * @param param connector parameters
+     * 
+     * @param param          connector parameters
      * @param connectorClass expected Connector type
-     * @param <T> Connector subclass type
+     * @param <T>            Connector subclass type
      * @return instance of the specified Connector type
      */
     @SuppressWarnings("unchecked")
@@ -76,6 +79,7 @@ public class ConnectorFactory {
 
     /**
      * Create a table connector instance
+     * 
      * @param param connector properties
      * @return instance of the table connector
      */
@@ -83,42 +87,33 @@ public class ConnectorFactory {
         String name = param.getName();
         try {
             // get or create ClassLoader
-           URLClassLoader classLoader = classLoaderCache.computeIfAbsent(name, k -> {
-               try {
-                   String connectorPath = getConnectorPath(name, param.getLibDir());
-                   // Create custom classloader for this connector
-                   File connectorDir = new File(connectorPath);
-                   if (!connectorDir.exists() || !connectorDir.isDirectory()) {
-                       throw new IllegalArgumentException("Connector directory does not exist: " + connectorDir.getAbsolutePath());
-                   }
-                   URL[] urls = getJarUrls(connectorDir);
-                   if (urls.length == 0) {
-                       throw new IllegalStateException("No jar files found in connector directory: " + connectorDir.getAbsolutePath());
-                   }
-                   log.debug("Creating new ClassLoader for connector: {} with {} jar files", name, urls.length);
-                   return new TableConnectorClassLoader(urls, Thread.currentThread().getContextClassLoader());
-               } catch (Exception e) {
-                   log.error("Failed to create ClassLoader for connector: {}", name, e);
-                   throw new RuntimeException("Failed to create ClassLoader for connector: " + name, e);
-               }
-           });
-            
-            // Use ServiceLoader to find and instantiate the connector
-            ServiceLoader<TableConnector> serviceLoader = ServiceLoader.load(TableConnector.class, classLoader);
-            // Find the connector with matching name
-            TableConnector connector = null;
-            for (TableConnector c : serviceLoader) {
-                if (c.getName().equalsIgnoreCase(name)) {
-                    connector = c;
-                    break;
+            URLClassLoader classLoader = classLoaderCache.computeIfAbsent(name, k -> {
+                try {
+                    String connectorPath = getConnectorPath(name, param.getLibDir());
+                    // Create custom classloader for this connector
+                    File connectorDir = new File(connectorPath);
+                    if (!connectorDir.exists() || !connectorDir.isDirectory()) {
+                        throw new IllegalArgumentException(
+                                "Connector directory does not exist: " + connectorDir.getAbsolutePath());
+                    }
+                    URL[] urls = getJarUrls(connectorDir);
+                    if (urls.length == 0) {
+                        throw new IllegalStateException(
+                                "No jar files found in connector directory: " + connectorDir.getAbsolutePath());
+                    }
+                    log.debug("Creating new ClassLoader for connector: {} with {} jar files", name, urls.length);
+                    return new TableConnectorClassLoader(urls, Thread.currentThread().getContextClassLoader());
+                } catch (Exception e) {
+                    log.error("Failed to create ClassLoader for connector: {}", name, e);
+                    throw new RuntimeException("Failed to create ClassLoader for connector: " + name, e);
                 }
-            }
-            if (connector == null) {
-                throw new IllegalStateException("No connector found with name: " + name);
-            }            
+            });
+
+            Connector connector = getConnector(param, classLoader);
             // Initialize the connector with properties
-            connector.initialize(param);
-            return connector;
+            TableConnector tableConnector = (TableConnector) connector;
+            tableConnector.initialize(param);
+            return tableConnector;
         } catch (Exception e) {
             log.error("Failed to create connector: {}", name, e);
             throw new RuntimeException("Failed to create connector: " + name, e);
@@ -127,27 +122,28 @@ public class ConnectorFactory {
 
     /**
      * Create a file connector instance
+     * 
      * @param param connector properties
      * @return instance of the file connector
      */
     public static FileConnector createFileConnector(Param param) {
-        // Use ServiceLoader to find and instantiate the connector
-        ServiceLoader<Connector> serviceLoader = ServiceLoader.load(Connector.class);
-        // Find the connector with matching name
-        Connector connector = null;
-        for (Connector c : serviceLoader) {
-            if (c.getName().equalsIgnoreCase(param.getName())) {
-                connector = c;
-                break;
-            }
-        }
-        if (connector == null) {
-            throw new IllegalStateException("No connector found with name: " + param.getName());
-        }            
+        Connector connector = getConnector(param, null);
         // Initialize the connector with properties
         FileConnector fileConnector = (FileConnector) connector;
         fileConnector.initialize(param);
         return fileConnector;
+    }
+
+    private static Connector getConnector(Param param, URLClassLoader classLoader) {
+        // Use ServiceLoader to find and instantiate the connector
+        ServiceLoader<Connector> serviceLoader = ServiceLoader.load(Connector.class, classLoader);
+        // Find the connector with matching name
+        for (Connector c : serviceLoader) {
+            if (c.getName().equalsIgnoreCase(param.getName())) {
+                return c;
+            }
+        }
+        throw new IllegalStateException("No connector found with name: " + param.getName());
     }
 
     private static String getConnectorPath(String name, String libDir) {
@@ -182,7 +178,7 @@ public class ConnectorFactory {
                 log.error("Failed to convert jar file to URL: {}", jarFiles[i], e);
             }
         }
-        
+
         // Return only valid URLs
         if (validUrlCount != urls.length) {
             URL[] validUrls = new URL[validUrlCount];
@@ -192,5 +188,5 @@ public class ConnectorFactory {
         }
         return urls;
     }
- 
+
 }

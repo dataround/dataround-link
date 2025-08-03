@@ -75,7 +75,8 @@ public class JdbcConnector extends AbstractTableConnector {
         config.setPassword(password);
         // Set additional properties
         props.forEach((key, value) -> {
-            if (!key.equals("driver") && !key.equals("url") &&
+            // database property used for Oracle will cause "Caused by: oracle.net.ns.NetException: ORA-17868: Unknown host specified"
+            if (!key.equals("driver") && !key.equals("url") && !key.equals("database") &&
                 !key.equals("username") && !key.equals("password") && !key.equals("libDir")) {
                 config.addDataSourceProperty(key, value);
             }
