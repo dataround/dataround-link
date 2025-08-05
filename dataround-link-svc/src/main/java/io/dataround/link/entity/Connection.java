@@ -43,7 +43,6 @@ public class Connection {
     private Long id;
     private Long projectId;
     private String name;
-    private String type;
     private String connector;
     private String host;
     private Integer port;

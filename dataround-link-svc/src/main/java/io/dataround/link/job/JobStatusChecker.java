@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import io.dataround.link.entity.JobInstance;
 import io.dataround.link.entity.enums.JobInstanceStatusEnum;
 import io.dataround.link.service.JobInstanceService;
@@ -50,12 +52,12 @@ public class JobStatusChecker {
 
     private final ExecutorService executorService;
     private final ConcurrentHashMap<String, JobInstance> runningJobs;
-    
+
     public JobStatusChecker() {
         this.executorService = Executors.newFixedThreadPool(5);
         this.runningJobs = new ConcurrentHashMap<>();
     }
-    
+
     @PostConstruct
     public void init() {
         // Load all unfinished jobs from database on startup
@@ -67,9 +69,10 @@ public class JobStatusChecker {
         }
         log.info("Loaded {} unfinished jobs on startup", unfinishedJobs.size());
     }
-    
+
     /**
      * Add a job to be monitored
+     * 
      * @param jobInstance Job instance to monitor
      */
     public void addJobToMonitor(JobInstance jobInstance) {
@@ -77,52 +80,110 @@ public class JobStatusChecker {
             runningJobs.put(jobInstance.getSeatunnelId(), jobInstance);
         }
     }
-    
+
     /**
      * Scheduled task to check job statuses every 30 seconds
      */
     @Scheduled(fixedRate = checkIntervalSeconds)
     public void checkJobStatuses() {
-        runningJobs.forEach((jobEngineId, jobInstance) -> {
+        runningJobs.forEach((seatunnelId, jobInstance) -> {
             executorService.submit(() -> {
                 try {
-                    String status = seaTunnelRestClient.getJobStatus(jobEngineId);
-                    updateJobStatus(jobInstance, status);
+                    JsonNode jobDetail = seaTunnelRestClient.getJobDetail(seatunnelId);
+                    updateJobStatus(jobInstance, jobDetail);
                 } catch (Exception e) {
-                    log.error("Failed to check status for job {}", jobEngineId, e);
+                    log.error("Failed to check status for job {}", seatunnelId, e);
                 }
             });
         });
     }
-    
-    private void updateJobStatus(JobInstance jobInstance, String status) {
+
+    private void updateJobStatus(JobInstance jobInstance, JsonNode jobDetail) {
+        String status = jobDetail.get("jobStatus").asText();
+        JsonNode metrics = jobDetail.get("metrics");
+        boolean changed = false;
         try {
             switch (status.toUpperCase()) {
                 case "FINISHED":
+                    changed = jobInstance.getStatus() != JobInstanceStatusEnum.SUCCESS.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.SUCCESS.getCode());
                     runningJobs.remove(jobInstance.getSeatunnelId());
                     break;
                 case "FAILED":
+                    changed = jobInstance.getStatus() != JobInstanceStatusEnum.FAILURE.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.FAILURE.getCode());
                     runningJobs.remove(jobInstance.getSeatunnelId());
                     break;
                 case "CANCELED":
                 case "CANCELLING":
+                    changed = jobInstance.getStatus() != JobInstanceStatusEnum.CANCELLED.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.CANCELLED.getCode());
                     break;
                 default:
+                    changed = jobInstance.getStatus() != JobInstanceStatusEnum.RUNNING.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.RUNNING.getCode());
             }
             jobInstance.setUpdateTime(new Date());
-            // update job instance
-            jobInstanceService.updateById(jobInstance);
-            // If job is finished, update metrics
-            if (JobInstanceStatusEnum.RUNNING.getCode() != jobInstance.getStatus()) {
+            // If job is finished, update end time
+            if (JobInstanceStatusEnum.SUBMITTED.getCode() != jobInstance.getStatus()
+                    && JobInstanceStatusEnum.RUNNING.getCode() != jobInstance.getStatus()) {
                 jobInstance.setEndTime(new Date());
-                jobInstanceService.updateJobMetrics(jobInstance);
+                String logs = seaTunnelRestClient.getJobLogs(jobInstance.getSeatunnelId());
+                jobInstance.setLogContent(logs);
+            }
+            changed = changed || parseAndUpdateMetrics(jobInstance, metrics);
+            // update job instance only if properties changed, avoid unnecessary updates, especially for streaming jobs
+            if (changed) {
+                jobInstanceService.updateById(jobInstance);
             }
         } catch (Exception e) {
             log.error("Failed to update status for job {}", jobInstance.getSeatunnelId(), e);
         }
     }
-} 
+
+    private boolean parseAndUpdateMetrics(JobInstance jobInstance, JsonNode metricsJson) {
+        // aggregate metrics of all pipelines
+        long totalReadCount = 0;
+        long totalWriteCount = 0;
+        double totalReadQps = 0.0;
+        double totalWriteQps = 0.0;
+        long totalReadBytes = 0;
+        long totalWriteBytes = 0;
+        // process read count
+        if (metricsJson.get("SourceReceivedCount") != null) {
+            totalReadCount = metricsJson.get("SourceReceivedCount").asLong();
+        }
+        // process write count
+        if (metricsJson.get("SinkWriteCount") != null) {
+            totalWriteCount = metricsJson.get("SinkWriteCount").asLong();
+        }
+        // process read QPS
+        if (metricsJson.get("SourceReceivedQPS") != null) {
+            totalReadQps = metricsJson.get("SourceReceivedQPS").asDouble();
+        }
+        // process write QPS
+        if (metricsJson.get("SinkWriteQPS") != null) {
+            totalWriteQps = metricsJson.get("SinkWriteQPS").asDouble();
+        }
+        // process read bytes
+        if (metricsJson.get("SourceReceivedBytes") != null) {
+            totalReadBytes = metricsJson.get("SourceReceivedBytes").asLong();
+        }
+        // process write bytes
+        if (metricsJson.get("SinkWriteBytes") != null) {
+            totalWriteBytes = metricsJson.get("SinkWriteBytes").asLong();
+        }
+        // ignore qps and bytes, they are changed always
+        boolean changed = jobInstance.getReadCount() != totalReadCount || jobInstance.getWriteCount() != totalWriteCount
+                || jobInstance.getReadBytes() != totalReadBytes || jobInstance.getWriteBytes() != totalWriteBytes;
+        // update JobInstance metrics
+        jobInstance.setReadCount(totalReadCount);
+        jobInstance.setWriteCount(totalWriteCount);
+        jobInstance.setReadQps(totalReadQps);
+        jobInstance.setWriteQps(totalWriteQps);
+        jobInstance.setReadBytes(totalReadBytes);
+        jobInstance.setWriteBytes(totalWriteBytes);
+        return changed;
+    }
+
+}

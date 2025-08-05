@@ -39,9 +39,12 @@ public class OracleJdbcConnectorTest {
         param.setConfig(new HashMap<>());
         param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
         param.getConfig().put("url", "jdbc:oracle:thin:@//10.8.0.1:1521/XEPDB1");
-        OracleJdbcConnector connector = new OracleJdbcConnector();
-        connector.initialize(param);
-        List<String> databases = connector.getDatabases();
-        System.out.println(databases);
+        try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
+            connector.initialize(param);
+            List<String> databases = connector.getDatabases();
+            System.out.println(databases);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

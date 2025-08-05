@@ -37,6 +37,4 @@ public class Param {
     private String user;
     private String password;
     private Map<String, String> config;
-    // lib directory, used to load connector jar
-    private String libDir;
 }

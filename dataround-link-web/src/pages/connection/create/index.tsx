@@ -97,8 +97,7 @@ const S: FC<IProps> = () => {
     const kerberosKeytab = values.kerberosKeytab;
     const kerberosKrb5Conf = values.kerberosKrb5Conf;
     const config = { database, svcType, url, broker, metastore_uri, hdfsSite, hiveSite, kerberosPrincipal, kerberosKeytab, kerberosKrb5Conf };
-    const type = connectionStore.getValues().type;
-    const conn = { id, connector, name, description, host, port, user, passwd, config, type };
+    const conn = { id, connector, name, description, host, port, user, passwd, config };
     return conn;
   }
 
@@ -191,9 +190,6 @@ const S: FC<IProps> = () => {
         <>
           <Form.Item name="broker" label={t('connection.create.form.broker')} rules={[{ required: true }]}>
             <Input placeholder={t('connection.create.placeholder.broker')} />
-          </Form.Item>
-          <Form.Item name="config" label={t('connection.create.form.kafkaConfig')}>
-            <Input.TextArea placeholder={t('connection.create.placeholder.kafkaConfig')} />
           </Form.Item>
         </>
       );

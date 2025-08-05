@@ -42,7 +42,7 @@ interface IProps { }
 interface DataType {
   key: string;
   name: string;
-  type: string;
+  connector: string;
   host: string;
   port: number;
   user: string;
@@ -69,9 +69,9 @@ const S: FC<IProps> = () => {
       key: "name"
     },
     {
-      title: t('connection.table.type'),
-      dataIndex: "type",
-      key: "type",
+      title: t('connection.table.connector'),
+      dataIndex: "connector",
+      key: "connector",
     }
   ];
 
@@ -140,7 +140,6 @@ const S: FC<IProps> = () => {
   const columnsNonstructural: TableProps<DataType>["columns"] = [...columnJDBC];
 
   const formatData = (res: any) => {
-    console.log(res);
     const conns: DataType[] = [];
     Object.keys(res).forEach((i) => {
       conns.push({
@@ -151,7 +150,7 @@ const S: FC<IProps> = () => {
         user: res[i].user,
         passwd: res[i].passwd,
         config: res[i].config,
-        type: res[i].type,
+        connector: res[i].connector,
         description: res[i].description,
         createUser: res[i].createUser,
         createTime: res[i].createTime,
@@ -176,7 +175,8 @@ const S: FC<IProps> = () => {
 
   const reqConnection = useRequest(getConnectionById, {
     wrapperFun: (res: any) => {
-      connectionStore.setValues({ ...res, type: res.type || activeKey });
+      // edit connection
+      connectionStore.setValues({ ...res, type: res.type });
       navigate("/connection/create");
       return res;
     }
@@ -206,7 +206,6 @@ const S: FC<IProps> = () => {
   });
 
   const newConnection = () => {
-    connectionStore.setValues({ type: activeKey });
     navigate(`/connection/create`);
   };
 

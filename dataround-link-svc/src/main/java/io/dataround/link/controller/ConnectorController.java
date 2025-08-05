@@ -22,6 +22,8 @@ import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.service.ConnectorService;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,11 +53,13 @@ public class ConnectorController extends BaseController {
     @GetMapping("/")
     public Result<Map<String, List<String>>> listSource(String type, Boolean streamSource) {
         LambdaQueryWrapper<Connector> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq("source".equals(type) ? Connector::getSupportSource : Connector:: getSupportSink, true);
+        if (StringUtils.isNotBlank(type)) {
+            queryWrapper.eq("source".equals(type) ? Connector::getSupportSource : Connector:: getSupportSink, true);
+        }
         if (streamSource != null) {
             queryWrapper.eq(Connector::getIsStream, streamSource);
         }
-        queryWrapper.orderByAsc(Connector::getCreateTime);
+        queryWrapper.orderByAsc(Connector::getId);
         List<Connector> connectors = connectorService.list(queryWrapper);
         Map<String, List<String>> map = connectors.stream()
                 .collect(Collectors.groupingBy(

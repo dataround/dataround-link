@@ -368,7 +368,7 @@
     },
     "table": {
       "name": "Connection Name",
-      "type": "Connection Type",
+      "connector": "Connector",
       "host": "Host",
       "port": "Port",
       "username": "Username",

@@ -47,7 +47,6 @@ public class Connector {
     private Boolean supportSink;
     private Boolean isStream;
     private Boolean virtualTable;
-    private String libDir;
     @TableField(typeHandler = JsonbTypeHandler.class)
     private Map<String, String> properties;
     private Long createBy;

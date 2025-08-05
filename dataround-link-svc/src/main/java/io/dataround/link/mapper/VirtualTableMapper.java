@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.dataround.link.entity.VirtualTable;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -35,11 +36,11 @@ import java.util.List;
 public interface VirtualTableMapper extends BaseMapper<VirtualTable> {
 
     @Select("select distinct database from virtual_table where connection_id = #{connectionId}")
-    List<String> getDatabaseByConnectionId(Long connectionId);
+    List<String> getDatabaseByConnectionId(@Param("connectionId") Long connectionId);
 
     @Select("select distinct table_name from virtual_table where connection_id = #{connectionId} and database = #{databaseName}")
-    List<String> getTablesByConnectionIdAndDatabase(Long connectionId, String databaseName);
+    List<String> getTablesByConnectionIdAndDatabase(@Param("connectionId") Long connectionId, @Param("databaseName") String databaseName);
 
     @Select("select * from virtual_table where connection_id = #{connectionId} and database = #{databaseName} and table_name = #{tableName}")
-    VirtualTable getVirtualTable(Long connectionId, String databaseName, String tableName);
+    VirtualTable getVirtualTable(@Param("connectionId") Long connectionId, @Param("databaseName") String databaseName, @Param("tableName") String tableName);
 }

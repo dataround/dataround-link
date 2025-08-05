@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.dataround.link.entity.Job;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -35,5 +36,5 @@ import java.util.List;
 public interface JobMapper extends BaseMapper<Job> {
 
     @Select("select * from job where schedule_type = #{scheduleType} and (end_time is null or end_time > now())")
-    List<Job> listForScheduler(Integer scheduleType);
+    List<Job> listForScheduler(@Param("scheduleType") Integer scheduleType);
 }

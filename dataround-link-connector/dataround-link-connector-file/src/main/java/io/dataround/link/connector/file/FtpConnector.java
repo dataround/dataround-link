@@ -283,13 +283,4 @@ public class FtpConnector extends AbstractFileConnector {
         }
     }
 
-    /**
-     * Get current working directory
-     */
-    private String getCurrentDirectory() throws IOException {
-        if (!connected) {
-            connect();
-        }
-        return ftpClient.printWorkingDirectory();
-    }
 }

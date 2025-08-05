@@ -18,6 +18,7 @@
 package io.dataround.link.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -35,5 +36,5 @@ import io.dataround.link.entity.Connector;
 public interface ConnectorMapper extends BaseMapper<Connector> {
     
     @Select("SELECT * FROM connector WHERE name = #{name}")
-    Connector findByName(String name);
+    Connector findByName(@Param("name") String name);
 } 

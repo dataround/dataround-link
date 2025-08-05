@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.dataround.link.entity.JobInstance;
 import io.dataround.link.entity.req.JobInstanceReq;
-import lombok.NonNull;
 
 import java.util.List;
 
@@ -41,6 +40,4 @@ public interface JobInstanceService extends IService<JobInstance> {
     boolean cancel(Long instanceId);
 
     List<JobInstance> selectUnfinishedJobs();
-
-    void updateJobMetrics(@NonNull JobInstance jobInstance);
 }

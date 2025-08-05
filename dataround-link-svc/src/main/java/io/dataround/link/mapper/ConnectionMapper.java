@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.dataround.link.entity.Connection;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper interface for Connection entity.
@@ -33,5 +34,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface ConnectionMapper extends BaseMapper<Connection> {
 
     @Select("select true from connection where project_id=#{projectId} limit 1")
-    boolean checkProjectUsed(Long projectId);
+    boolean checkProjectUsed(@Param("projectId") Long projectId);
 }

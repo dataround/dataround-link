@@ -32,14 +32,13 @@ public class ParamParser {
     public static Param from(Connection connection, Connector connector) {
         Param param = new Param();
         param.setName(connection.getConnector());
-        param.setType(connection.getType());
         param.setHost(connection.getHost());
         param.setPort(connection.getPort());
         param.setUser(connection.getUser());
         param.setPassword(connection.getPasswd());
         param.setConfig(connection.getConfig());
         if (connector != null) {
-            param.setLibDir(connector.getLibDir());
+            param.setType(connector.getType());
         }
         return param;
     }

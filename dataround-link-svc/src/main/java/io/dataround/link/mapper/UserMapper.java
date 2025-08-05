@@ -22,6 +22,7 @@ import io.dataround.link.common.entity.res.UserResponse;
 import io.dataround.link.entity.User;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper interface for User entity.
@@ -39,5 +40,5 @@ public interface UserMapper extends BaseMapper<User> {
         left join project p on pu.project_id=p.id
         where pu.selected=true and u.name = #{name} and passwd = #{passwd}
         """)
-    UserResponse login(String name, String passwd);
+    UserResponse login(@Param("name") String name, @Param("passwd") String passwd);
 }

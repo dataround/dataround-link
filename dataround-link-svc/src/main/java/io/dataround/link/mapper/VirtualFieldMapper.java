@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.dataround.link.entity.VirtualField;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper interface for VirtualField entity.
@@ -33,5 +34,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface VirtualFieldMapper extends BaseMapper<VirtualField> {
 
     @Delete("delete from virtual_field where table_id = #{tableId}")
-    void removeByTableId(long tableId);
+    void removeByTableId(@Param("tableId") Long tableId);
 }

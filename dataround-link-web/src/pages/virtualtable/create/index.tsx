@@ -115,7 +115,7 @@ const S: FC<IProps> = () => {
   });
 
   useEffect(() => {
-    reqConnection.caller({ type: "nonstructural" });
+    reqConnection.caller({ connector: "Kafka" });
   }, []);
 
   const onCancel = () => {
@@ -191,8 +191,7 @@ const S: FC<IProps> = () => {
 
         {renderDaynamic()}
         <Divider orientation="left" orientationMargin={0}>{t('virtualTable.create.fieldInfo')}</Divider>
-        <Row gutter={20}>
-          <Col span={1}></Col>
+        <Row gutter={20}>          
           <Col span={4}>
             <span>{t('virtualTable.create.form.fieldName')}</span>
           </Col>

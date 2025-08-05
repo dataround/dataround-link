@@ -154,7 +154,6 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
         if (properties != null) {
             map.put("driver", properties.get("driver"));
         }
-        map.put("libDir", connector.getLibDir());
         map.put("type", connector.getType());
         map.put("host", connection.getHost());
         if (connection.getPort() != null) {

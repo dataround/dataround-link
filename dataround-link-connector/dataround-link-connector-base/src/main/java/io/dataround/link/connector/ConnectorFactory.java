@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConnectorFactory {
 
     private static final String HOME_DIR_PROPERTY = "dataround.link.homeDir";
+    private static final String HOME_DIR_DEFAULT_PATH = "/opt/dataround.io/dataround-link";
     private static final String CONNECTOR_LIB_DIR = "lib/connector";
     // cache ClassLoader, key is connectorPath
     private static final Map<String, URLClassLoader> classLoaderCache = new ConcurrentHashMap<>();
@@ -89,20 +90,19 @@ public class ConnectorFactory {
             // get or create ClassLoader
             URLClassLoader classLoader = classLoaderCache.computeIfAbsent(name, k -> {
                 try {
-                    String connectorPath = getConnectorPath(name, param.getLibDir());
+                    String connectorPath = getConnectorPath(name);
                     // Create custom classloader for this connector
                     File connectorDir = new File(connectorPath);
-                    if (!connectorDir.exists() || !connectorDir.isDirectory()) {
-                        throw new IllegalArgumentException(
-                                "Connector directory does not exist: " + connectorDir.getAbsolutePath());
+                    URL[] parentUrls = getJarUrls(connectorDir.getParentFile());
+                    URL[] subUrls = getJarUrls(connectorDir);
+                    URL[] allUrls = new URL[parentUrls.length + subUrls.length];
+                    System.arraycopy(parentUrls, 0, allUrls, 0, parentUrls.length);
+                    System.arraycopy(subUrls, 0, allUrls, parentUrls.length, subUrls.length);
+                    if (allUrls.length == 0) {
+                        throw new IllegalStateException("No jar files found in connector directory: " + connectorDir.getAbsolutePath());
                     }
-                    URL[] urls = getJarUrls(connectorDir);
-                    if (urls.length == 0) {
-                        throw new IllegalStateException(
-                                "No jar files found in connector directory: " + connectorDir.getAbsolutePath());
-                    }
-                    log.debug("Creating new ClassLoader for connector: {} with {} jar files", name, urls.length);
-                    return new TableConnectorClassLoader(urls, Thread.currentThread().getContextClassLoader());
+                    log.debug("Creating new ClassLoader for connector: {} with {} jar files", name, allUrls.length);
+                    return new TableConnectorClassLoader(allUrls, Thread.currentThread().getContextClassLoader());
                 } catch (Exception e) {
                     log.error("Failed to create ClassLoader for connector: {}", name, e);
                     throw new RuntimeException("Failed to create ClassLoader for connector: " + name, e);
@@ -146,19 +146,19 @@ public class ConnectorFactory {
         throw new IllegalStateException("No connector found with name: " + param.getName());
     }
 
-    private static String getConnectorPath(String name, String libDir) {
+    private static String getConnectorPath(String name) {
         String homeDir = System.getProperty(HOME_DIR_PROPERTY);
         if (homeDir == null || homeDir.trim().isEmpty()) {
-            log.warn("System property '" + HOME_DIR_PROPERTY + "' is not set");
+            log.warn("System property '" + HOME_DIR_PROPERTY + "' is not set, use default path: " + HOME_DIR_DEFAULT_PATH);
+            homeDir = HOME_DIR_DEFAULT_PATH;
         }
-        File file = new File(libDir);
-        if (!file.exists()) {
-            StringBuilder pathBuilder = new StringBuilder(homeDir);
-            pathBuilder.append(File.separator).append(CONNECTOR_LIB_DIR).append(File.separator);
-            pathBuilder.append(libDir == null ? name : libDir);
-            libDir = pathBuilder.toString();
+        StringBuilder pathBuilder = new StringBuilder(homeDir);
+        pathBuilder.append(File.separator).append(CONNECTOR_LIB_DIR).append(File.separator).append(name);
+        File connectorDir = new File(pathBuilder.toString());
+        if (!connectorDir.exists()) {
+            connectorDir.mkdirs();
         }
-        return libDir;
+        return connectorDir.getAbsolutePath();
     }
 
     private static URL[] getJarUrls(File directory) {

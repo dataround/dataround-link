@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,10 +87,22 @@ public class ConnectionController extends BaseController {
     @GetMapping("/list")
     public PageResult<List<ConnectionRes>> list(@Parameter(hidden = true) Page<Connection> page, String connector, Integer type) {
         LambdaQueryWrapper<Connection> wrapper = new LambdaQueryWrapper<>();
-        if (type != null && type == 1) {
-            wrapper.eq(Connection::getType, Constants.CONNECTION_TYPE_DATABASE);
-        } else {
-            wrapper.ne(Connection::getType, Constants.CONNECTION_TYPE_DATABASE);
+        if (type != null) {
+            LambdaQueryWrapper<Connector> subQueryWrapper = new LambdaQueryWrapper<>();
+            if (type == 1) {
+                subQueryWrapper.eq(Connector::getType, Constants.CONNECTION_TYPE_DATABASE);
+            } else {
+                subQueryWrapper.ne(Connector::getType, Constants.CONNECTION_TYPE_DATABASE);
+            }
+            List<Connector> connectors = connectorService.list(subQueryWrapper);
+            // extract connector name list
+            List<String> connectorNames = connectors.stream().map(Connector::getName).collect(Collectors.toList());
+            // if no connector match, return empty result
+            if (connectorNames.isEmpty()) {
+                return PageResult.success(0L, new ArrayList<>());
+            }
+            // filter connection by connector name
+            wrapper.in(Connection::getConnector, connectorNames);
         }
         if (connector != null) {
             wrapper.eq(Connection::getConnector, connector);

@@ -106,38 +106,22 @@ public class SeaTunnelRestClient {
     }
 
     /**
-     * Get job status from SeaTunnel engine
+     * Get job detail from SeaTunnel engine
      *
      * @param jobId Job ID
-     * @return Job status
+     * @return Job detail
      */
-    public String getJobStatus(String jobId) {
+    public JsonNode getJobDetail(String jobId) {
         try {
             String response = restTemplate.getForObject(baseUrl + "/job-info/" + jobId, String.class);
             JsonNode responseJson = objectMapper.readTree(response);
-            return responseJson.get("jobStatus").asText();
+            return responseJson;
         } catch (Exception e) {
-            log.error("Failed to get job status for job {}", jobId, e);
-            throw new RuntimeException("Failed to get job status", e);
+            log.error("Failed to get job detail for job {}", jobId, e);
+            throw new RuntimeException("Failed to get job detail", e);
         }
     }
 
-    /**
-     * Get job metrics from SeaTunnel engine
-     *
-     * @param jobId Job ID
-     * @return Job metrics as JSON string
-     */
-    public JsonNode getJobMetrics(String jobId) {
-        try {
-            String response = restTemplate.getForObject(baseUrl + "/job-info/" + jobId, String.class);
-            JsonNode responseJson = objectMapper.readTree(response);
-            return responseJson.get("metrics");
-        } catch (Exception e) {
-            log.error("Failed to get metrics for job {}", jobId, e);
-            throw new RuntimeException("Failed to get job metrics", e);
-        }
-    }
 
     /**
      * Stop a running job

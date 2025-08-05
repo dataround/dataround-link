@@ -107,13 +107,16 @@ public class VirtualTableController extends BaseController {
             virtualTable.setCreateBy(currentUser.getUserId());
         }
         virtualTable.setUpdateTime(now);
+        virtualTable.setUpdateBy(currentUser.getUserId());
         for (VirtualField field : virtualTable.getFields()) {
             // save new vtable or update vtable with new field
             if (virtualTable.getId() == null || field.getId() == null) {
                 field.setCreateTime(now);
-            }
+                field.setCreateBy(currentUser.getUserId());
+            } 
             field.setTableId(virtualTable.getId());
             field.setUpdateTime(now);
+            field.setUpdateBy(currentUser.getUserId());
         }
         // save or update
         boolean bool = virtualTableService.saveOrUpdate(virtualTable);

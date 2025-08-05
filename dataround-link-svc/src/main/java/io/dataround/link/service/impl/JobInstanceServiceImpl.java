@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.JobInstance;
@@ -43,7 +42,6 @@ import io.dataround.link.service.FileSyncService;
 import io.dataround.link.service.JobConfigService;
 import io.dataround.link.service.JobInstanceService;
 import io.dataround.link.utils.SeaTunnelRestClient;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -116,63 +114,7 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
         queryWrapper.in(JobInstance::getStatus, JobInstanceStatusEnum.SUBMITTED.getCode(), JobInstanceStatusEnum.RUNNING.getCode());
         return this.list(queryWrapper);
     }
-
-    @Override
-    public void updateJobMetrics(@NonNull JobInstance jobInstance) {
-        String jobEngineId = jobInstance.getSeatunnelId();
-        JsonNode metricsJson = seaTunnelRestClient.getJobMetrics(jobEngineId);
-        parseAndUpdateMetrics(jobInstance, metricsJson);
-        // update JobInstance to database
-        Date now = new Date();
-        jobInstance.setUpdateTime(now);
-        this.updateById(jobInstance);
-    }
-
-    private void parseAndUpdateMetrics(JobInstance jobInstance, JsonNode metricsJson) {
-        try {
-            // aggregate metrics of all pipelines
-            long totalReadCount = 0;
-            long totalWriteCount = 0;
-            double totalReadQps = 0.0;
-            double totalWriteQps = 0.0;
-            long totalReadBytes = 0;
-            long totalWriteBytes = 0;
-            // process read count
-            if (metricsJson.get("SourceReceivedCount") != null) {
-                totalReadCount = metricsJson.get("SourceReceivedCount").asLong();
-            }
-            // process write count
-            if (metricsJson.get("SinkWriteCount") != null) {
-                totalWriteCount = metricsJson.get("SinkWriteCount").asLong();
-            }
-            // process read QPS
-            if (metricsJson.get("SourceReceivedQPS") != null) {
-                totalReadQps = metricsJson.get("SourceReceivedQPS").asDouble();
-            }
-            // process write QPS
-            if (metricsJson.get("SinkWriteQPS") != null) {
-                totalWriteQps = metricsJson.get("SinkWriteQPS").asDouble();
-            }
-            // process read bytes
-            if (metricsJson.get("SourceReceivedBytes") != null) {
-                totalReadBytes = metricsJson.get("SourceReceivedBytes").asLong();
-            }
-            // process write bytes
-            if (metricsJson.get("SinkWriteBytes") != null) {
-                totalWriteBytes = metricsJson.get("SinkWriteBytes").asLong();
-            }
-            // update JobInstance metrics
-            jobInstance.setReadCount(totalReadCount);
-            jobInstance.setWriteCount(totalWriteCount);
-            jobInstance.setReadQps(totalReadQps);
-            jobInstance.setWriteQps(totalWriteQps);
-            jobInstance.setReadBytes(totalReadBytes);
-            jobInstance.setWriteBytes(totalWriteBytes);
-        } catch (Exception e) {
-            log.error("Error parsing metrics JSON for job instance {}", jobInstance.getId(), e);
-        }
-    }
-
+    
     public void executeBySeaTunnel(String configContent, Long instanceId) {
         try {
             // Submit job using REST API

@@ -3,7 +3,6 @@ CREATE TABLE public.connection (
     id int8 NOT NULL PRIMARY KEY,
     project_id int8 NOT NULL,
     "name" varchar NOT NULL,
-    type varchar NOT NULL,
     connector varchar NOT NULL,
     host varchar NULL,
     port int4 NULL,
@@ -92,7 +91,6 @@ CREATE TABLE connector (
     support_sink BOOLEAN NOT NULL DEFAULT FALSE,
     is_stream BOOLEAN NOT NULL DEFAULT FALSE,
     virtual_table BOOLEAN NOT NULL DEFAULT FALSE,
-    lib_dir VARCHAR(100) NOT NULL,
     properties JSONB NOT NULL,
     create_by int8 NOT NULL,
     update_by int8 NOT NULL,
@@ -101,19 +99,19 @@ CREATE TABLE connector (
 );
 
 -- Insert database connectors
-INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, lib_dir, properties, create_by, update_by) VALUES
-(1, 'MySQL', 'Database', 'JDBC-MYSQL', true, true, false, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-jdbc/target', '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 1000, 1000),
-(2, 'PostgreSQL', 'Database', 'JDBC-POSTGRES', true, true, false, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-jdbc/target', '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 1000, 1000),
-(3, 'Oracle', 'Database', 'JDBC-ORACLE', true, true, false, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-jdbc/target', '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 1000, 1000),
-(4, 'SQLServer', 'Database', 'JDBC-SQLSERVER', true, true, false, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-jdbc/target', '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 1000, 1000),
-(5, 'Tidb', 'Database', 'JDBC-TIDB', true, true, false, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-jdbc/target', '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 1000, 1000),
-(6, 'Hive', 'Database', 'Hive', true, true, false, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-hive/target', '{}', 1000, 1000);
+INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by) VALUES
+(1, 'MySQL', 'Database', 'JDBC-MYSQL', true, true, false, false, '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 1000, 1000),
+(2, 'PostgreSQL', 'Database', 'JDBC-POSTGRES', true, true, false, false, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 1000, 1000),
+(3, 'Oracle', 'Database', 'JDBC-ORACLE', true, true, false, false, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 1000, 1000),
+(4, 'SQLServer', 'Database', 'JDBC-SQLSERVER', true, true, false, false, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 1000, 1000),
+(5, 'Tidb', 'Database', 'JDBC-TIDB', true, true, false, false, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 1000, 1000),
+(6, 'Hive', 'Database', 'Hive', true, true, false, false, '{}', 1000, 1000);
 
 -- Insert CDC connectors
-INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, lib_dir, properties, create_by, update_by) VALUES
-(7, 'MySQL-CDC', 'Database', 'MYSQL-CDC', true, false, true, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-cdc/target', '{"driver":"com.mysql.jdbc.Driver","url":"jdbc:mysql://mysql:3306"}', 1000, 1000),
-(8, 'SQLServer-CDC', 'Database', 'SQLServer-CDC', true, false, true, false, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-cdc/target', '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","url":"jdbc:sqlserver://sqlserver:1433"}', 1000, 1000);
+INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by) VALUES
+(7, 'MySQL-CDC', 'Database', 'MYSQL-CDC', true, false, true, false, '{"driver":"com.mysql.jdbc.Driver","url":"jdbc:mysql://mysql:3306"}', 1000, 1000),
+(8, 'SQLServer-CDC', 'Database', 'SQLServer-CDC', true, false, true, false, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","url":"jdbc:sqlserver://sqlserver:1433"}', 1000, 1000);
 
 -- Insert nonstructural connectors
-INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, lib_dir, properties, create_by, update_by) VALUES
-(9, 'Kafka', 'MQ', 'KAFKA', true, true, true, true, 'D:/github/dataround-link/dataround-link-connector/dataround-link-connector-kafka/target', '{"bootstrap.servers":"localhost:9092","topics":"topic1"}', 1000, 1000); 
+INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by) VALUES
+(9, 'Kafka', 'MQ', 'KAFKA', true, true, true, true, '{"bootstrap.servers":"localhost:9092","topics":"topic1"}', 1000, 1000); 

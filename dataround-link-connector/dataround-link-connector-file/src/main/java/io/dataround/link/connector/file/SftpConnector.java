@@ -244,14 +244,4 @@ public class SftpConnector extends AbstractFileConnector {
         }
     }
 
-    private String getCurrentDirectory() throws SftpException {
-        if (!connected) {
-            try {
-                connect();
-            } catch (JSchException e) {
-                throw new SftpException(0, "Failed to connect to SFTP server", e);
-            }
-        }
-        return sftpChannel.pwd();
-    }
 }
