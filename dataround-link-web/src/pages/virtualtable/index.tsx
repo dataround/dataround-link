@@ -109,7 +109,9 @@ const S: FC<IProps> = () => {
       title: t('virtualTable.table.fields'),
       dataIndex: "fields",
       key: "fields",
-      render: (text) => <><Popover content={text}>
+      render: (text) => <><Popover content={
+        Array.isArray(text) ? text.map(item => `${item.name}(${item.type})`).join(', ') : JSON.stringify(text)
+      }>
         <Button type="link"><InfoCircleOutlined /></Button>
       </Popover></>,
     },

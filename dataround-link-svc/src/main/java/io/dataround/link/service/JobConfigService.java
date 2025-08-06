@@ -31,7 +31,7 @@ import io.dataround.link.entity.res.JobRes;
  */
 public interface JobConfigService {
 
-    String getJobJson(JobRes jobVo);
+    String getJobJson(JobRes jobVo, Long instanceId);
 
     JobRes getJobVo(Job job);
 

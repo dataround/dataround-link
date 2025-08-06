@@ -66,7 +66,7 @@ public class JobConfigSerivceTest {
         obj.put("targetTable", "table2");
         array.add(obj);
         //request.setTableMapping(array);
-        String config = jobConfigService.getJobJson(request);
+        String config = jobConfigService.getJobJson(request, 1L);
         System.out.println(config);
     }
 }

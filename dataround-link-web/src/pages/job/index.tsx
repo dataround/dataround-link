@@ -179,8 +179,8 @@ const S: FC<IProps> = () => {
   });
 
   useEffect(() => {
-    reqSourceConnector.caller({ type: "source", "streamSource": jobType == JOB_TYPE_STREAM });
-    reqTargetConnector.caller({ type: "sink" });
+    reqSourceConnector.caller({ supportSource: true, isStream: jobType == JOB_TYPE_STREAM, fileType: jobType == JOB_TYPE_FILESYNC });
+    reqTargetConnector.caller({ supportSink: true, fileType: jobType == JOB_TYPE_FILESYNC });
   }, []);
 
   useEffect(() => {

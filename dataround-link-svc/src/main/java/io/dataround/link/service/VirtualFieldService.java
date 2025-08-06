@@ -17,6 +17,9 @@
 
 package io.dataround.link.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.dataround.link.entity.VirtualField;
 
@@ -30,4 +33,6 @@ import io.dataround.link.entity.VirtualField;
 public interface VirtualFieldService extends IService<VirtualField> {
 
     void removeByTableId(Long tableId);
+
+    Map<Long, List<VirtualField>> listByTableIds(List<Long> tableIds);
 }

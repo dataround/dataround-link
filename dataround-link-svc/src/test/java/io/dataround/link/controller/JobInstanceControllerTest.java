@@ -79,7 +79,6 @@ public class JobInstanceControllerTest extends BaseControllerTest {
         JobInstance instance = new JobInstance();
         instance.setId(1L);
         instance.setJobId(1L);
-        instance.setJobConfig("{\"jobName\":\"test\"}");
         instance.setSeatunnelId("seatunnel");
         Date now = new Date();
         instance.setEndTime(now);

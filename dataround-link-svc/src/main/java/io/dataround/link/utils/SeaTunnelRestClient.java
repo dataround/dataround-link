@@ -48,23 +48,22 @@ public class SeaTunnelRestClient {
     /**
      * Submit a job to SeaTunnel engine
      *
-     * @param configContent Job configuration content
+     * @param jobConfig Job configuration content
      * @return Job ID
      */
-    public String submitJob(String configContent) {
+    public String submitJob(String jobConfig) {
         try {
             // Get job name from config
-            JsonNode configJson = objectMapper.readTree(configContent);
+            JsonNode configJson = objectMapper.readTree(jobConfig);
             String jobName = configJson.get("env").get("job.name").asText();
-            // TODO unchek temporary
-            /*if (checkJobExistOrNot(jobName)) {
+            if (checkJobExistOrNot(jobName)) {
                 log.error("jobName: {} already exists, please check", jobName);
                 throw new RuntimeException("jobName: " + jobName + " already exists, please check");
-            }*/
+            }
             // Submit job
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> request = new HttpEntity<>(configContent, headers);
+            HttpEntity<String> request = new HttpEntity<>(jobConfig, headers);
             String response = restTemplate.postForObject(baseUrl + "/submit-job", request, String.class);
             JsonNode responseJson = objectMapper.readTree(response);
             return responseJson.get("jobId").asText();

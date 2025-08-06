@@ -21,9 +21,9 @@ import io.dataround.link.common.Result;
 import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.service.ConnectorService;
+import io.dataround.link.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,22 +51,31 @@ public class ConnectorController extends BaseController {
     private ConnectorService connectorService;
 
     @GetMapping("/")
-    public Result<Map<String, List<String>>> listSource(String type, Boolean streamSource) {
+    public Result<Map<String, List<String>>> listConnector(Boolean supportSource, Boolean supportSink, Boolean isStream,
+            Boolean fileType) {
         LambdaQueryWrapper<Connector> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(type)) {
-            queryWrapper.eq("source".equals(type) ? Connector::getSupportSource : Connector:: getSupportSink, true);
+        if (supportSource != null) {
+            queryWrapper.eq(Connector::getSupportSource, supportSource);
         }
-        if (streamSource != null) {
-            queryWrapper.eq(Connector::getIsStream, streamSource);
+        if (supportSink != null) {
+            queryWrapper.eq(Connector::getSupportSink, supportSink);
+        }
+        if (isStream != null) {
+            queryWrapper.eq(Connector::getIsStream, isStream);
+        }
+        if (fileType != null) {
+            if (fileType) {
+                queryWrapper.eq(Connector::getType, Constants.CONNECTOR_TYPE_FILE);
+            } else {
+                queryWrapper.ne(Connector::getType, Constants.CONNECTOR_TYPE_FILE);
+            }
         }
         queryWrapper.orderByAsc(Connector::getId);
         List<Connector> connectors = connectorService.list(queryWrapper);
-        Map<String, List<String>> map = connectors.stream()
-                .collect(Collectors.groupingBy(
-                        Connector::getType,
-                        Collectors.mapping(Connector::getName, Collectors.toList())));
+        Map<String, List<String>> map = connectors.stream().collect(
+                Collectors.groupingBy(Connector::getType, Collectors.mapping(Connector::getName, Collectors.toList())));
         TreeMap<String, List<String>> treeMap = new TreeMap<>(map);
-        // return 
+        // return
         return Result.success(treeMap);
     }
 }

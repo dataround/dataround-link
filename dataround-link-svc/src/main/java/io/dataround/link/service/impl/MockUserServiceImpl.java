@@ -59,6 +59,7 @@ public class MockUserServiceImpl extends ServiceImpl<UserMapper, User> implement
             User mockUser = new User();
             mockUser.setId((Long)id);
             mockUser.setName("admin");
+            users.add(mockUser);
         }
         return users;
     }

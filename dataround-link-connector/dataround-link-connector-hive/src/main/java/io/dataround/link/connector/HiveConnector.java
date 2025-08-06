@@ -18,32 +18,33 @@
 package io.dataround.link.connector;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Hive connector implementation
+ * 
  * @author yuehan124@gmail.com
  * @since 2025-06-09
  */
 @Slf4j
-public class HiveConnector extends AbstractTableConnector {
+public class HiveConnector extends JdbcConnector {
 
     private final String name = "Hive";
-    private Connection connection;
-    private String driverClassName;
-    private String host;
-    private Integer port;
-    private String username;
-    private String password;
-    private String url;
+    
+    // Hive system databases that should be filtered out
+    private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(
+        "information_schema",
+        "sys"
+    ));
 
     @Override
     public String getName() {
@@ -53,91 +54,53 @@ public class HiveConnector extends AbstractTableConnector {
     @Override
     public void doInitialize() throws Exception {
         Map<String, String> props = getParam().getConfig();
-        host = getParam().getHost();
-        port = getParam().getPort();
-        username = getParam().getUser();
-        password = getParam().getPassword();
-        // Validate required properties
-        if (!props.containsKey("url")) {
-            url = "jdbc:hive2://" + host + ":" + port + "/default";
-        } else {
-            url = props.get("url");
-        }
-        driverClassName = props.getOrDefault("driver", "org.apache.hive.jdbc.HiveDriver");
-        // Load Hive JDBC driver
-        Class.forName(driverClassName);
-        // Initialize connection
-        connection = DriverManager.getConnection(url, username, password);
-        log.info("Successfully connected to Hive: {}", url);
+        int timeout = Integer.parseInt(props.getOrDefault("timeout", "30"));
+        DriverManager.setLoginTimeout(timeout);
+        // Call parent initialization to setup connection pool
+        super.doInitialize();
+        log.info("Successfully initialized Hive connector: {}", props.get("url"));
     }
 
     @Override
     public List<String> doGetDatabases() {
-        List<String> databases = new ArrayList<>();
-        try {
-            DatabaseMetaData metaData = connection.getMetaData();
-            try (ResultSet rs = metaData.getCatalogs()) {
-                while (rs.next()) {
-                    databases.add(rs.getString(1));
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Failed to get Hive databases", e);
-            throw new RuntimeException("Failed to get Hive databases", e);
-        }
-        return databases;
+        // Call parent method to get all databases, then filter out system databases
+        return super.doGetDatabases().stream()
+                .filter(db -> !SYSTEM_DATABASES.contains(db.toLowerCase()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<String> doGetTables(String database) {
-        List<String> tables = new ArrayList<>();
-        try {
-            DatabaseMetaData metaData = connection.getMetaData();
-            try (ResultSet rs = metaData.getTables(database, null, "%", new String[]{"TABLE", "VIEW"})) {
-                while (rs.next()) {
-                    tables.add(rs.getString("TABLE_NAME"));
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Failed to get Hive tables and views", e);
-            throw new RuntimeException("Failed to get Hive tables and views", e);
-        }
-        return tables;
+        // For Hive: catalog = null, schema = database name
+        return getTablesWithParams(null, database, "%", new String[]{"TABLE", "VIEW"});
     }
 
     @Override
-    public List<String> doGetTables(String database, String schema) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'doGetTables'");
+    public List<String> doGetTables(String database, String tableNamePattern) {
+        // For Hive: catalog = null, schema = database name, with table name pattern
+        return getTablesWithParams(null, database, tableNamePattern, new String[]{"TABLE", "VIEW"});
     }
-
 
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'doGetTableFields'");
+        // For Hive: catalog = null, schema = database name
+        return getTableFieldsWithParams(null, database, table, "%");
     }
 
     @Override
-    public List<TableField> doGetTableFields(String database, String table, String schema) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'doGetTableFields'");
+    public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
+        // For Hive: catalog = null, schema = database name, with column name pattern
+        return getTableFieldsWithParams(null, database, table, columnNamePattern);
     }
     
     @Override
     public boolean doTestConnectivity() {
-        try {
-            return connection != null && !connection.isClosed() && connection.isValid(5);
+        try (Connection conn = dataSource.getConnection()) {
+            // Test with a longer timeout for Hive as it might be slower
+            return conn.isValid(10);
         } catch (SQLException e) {
             log.error("Failed to test Hive connectivity", e);
             return false;
-        }
-    }
-
-    @Override
-    public void close() throws Exception {
-        if (connection != null) {
-            connection.close();
         }
     }
 } 

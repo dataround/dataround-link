@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.dataround.link.common.PageResult;
@@ -47,6 +47,7 @@ import io.dataround.link.entity.req.VirtualTableReq;
 import io.dataround.link.entity.res.VirtualTableRes;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.UserService;
+import io.dataround.link.service.VirtualFieldService;
 import io.dataround.link.service.VirtualTableService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +66,8 @@ public class VirtualTableController extends BaseController {
     @Autowired
     private VirtualTableService virtualTableService;
     @Autowired
+    private VirtualFieldService virtualFieldService;
+    @Autowired
     private UserService userService;
     @Autowired
     private ConnectionService connectionService;
@@ -76,10 +79,11 @@ public class VirtualTableController extends BaseController {
     }
 
     @GetMapping("/list")
-    public PageResult<List<VirtualTable>> list(@Parameter(hidden = true) Page<VirtualTable> page) {
-        QueryWrapper<VirtualTable> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("id");
-        wrapper.eq("project_id", getCurrentProjectId());
+    public PageResult<List<VirtualTableRes>> list(@Parameter(hidden = true) Page<VirtualTable> page) {
+        LambdaQueryWrapper<VirtualTable> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(VirtualTable::getProjectId, getCurrentProjectId());
+        wrapper.eq(VirtualTable::getDeleted, false);
+        wrapper.orderByDesc(VirtualTable::getId);
         Page<VirtualTable> virtualTables = virtualTableService.page(page, wrapper);
         Page<VirtualTableRes> virtualTableResPage = convert(virtualTables);
         // fill createUser
@@ -88,11 +92,16 @@ public class VirtualTableController extends BaseController {
         // fill connector
         Set<Long> connIds = virtualTables.getRecords().stream().map(VirtualTable::getConnectionId).collect(Collectors.toSet());
         Map<Long, String> connectionNameMap = connectionService.listNameByIds(connIds);
+        // fill fields
+        List<Long> tableIds = virtualTables.getRecords().stream().map(VirtualTable::getId).collect(Collectors.toList());
+        Map<Long, List<VirtualField>> fieldMap = virtualFieldService.listByTableIds(tableIds);
+        // do fill createUser, connectionName, fields
         for (VirtualTableRes virtualTable : virtualTableResPage.getRecords()) {
             virtualTable.setCreateUser(userNameMap.get(virtualTable.getCreateBy()));
             virtualTable.setConnectionName(connectionNameMap.get(virtualTable.getConnectionId()));
+            virtualTable.setFields(fieldMap.get(virtualTable.getId()));
         }
-        return PageResult.success(virtualTables.getTotal(), virtualTables.getRecords());
+        return PageResult.success(virtualTableResPage.getTotal(), virtualTableResPage.getRecords());
     }
 
     @PostMapping("/saveOrUpdate")
@@ -126,13 +135,14 @@ public class VirtualTableController extends BaseController {
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         Assert.notNull(id, "virtual table id should not be null");
-        // TODO
-        // check job used or not
-        log.info("delete virtual table id:{}", id);
-        boolean bool = virtualTableService.removeById(id);
+        VirtualTable virtualTable = virtualTableService.getById(id);
+        log.info("logical delete virtual table id:{}", id);
+        virtualTable.setDeleted(true);
+        virtualTable.setUpdateTime(new Date());
+        virtualTable.setUpdateBy(getCurrentUser().getUserId());
+        boolean bool = virtualTableService.updateById(virtualTable);
         return Result.success(bool);
     }
-
 
     /**
      * Convert VirtualTable page to VirtualTableRes page.
@@ -145,7 +155,7 @@ public class VirtualTableController extends BaseController {
         page.setTotal(virtualTables.getTotal());
         page.setRecords(virtualTables.getRecords().stream().map(vt -> {
             VirtualTableRes res = new VirtualTableRes();
-            BeanUtils.copyProperties(virtualTables, page);
+            BeanUtils.copyProperties(vt, res);
             return res;
         }).collect(Collectors.toList()));
         return page;

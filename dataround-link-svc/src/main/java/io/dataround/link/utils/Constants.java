@@ -37,4 +37,6 @@ public class Constants {
 
     public static String CONNECTION_TYPE_DATABASE = "Database";
     public static String CONNECTION_TYPE_FILE = "File";
+
+    public static String CONNECTOR_TYPE_FILE = "File";
 }

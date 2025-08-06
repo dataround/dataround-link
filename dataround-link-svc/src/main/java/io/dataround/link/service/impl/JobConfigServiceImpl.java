@@ -64,13 +64,13 @@ public class JobConfigServiceImpl implements JobConfigService {
     private VirtualTableService virtualTableService;
 
     @Override
-    public String getJobJson(JobRes jobVo) {
+    public String getJobJson(JobRes jobVo, Long instanceId) {
         JSONObject jsonConfig = new JSONObject();        
         // Add env section
         JSONObject env = new JSONObject();
         String jobMode = JobTypeEnum.getByCode(jobVo.getJobType()).getDescription();
         env.put("job.mode", jobMode);
-        env.put("job.name", jobVo.getId() + "_" + jobVo.getName());
+        env.put("job.name", instanceId + "_" + jobVo.getName());
         jsonConfig.put("env", env);
 
         // Add source section

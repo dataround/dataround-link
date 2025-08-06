@@ -20,7 +20,6 @@ package io.dataround.link.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -84,7 +83,7 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
     public void execute(Long userId, Long jobId, Long instanceId) {
         Job job = jobMapper.selectById(jobId);
         JobRes vo = jobConfigService.getJobVo(job);
-        String config = jobConfigService.getJobJson(vo);
+        String config = jobConfigService.getJobJson(vo, instanceId);
         log.debug("Job Config:\n {}", config);
         if (job.getJobType() == JobTypeEnum.FILESYNC.getCode()) {
             executeByFileSync(vo, instanceId);
@@ -115,34 +114,19 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
         return this.list(queryWrapper);
     }
     
-    public void executeBySeaTunnel(String configContent, Long instanceId) {
-        try {
-            // Submit job using REST API
-            String jobEngineId = seaTunnelRestClient.submitJob(configContent);
-            // Update job instance with engine ID
-            JobInstance jobInstance = jobInstanceMapper.selectById(instanceId);
-            jobInstance.setSeatunnelId(jobEngineId);
-            jobInstance.setStatus(JobInstanceStatusEnum.RUNNING.getCode());
-            jobInstanceMapper.updateById(jobInstance);
-            // Add job to status checker
-            jobStatusChecker.addJobToMonitor(jobInstance);
-        } catch (Exception e) {
-            log.error("Job execution submission failed.", e);
-            JobInstance jobInstance = jobInstanceMapper.selectById(instanceId);
-            jobInstance.setStatus(JobInstanceStatusEnum.FAILURE.getCode());
-            jobInstance.setEndTime(new Date());
-            String stackTrace = ExceptionUtils.getStackTrace(e);
-            jobInstance.setLogContent(stackTrace);
-            jobInstanceMapper.updateById(jobInstance);
-        }
+    public void executeBySeaTunnel(String jobConfig, Long instanceId) {
+        // Submit job using REST API
+        String seatunnelId = seaTunnelRestClient.submitJob(jobConfig);
+        // Update job instance with seatunnelId
+        JobInstance jobInstance = jobInstanceMapper.selectById(instanceId);
+        jobInstance.setSeatunnelId(seatunnelId);
+        jobInstance.setStatus(JobInstanceStatusEnum.RUNNING.getCode());
+        jobInstanceMapper.updateById(jobInstance);
+        // Add job to status checker
+        jobStatusChecker.addJobToMonitor(jobInstance);
     }
 
     public void executeByFileSync(JobRes jobVo, Long instanceId) {
-        try {
-            // Submit job using REST API
-            fileSyncService.executeFileSync(jobVo, instanceId);
-        } catch (Exception e) {
-            log.error("Job execution submission failed.", e);
-        }
+        fileSyncService.executeFileSync(jobVo, instanceId);
     }
 }

@@ -17,10 +17,17 @@
 
 package io.dataround.link.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.dataround.link.entity.VirtualField;
 import io.dataround.link.mapper.VirtualFieldMapper;
 import io.dataround.link.service.VirtualFieldService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +47,17 @@ public class VirtualFieldServiceImpl extends ServiceImpl<VirtualFieldMapper, Vir
     @Override
     public void removeByTableId(Long tableId) {
         virtualFieldMapper.removeByTableId(tableId);
+    }
+
+    @Override
+    public Map<Long, List<VirtualField>> listByTableIds(List<Long> tableIds) {
+        LambdaQueryWrapper<VirtualField> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(VirtualField::getTableId, tableIds);
+        List<VirtualField> virtualFields = virtualFieldMapper.selectList(queryWrapper);
+        Map<Long, List<VirtualField>> result = new HashMap<>();
+        for (VirtualField virtualField : virtualFields) {
+            result.computeIfAbsent(virtualField.getTableId(), k -> new ArrayList<>()).add(virtualField);
+        }
+        return result;
     }
 }

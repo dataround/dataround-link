@@ -57,6 +57,10 @@ public class JobRunner extends QuartzJobBean {
         instance.setStatus(JobInstanceStatusEnum.RUNNING.getCode());
         instance.setReadCount(0L);
         instance.setWriteCount(0L);
+        instance.setReadQps(0.0);
+        instance.setWriteQps(0.0);
+        instance.setReadBytes(0L);
+        instance.setWriteBytes(0L);
         Date now = new Date();
         instance.setUpdateTime(now);
         instance.setStartTime(now);

@@ -12,7 +12,7 @@ CREATE TABLE public.connection (
     description varchar NULL,
     create_by int8 NOT NULL,
     update_by int8 NOT NULL,
-	  create_time timestamp with time zone NOT NULL,
+	create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
 CREATE TABLE public.virtual_table (
@@ -23,6 +23,7 @@ CREATE TABLE public.virtual_table (
     table_name varchar NOT NULL,
     table_config varchar NOT NULL,
     description varchar NULL,
+    deleted bool NOT NULL DEFAULT FALSE,
     create_by int8 NOT NULL,
     update_by int8 NOT NULL,
     create_time timestamp with time zone NOT NULL,
@@ -66,7 +67,6 @@ CREATE TABLE public.job_instance (
     job_id int8 NOT NULL,
     project_id int8 NOT NULL,
     status int2 NOT NULL,
-    job_config varchar NULL,
     seatunnel_id varchar NULL,
     start_time timestamp with time zone NULL,
     end_time timestamp with time zone NULL,

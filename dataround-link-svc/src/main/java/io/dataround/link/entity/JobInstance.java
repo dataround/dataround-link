@@ -41,7 +41,6 @@ public class JobInstance {
     private Long projectId;
     // 0:waiting, 1:submitted, 2:running, 3:success, 4:failed
     private Integer status;
-    private String jobConfig;
     private String seatunnelId;
     private Date startTime;
     private Date endTime;

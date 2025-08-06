@@ -14,7 +14,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: "jdbc:postgresql://10.8.0.1:5432/dataround_link?currentSchema=public"
     username: postgres
-    password: "dataround.io"
+    password: "1223QWsk!aaa..."
     sql:
       init:
         schema-locations: classpath:init_pg_schema.sql

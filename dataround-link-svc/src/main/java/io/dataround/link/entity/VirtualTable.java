@@ -45,6 +45,7 @@ public class VirtualTable {
     private String tableName;
     private String tableConfig;
     private String description;
+    private Boolean deleted;
     private Long createBy;
     private Long updateBy;
     private Date createTime;
