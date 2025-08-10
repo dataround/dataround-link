@@ -37,13 +37,13 @@ const FtpConnectionForm: FC<IProps> = () => {
       <Form.Item name="port" label={t('connection.create.form.port')} rules={[{ required: true }]}>
         <Input placeholder={t('connection.create.placeholder.port')} />
       </Form.Item>
-      <Form.Item name="user" label={t('connection.create.form.username')} rules={[{ required: true }]}>
+      <Form.Item name="user" label={t('connection.create.form.username')} rules={[{ required: false }]}>
         <Input placeholder={t('connection.create.placeholder.username')} />
       </Form.Item>
-      <Form.Item name="passwd" label={t('connection.create.form.password')} rules={[{ required: true }]}>
+      <Form.Item name="passwd" label={t('connection.create.form.password')} rules={[{ required: false }]}>
         <Input.Password placeholder={t('connection.create.placeholder.password')} />
       </Form.Item>
-      <Form.Item name="timeout" label={t('connection.create.form.timeout')} rules={[{ required: true }]}>
+      <Form.Item name="timeout" label={t('connection.create.form.timeout')} rules={[{ required: false }]}>
         <Input placeholder={t('connection.create.placeholder.timeout')} />
       </Form.Item>
     </>

@@ -17,14 +17,22 @@
 
 package io.dataround.link.service.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.dataround.link.common.connector.Param;
@@ -52,6 +60,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class FileSyncServiceImpl implements FileSyncService {
 
+    @Value("${dataround.link.fileSync.minThreadCount:2}")
+    private Integer minThreadCount;
+    @Value("${dataround.link.fileSync.maxThreadCount:10}")
+    private Integer maxThreadCount;
+    private ExecutorService executorService;
+
     @Autowired
     private ConnectionService connectionService;
     @Autowired
@@ -59,13 +73,19 @@ public class FileSyncServiceImpl implements FileSyncService {
     @Autowired
     private JobInstanceService jobInstanceService;
 
+    @PostConstruct
+    public void init() {
+        this.executorService = new ThreadPoolExecutor(minThreadCount, maxThreadCount, 10L,
+                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    }
+
     @Override
     public boolean executeFileSync(JobRes jobVo, Long instanceId) {
+        long startTime = System.currentTimeMillis();
         Long sourceConnId = jobVo.getSourceConnId();
         Long targetConnId = jobVo.getTargetConnId();
-        
 
-        JobInstance jobInstance = jobInstanceService.getById(instanceId);
+        
         String sourcePath = jobVo.getSourcePath();
         String targetPath = jobVo.getTargetPath();
         String filePattern = jobVo.getFilePattern();
@@ -81,50 +101,58 @@ public class FileSyncServiceImpl implements FileSyncService {
         FileConnector sourceConnector = ConnectorFactory.createFileConnector(sourceParam);
         FileConnector targetConnector = ConnectorFactory.createFileConnector(targetParam);
         List<String> files = sourceConnector.getFiles(sourcePath, filePattern);
-        long readCount = 0;
-        long writeCount = 0;
-        long readBytes = 0;
-        long writeBytes = 0;
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        long startTime = System.currentTimeMillis();
-        try {
-            for (String file : files) {
-                String srcFile = sourcePath.endsWith("/") ? sourcePath + file : sourcePath + "/" + file;
-                String targetFile = targetPath.endsWith("/") ? targetPath + file : targetPath + "/" + file;
-                outputStream = targetConnector.writeFile(targetFile);
-                inputStream = sourceConnector.readFile(srcFile);
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
+        AtomicLong readCount = new AtomicLong(0);
+        AtomicLong writeCount = new AtomicLong(0);
+        AtomicLong readBytes = new AtomicLong(0);
+        AtomicLong writeBytes = new AtomicLong(0);
+
+        JobInstance jobInstance = jobInstanceService.getById(instanceId);
+        // If exception occurs, the upper layer will handle it
+        for (String file : files) {
+            executorService.submit(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try {
+                        String srcFile = sourcePath.endsWith("/") ? sourcePath + file : sourcePath + "/" + file;
+                        String targetFile = targetPath.endsWith("/") ? targetPath + file : targetPath + "/" + file;
+                        outputStream = targetConnector.writeFile(targetFile);
+                        inputStream = sourceConnector.readFile(srcFile);
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                        readCount.addAndGet(1);
+                        readBytes.addAndGet(file.length());
+                        writeCount.addAndGet(1);
+                        writeBytes.addAndGet(file.length());
+                        long duration = System.currentTimeMillis() - startTime;
+                        updateJobInstanceMetrics(jobInstance, readCount, readBytes, writeCount, writeBytes, duration);
+                        return null;
+                    } finally {
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
                 }
-                readCount++;
-                readBytes += file.length();
-                writeCount++;
-                writeBytes += file.length();
-            }
-        } catch (IOException e) {
-            log.error("Error reading file: {}", e);
-            return false;
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
+            });
         }
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        double readQps = readBytes / (duration / 1000.0);
-        double writeQps = writeBytes / (duration / 1000.0);
         // update job instance metrics
-        jobInstance.setReadCount(readCount);
-        jobInstance.setReadBytes(readBytes);
-        jobInstance.setWriteCount(writeCount);
-        jobInstance.setWriteBytes(writeBytes);
-        jobInstance.setReadQps(readQps);
-        jobInstance.setWriteQps(writeQps);
-        jobInstance.setStatus(JobInstanceStatusEnum.SUCCESS.getCode());
         jobInstance.setEndTime(new Date());
+        jobInstance.setStatus(JobInstanceStatusEnum.SUCCESS.getCode());
         jobInstanceService.updateById(jobInstance);
         return true;
+    }
+
+    private void updateJobInstanceMetrics(JobInstance jobInstance, AtomicLong readCount, AtomicLong readBytes,
+            AtomicLong writeCount, AtomicLong writeBytes, long duration) {
+        jobInstance.setReadCount(readCount.get());
+        jobInstance.setReadBytes(readBytes.get());
+        jobInstance.setWriteCount(writeCount.get());
+        jobInstance.setWriteBytes(writeBytes.get());
+        jobInstance.setReadQps(readBytes.get() / (duration / 1000.0));
+        jobInstance.setWriteQps(writeBytes.get() / (duration / 1000.0));
+        jobInstanceService.updateById(jobInstance);
     }
 }

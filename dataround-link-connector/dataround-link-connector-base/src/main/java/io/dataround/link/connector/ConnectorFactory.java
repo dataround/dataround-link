@@ -136,7 +136,12 @@ public class ConnectorFactory {
 
     private static Connector getConnector(Param param, URLClassLoader classLoader) {
         // Use ServiceLoader to find and instantiate the connector
-        ServiceLoader<Connector> serviceLoader = ServiceLoader.load(Connector.class, classLoader);
+        ServiceLoader<Connector> serviceLoader;
+        if (classLoader == null) {
+            serviceLoader = ServiceLoader.load(Connector.class);
+        } else {
+            serviceLoader = ServiceLoader.load(Connector.class, classLoader);
+        }
         // Find the connector with matching name
         for (Connector c : serviceLoader) {
             if (c.getName().equalsIgnoreCase(param.getName())) {

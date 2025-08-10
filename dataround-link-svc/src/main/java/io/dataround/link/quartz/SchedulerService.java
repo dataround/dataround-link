@@ -57,8 +57,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SchedulerService {
 
-    @Value("${dataround.link.scheduler.threadPoolSize}")
-    private final Integer maxThreads = 10;
+    @Value("${dataround.link.scheduler.threadPoolSize:10}")
+    private Integer threadCount;
     private final String schedulerName = "dataroundScheduler";
     private final String schedulerInstanceId = "dataroundInstance";
 
@@ -83,7 +83,7 @@ public class SchedulerService {
             }
             
             JobStore jobStore = new RAMJobStore();
-            SimpleThreadPool threadPool = new SimpleThreadPool(maxThreads, Thread.NORM_PRIORITY);
+            SimpleThreadPool threadPool = new SimpleThreadPool(threadCount, Thread.NORM_PRIORITY);
             sf.createScheduler(schedulerName, schedulerInstanceId, threadPool, jobStore);
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
