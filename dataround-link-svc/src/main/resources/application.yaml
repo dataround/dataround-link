@@ -34,3 +34,4 @@ dataround:
 logging:
   level:
     io.dataround.link: debug
+    io.dataround.link.mapper: info

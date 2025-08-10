@@ -13,7 +13,8 @@
     "delete": "删除",
     "edit": "编辑",
     "search": "搜索",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "tip": "提示"
   },
   "menu": {
     "dataIntegration": "数据集成",
@@ -427,13 +428,15 @@
         "host": "请输入主机名或IP",
         "port": "请输入端口",
         "database": "请输入数据库名",
+        "jdbcUrl": "请输入JDBC连接URL，如: jdbc:mysql://localhost:3306/database",
         "username": "请输入用户名",
         "password": "请输入密码",
         "broker": "请输入broker地址: host1:9092,host2:9092",
         "kafkaConfig": "请输入Kafka额外配置",
         "paramName": "参数名",
         "paramValue": "参数值",
-        "timeout": "请输入超时时间(秒)，如: 30",
+        "timeout": "请输入超时时间(毫秒)，如: 30000",
+        "usernameTip": "如果允许匿名登录可不填写用户名和密码",
         "endpoint": "请输入S3端点地址，如: https://s3.amazonaws.com",
         "accessKey": "请输入访问密钥ID",
         "secretKey": "请输入安全访问密钥",

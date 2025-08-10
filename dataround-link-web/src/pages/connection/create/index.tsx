@@ -82,6 +82,7 @@ const S: FC<IProps> = () => {
     const user = values.user;
     const passwd = values.passwd;
     const url = values.url;
+    const timeout = values.timeout;
     // kafka property
     const broker = values.broker;
     // hive property
@@ -96,7 +97,7 @@ const S: FC<IProps> = () => {
     const kerberosPrincipal = values.kerberosPrincipal;
     const kerberosKeytab = values.kerberosKeytab;
     const kerberosKrb5Conf = values.kerberosKrb5Conf;
-    const config = { database, svcType, url, broker, metastore_uri, hdfsSite, hiveSite, kerberosPrincipal, kerberosKeytab, kerberosKrb5Conf };
+    const config = { database, svcType, url, broker, metastore_uri, hdfsSite, hiveSite, kerberosPrincipal, kerberosKeytab, kerberosKrb5Conf, timeout };
     const conn = { id, connector, name, description, host, port, user, passwd, config };
     return conn;
   }
@@ -259,13 +260,13 @@ const S: FC<IProps> = () => {
             </Form.Item>
           )}
           <Form.Item name="url" label={t('connection.create.form.jdbcUrl')} rules={[{ required: true }]}>
-            <Input />
+            <Input placeholder={t('connection.create.placeholder.jdbcUrl')} />
           </Form.Item>
           <Form.Item name="user" label={t('connection.create.form.username')} rules={[{ required: true }]}>
-            <Input />
+            <Input placeholder={t('connection.create.placeholder.username')} autoComplete="off" />
           </Form.Item>
           <Form.Item name="passwd" label={t('connection.create.form.password')} rules={[{ required: true }]}>
-            <Input.Password />
+            <Input.Password placeholder={t('connection.create.placeholder.password')} autoComplete="new-password" />
           </Form.Item>
         </>
       )

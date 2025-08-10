@@ -19,7 +19,8 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-06-05
  */
-import { Form, Input } from "antd";
+import { Form, Input, Popover } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { FC } from "react";
 import { useTranslation } from 'react-i18next';
 
@@ -38,10 +39,24 @@ const FtpConnectionForm: FC<IProps> = () => {
         <Input placeholder={t('connection.create.placeholder.port')} />
       </Form.Item>
       <Form.Item name="user" label={t('connection.create.form.username')} rules={[{ required: false }]}>
-        <Input placeholder={t('connection.create.placeholder.username')} />
+        <Input 
+          placeholder={t('connection.create.placeholder.username')} 
+          autoComplete="off"
+          suffix={
+            <Popover 
+              content={t('connection.create.placeholder.usernameTip')} 
+              title={t('common.tip')}
+            >
+              <InfoCircleOutlined style={{ color: '#1890ff' }} />
+            </Popover>
+          }
+        />
       </Form.Item>
       <Form.Item name="passwd" label={t('connection.create.form.password')} rules={[{ required: false }]}>
-        <Input.Password placeholder={t('connection.create.placeholder.password')} />
+        <Input.Password 
+          placeholder={t('connection.create.placeholder.password')} 
+          autoComplete="new-password"
+        />
       </Form.Item>
       <Form.Item name="timeout" label={t('connection.create.form.timeout')} rules={[{ required: false }]}>
         <Input placeholder={t('connection.create.placeholder.timeout')} />

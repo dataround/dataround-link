@@ -20,6 +20,7 @@ package io.dataround.link.connector.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,7 @@ public class FtpConnector extends AbstractFileConnector {
         if (timeout != null) {
             ftpClient.setDefaultTimeout(timeout);
             ftpClient.setConnectTimeout(timeout);
+            ftpClient.setDataTimeout(Duration.ofMillis(timeout));
         }
         // set encoding
         if (encoding != null) {
@@ -96,7 +98,7 @@ public class FtpConnector extends AbstractFileConnector {
             disconnect();
             return isValid;
         } catch (Exception e) {
-            log.error("FTP connector test connection failed", e);
+            log.error("FTP connector test connection failed to {}:{}", host, port, e);
             return false;
         }
     }

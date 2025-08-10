@@ -35,4 +35,12 @@ public interface FileSyncService {
      * @return true if executed successfully, false otherwise
      */
     boolean executeFileSync(JobRes jobVo, Long instanceId);
+    
+    /**
+     * Cancel file synchronization task.
+     *
+     * @param instanceId the job instance id
+     * @return true if cancelled successfully, false otherwise
+     */
+    boolean cancelFileSync(Long instanceId);
 } 

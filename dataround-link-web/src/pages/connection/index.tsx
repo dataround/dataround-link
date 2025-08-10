@@ -133,7 +133,7 @@ const S: FC<IProps> = () => {
     title: t('connection.table.password'),
     dataIndex: "passwd",
     key: "passwd",
-    render: (text) => <Popover content={text} trigger="click"><Button type="link"><EyeOutlined /></Button></Popover>,
+    render: (text) => text ? <Popover content={text} trigger="click"><Button type="link"><EyeOutlined /></Button></Popover> : null,
   }, ...columnTail
   ]
   const columnsCdc: TableProps<DataType>["columns"] = [...columnHead, ...columnTail];
@@ -218,9 +218,6 @@ const S: FC<IProps> = () => {
         <TabPane tab={t('connection.tabs.database')} key="Database">
           <Table size="small" columns={columnJDBC} dataSource={tabData} />
         </TabPane>
-        {/* <TabPane tab={t('connection.tabs.cdc')} key="CDC">
-          <Table size="small" columns={columnsCdc} dataSource={tabData} />
-        </TabPane> */}
         <TabPane tab={t('connection.tabs.nonstructural')} key="File">
           <Table size="small" columns={columnsNonstructural} dataSource={tabData} />
         </TabPane>

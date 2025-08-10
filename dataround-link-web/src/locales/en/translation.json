@@ -13,7 +13,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "search": "Search",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "tip": "Tips"
   },
   "menu": {
     "dataIntegration": "Data Integration",
@@ -427,13 +428,15 @@
         "host": "Please enter hostname or IP",
         "port": "Please enter port",
         "database": "Please enter database name",
+        "jdbcUrl": "Please enter JDBC URL, e.g: jdbc:mysql://localhost:3306/database",
         "username": "Please enter username",
         "password": "Please enter password",
         "broker": "Please enter broker address: host1:9092,host2:9092",
         "kafkaConfig": "Please enter Kafka extra configuration",
         "paramName": "Parameter Name",
         "paramValue": "Parameter Value",
-        "timeout": "Please enter timeout in seconds, e.g: 30",
+        "timeout": "Please enter timeout in milliseconds, e.g: 30000",
+        "usernameTip": "Username and password can be left empty if anonymous login is allowed",
         "endpoint": "Please enter S3 endpoint, e.g: https://s3.amazonaws.com",
         "accessKey": "Please enter access key ID",
         "secretKey": "Please enter secret access key",

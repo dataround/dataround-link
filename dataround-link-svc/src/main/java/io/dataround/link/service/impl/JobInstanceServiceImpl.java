@@ -83,11 +83,11 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
     public void execute(Long userId, Long jobId, Long instanceId) {
         Job job = jobMapper.selectById(jobId);
         JobRes vo = jobConfigService.getJobVo(job);
-        String config = jobConfigService.getJobJson(vo, instanceId);
-        log.debug("Job Config:\n {}", config);
         if (job.getJobType() == JobTypeEnum.FILESYNC.getCode()) {
             executeByFileSync(vo, instanceId);
         } else {
+            String config = jobConfigService.getJobJson(vo, instanceId);
+            log.debug("Job Config:\n {}", config);
             executeBySeaTunnel(config, instanceId);
         }
     }
@@ -95,8 +95,13 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
     @Override
     public boolean cancel(Long instanceId) {
         JobInstance jobInstance = jobInstanceMapper.selectById(instanceId);
+        Job job = jobMapper.selectById(jobInstance.getJobId());
         try {
-            seaTunnelRestClient.stopJob(jobInstance.getSeatunnelId());
+            if (job.getJobType() == JobTypeEnum.FILESYNC.getCode()) {
+                fileSyncService.cancelFileSync(instanceId);
+            } else {
+                seaTunnelRestClient.stopJob(jobInstance.getSeatunnelId());
+            }
             jobInstance.setStatus(JobInstanceStatusEnum.CANCELLED.getCode());
             jobInstance.setEndTime(new Date());
             jobInstanceMapper.updateById(jobInstance);
