@@ -45,6 +45,7 @@ import hljs from "highlight.js/lib/core";
 import java from "highlight.js/lib/languages/java";
 import "highlight.js/styles/default.css";
 import { JOB_TYPE_BATCH, JOB_TYPE_FILESYNC, JOB_TYPE_STREAM } from "../../store";
+import CommonTable from "../../components/common-table";
 // Then register the languages you need
 hljs.registerLanguage("java", java);
 
@@ -324,8 +325,14 @@ const S: FC<IProps> = () => {
         </Form>
       </Card>
 
-      <Tabs defaultActiveKey="tabInstance" items={items} />
-      <Table size="small" columns={columns} dataSource={tabData} pagination={{ pageSize: pageSize, total: totalCount, onChange: onPageChange }} />
+      <Tabs defaultActiveKey="tabInstance" items={items} />      
+      <CommonTable 
+        columns={columns} 
+        dataSource={tabData} 
+        pageSize={pageSize} 
+        total={totalCount} 
+        onPageChange={onPageChange}
+      />
       <Modal title={t('instance.modal.logTitle')} open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => setIsModalOpen(false)}

@@ -28,6 +28,16 @@ import lombok.Data;
 @Data
 public class Request {
 
-    private Long offset;
+    private Long current;
     private Long size;
+
+    /**
+     * Get the offset for the current page. JobInstanceMapper's selectPage method will use this method to get the offset.
+     * 
+     * @return the offset for the current page
+     */
+    public Long getOffset() {
+        // make sure current is not null
+        return current == null ? 0 : (current - 1) * size;
+    }
 }

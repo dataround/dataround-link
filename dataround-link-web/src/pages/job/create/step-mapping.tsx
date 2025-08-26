@@ -30,11 +30,11 @@ import {
   Select,
   Space,
   Spin,
-  Table,
   TableProps,
   Tabs,
   message
 } from "antd";
+import CommonTable from "../../../components/common-table";
 import { FC, memo, useEffect, useState } from "react";
 import { getTableColumns } from "../../../api/connection";
 import useRequest from "../../../hooks/useRequest";
@@ -348,13 +348,10 @@ const S: FC<IProps> = () => {
             </div>
           </Col>
         </Row>
-        <Table
-          bordered
-          size="small"
-          columns={columns}
+        <CommonTable 
+          bordered 
+          columns={columns} 
           dataSource={tableData}
-          pagination={false}
-          rowKey="key"
         />
       </Form>
     </Spin>

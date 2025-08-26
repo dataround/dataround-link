@@ -22,13 +22,13 @@
 import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import {
   Button, Card, Checkbox, Col, Form, Input, Popconfirm, Popover, Row, Select, Space,
-  Table,
   TableProps,
   Tabs,
   TabsProps,
   TreeSelect,
   message
 } from "antd";
+import CommonTable from "../../components/common-table";
 import { FC, memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -363,7 +363,13 @@ const S: FC<IProps> = () => {
         <Button type="primary" htmlType="submit" onClick={newBatchJob}>{jobType == JOB_TYPE_BATCH ? t('job.list.newBatchJob') : jobType == JOB_TYPE_STREAM ? t('job.list.newStreamJob') : t('job.list.newFileSyncJob')}</Button>
       }
       />
-      <Table size="small" columns={columns} dataSource={tabData} pagination={{ pageSize: pageSize, total: totalCount, onChange: onPageChange }} />
+      <CommonTable 
+        columns={columns} 
+        dataSource={tabData} 
+        pageSize={pageSize} 
+        total={totalCount} 
+        onPageChange={onPageChange}
+      />
     </>
   );
 };
