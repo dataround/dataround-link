@@ -66,25 +66,25 @@ public class KingbaseJdbcConnector extends JdbcConnector {
     @Override
     public List<String> doGetTables(String database) {
         // For KingbaseES: catalog = database name, schema = "public" (default schema)
-        return getTablesWithParams(database, "public", "%", new String[]{"TABLE", "VIEW"});
+        return getTablesWithParams(database, null, "%", new String[]{"TABLE", "VIEW"});
     }
 
     @Override
     public List<String> doGetTables(String database, String tableNamePattern) {
         // For KingbaseES: catalog = database name, schema = "public" (default schema)
-        return getTablesWithParams(database, "public", tableNamePattern, new String[]{"TABLE", "VIEW"});
+        return getTablesWithParams(database, null, tableNamePattern, new String[]{"TABLE", "VIEW"});
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
         // For KingbaseES: catalog = database name, schema = "public" (default schema)
-        return getTableFieldsWithParams(database, "public", table, "%");
+        return getTableFieldsWithParams(database, null, table, "%");
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
         // For KingbaseES: catalog = database name, schema = "public" (default schema)
-        return getTableFieldsWithParams(database, "public", table, columnNamePattern);
+        return getTableFieldsWithParams(database, null, table, columnNamePattern);
     }
 
 } 

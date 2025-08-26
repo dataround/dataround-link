@@ -27,12 +27,12 @@ import {
   Row,
   Select,
   Table,
-  Tabs, TreeSelect
+  Tabs
 } from "antd";
 import { FC, memo, useEffect, useState } from "react";
 import useRequest from "../../../hooks/useRequest";
 import { useNavigate } from "react-router-dom";
-import { formatConnector, getConnections, getConnector, getDatabaseList, getTableList } from "../../../api/connection";
+import { getConnections, getDatabaseList, getTableList } from "../../../api/connection";
 import { CheckboxChangeEventTarget, CheckboxProps } from "antd/es/checkbox/Checkbox";
 import { JOB_TYPE_STREAM, jobStore } from "../../../store";
 import { useTranslation } from 'react-i18next';
@@ -72,10 +72,8 @@ const S: FC<IProps> = (props) => {
   const navigate = useNavigate();
   const jobType = jobStore.jobType;
   // request from store
-  const [sourceConnector, setSourceConnector] = useState<string>(jobStore.sourceConnector);
   const [sourceConnId, setSourceConnId] = useState<string>(jobStore.sourceConnId);
   const [sourceDbName, setSourceDbName] = useState<string>(jobStore.sourceDbName);
-  const [targetConnector, setTargetConnector] = useState<string>(jobStore.targetConnector);
   const [targetConnId, setTargetConnId] = useState<string>(jobStore.targetConnId);
   const [targetDbName, setTargetDbName] = useState<string>(jobStore.targetDbName);
   // request new data
@@ -114,7 +112,14 @@ const S: FC<IProps> = (props) => {
       title: t('job.edit.source.table.targetTable'),
       dataIndex: 'targetTable',
       render: (text: string, record: any) => {
-        return <Select size="middle" style={{ width: '100%' }} options={targetTables} defaultValue={text} onChange={(val: string) => { record.targetTable = val }}></Select>;
+        return <Select 
+          size="small" 
+          style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
+          showSearch 
+          options={targetTables} 
+          defaultValue={text} 
+          onChange={(val: string) => { record.targetTable = val }}
+        />;
       }
     },
     {
@@ -122,7 +127,12 @@ const S: FC<IProps> = (props) => {
       title: t('job.edit.source.table.filter'),
       dataIndex: 'whereClause',
       render: (text: string, record: any) => {
-        return <Input size="middle" style={{ width: '100%' }} defaultValue={text} onChange={(e) => { record.whereClause = e.target.value; }}></Input>;
+        return <Input 
+          size="small" 
+          style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
+          defaultValue={text} 
+          onChange={(e) => { record.whereClause = e.target.value; }}
+        />;
       }
     },
     {
@@ -137,38 +147,17 @@ const S: FC<IProps> = (props) => {
     },
   ];
 
-  // request connector
-  const reqSourceConnector = useRequest(getConnector, {
-    wrapperFun: formatConnector
-  });
-
-  const reqTargetConnector = useRequest(getConnector, {
-    wrapperFun: formatConnector
-  });
-
   useEffect(() => {
-    reqSourceConnector.caller({"type":"source", "streamSource": jobType == JOB_TYPE_STREAM});
-    reqTargetConnector.caller({"type":"sink"});
+    reqSourceConnection.caller({"types":["Database", "MQ"]});
+    reqTargetConnection.caller({"types":["Database", "MQ"]});
   }, []);
-
-  useEffect(() => {
-    if (sourceConnector) {
-      reqSourceConnection.caller({"connector":sourceConnector});
-    }
-  }, [sourceConnector]);
-
-  useEffect(() => {
-    if (targetConnector) {
-      reqTargetConnection.caller({"connector":targetConnector});
-    }
-  }, [targetConnector]);
 
   // request connections
   const formatConnections = (res: any) => {
     const arr: object[] = [];
     Object.keys(res).forEach((i) => {
       // res[i].id is the connection id, used to get database/table list
-      arr.push({ value: res[i].id, label: res[i].name });
+      arr.push({ value: res[i].id, label: `${res[i].name} (${res[i].connector})` });
     });
     return arr;
   };
@@ -333,20 +322,17 @@ const S: FC<IProps> = (props) => {
 
   // jobstore
   useEffect(() => {
-    jobStore.setSourceConnector(sourceConnector)
     jobStore.setSourceConnId(sourceConnId);
     jobStore.setSourceDbName(sourceDbName);
-    jobStore.setTargetConnector(targetConnector);
     jobStore.setTargetConnId(targetConnId);
     jobStore.setTargetDbName(targetDbName);
+    console.log("tableMapping changed===>", tableData);
     jobStore.setTableMapping(tableData);
-  }, [sourceConnector, sourceConnId, sourceDbName, targetConnector, targetConnId, targetDbName, tableData]);
+  }, [sourceConnId, sourceDbName, targetConnId, targetDbName, tableData]);
 
   const initialValues = {
-    sourceConnector: sourceConnector,
     sourceConnection: sourceConnId,
     sourceDatabase: sourceDbName,
-    targetConnector: targetConnector,
     targetConnection: targetConnId,
     targetDatabase: targetDbName,
   };
@@ -359,66 +345,59 @@ const S: FC<IProps> = (props) => {
         initialValues={initialValues}
       >
         <Tabs defaultActiveKey="tabList" items={[{ key: "tabSource", label: t('job.edit.source.tabs.source') }]} />
-        <Form.Item name="sourceConnector" label={t('job.edit.source.form.sourceType')} rules={[{ required: true }]}>
-          <TreeSelect
-            showSearch
-            style={{ width: '100%', textAlign: 'left' }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder="Please select"
-            allowClear
-            treeDefaultExpandAll
-            onChange={val => setSourceConnector(val)}
-            treeData={reqSourceConnector.data}
-          />
-        </Form.Item>
         <Form.Item name="sourceConnection" label={t('job.edit.source.form.sourceConnection')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectConnection')} options={sourceConnOptions} onChange={val => setSourceConnId(val)}></Select>
+          <Select placeholder={t('job.edit.source.placeholder.selectConnection')} options={sourceConnOptions} onChange={val => setSourceConnId(val)} 
+            showSearch
+            filterOption={(input, option: any) =>
+              (option?.label as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+            }></Select>
         </Form.Item>
         <Form.Item name="sourceDatabase" label={t('job.edit.source.form.sourceDatabase')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectDatabase')} options={sourceDbOptions} onChange={val => setSourceDbName(val)}></Select>
+          <Select placeholder={t('job.edit.source.placeholder.selectDatabase')} showSearch options={sourceDbOptions} onChange={val => setSourceDbName(val)}></Select>
         </Form.Item>
 
         <Tabs defaultActiveKey="tabList" items={[{ key: "tabTarget", label: t('job.edit.source.tabs.target') }]} />
-        <Form.Item name="targetConnector" label={t('job.edit.source.form.targetType')} rules={[{ required: true }]}>
-          <TreeSelect
-            showSearch
-            style={{ width: '100%', textAlign: 'left' }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder="Please select"
-            allowClear
-            treeDefaultExpandAll
-            onChange={val => setTargetConnector(val)}
-            treeData={reqTargetConnector.data}
-          />
-        </Form.Item>
         <Form.Item name="targetConnection" label={t('job.edit.source.form.targetConnection')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectConnection')} options={targetConnOptions} onChange={val => setTargetConnId(val)}></Select>
+          <Select placeholder={t('job.edit.source.placeholder.selectConnection')} options={targetConnOptions} onChange={val => setTargetConnId(val)}
+            showSearch
+            filterOption={(input, option: any) =>
+              (option?.label as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+            }></Select>
         </Form.Item>
         <Form.Item name="targetDatabase" label={t('job.edit.source.form.targetDatabase')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectDatabase')} options={targetDbOptions} onChange={val => setTargetDbName(val)}></Select>
+          <Select placeholder={t('job.edit.source.placeholder.selectDatabase')} showSearch options={targetDbOptions} onChange={val => setTargetDbName(val)}></Select>
         </Form.Item>
 
         <Tabs defaultActiveKey="tabList" items={[{ key: "tabMapping", label: t('job.edit.source.tabs.mapping') }]} />
         <Row>
           <Col span={6}>
-            <List size="small" bordered dataSource={sourceTables} pagination={{ pageSize: 6 }}
-              header={
-                <div>
-                  <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkedAll}>
-                    {t('job.edit.source.list.selectAll')}
-                  </Checkbox>
-                </div>
-              }
-              renderItem={(item: ListType) => (
-                <List.Item>
-                  <Checkbox checked={item.checked} onChange={(e) => onCheckedChange(e.target, item)}>{item.value}</Checkbox>
-                </List.Item>
-              )}
+            <Table 
+              size="small" 
+              bordered 
+              dataSource={sourceTables} 
+              pagination={{ pageSize: 15 }}
+              showHeader={true}
+              columns={[
+                {
+                  title: (
+                    <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkedAll}>
+                      {t('job.edit.source.list.selectAll')}
+                    </Checkbox>
+                  ),
+                  dataIndex: 'value',
+                  key: 'value',
+                  render: (text: string, record: ListType) => (
+                    <Checkbox checked={record.checked} onChange={(e) => onCheckedChange(e.target, record)}>
+                      {record.value}
+                    </Checkbox>
+                  )
+                }
+              ]}
             />
           </Col>
           <Col span={1}></Col>
           <Col span={16}>
-            <Table bordered size="small" columns={columns} dataSource={tableData} pagination={{ pageSize: 6 }} />
+            <Table bordered size="small" columns={columns} dataSource={tableData} pagination={{ pageSize: 15 }} />
           </Col>
         </Row>
       </Form>

@@ -74,7 +74,7 @@ const FileSyncCreate: FC<IProps> = () => {
   const reqJobDetail = useRequest(getJobId);
 
   useEffect(() => {
-    reqConnections.caller().then((res: any) => {
+    reqConnections.caller({"types":["File"]}).then((res: any) => {
       const options = res.map((conn: any) => ({ value: conn.id, label: `${conn.name} (${conn.connector})` }));
       form.setFieldsValue({
         sourceConnectionOptions: options,

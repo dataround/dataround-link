@@ -54,27 +54,27 @@ public abstract class AbstractTableConnector implements TableConnector {
 
     @Override
     public List<String> getDatabases() {
-        return withCustomClassLoader(this::doGetDatabases);
+        return withCustomClassLoadeAutoClose(this::doGetDatabases);
     }
 
     @Override
     public List<String> getTables(String database) {
-        return withCustomClassLoader(()->doGetTables(database));
+        return withCustomClassLoadeAutoClose(()->doGetTables(database));
     }
 
     @Override
     public List<String> getTables(String database, String tableNamePattern) {
-        return withCustomClassLoader(()->doGetTables(database, tableNamePattern));
+        return withCustomClassLoadeAutoClose(()->doGetTables(database, tableNamePattern));
     }
 
     @Override
     public List<TableField> getTableFields(String database, String table) {
-        return withCustomClassLoader(()->doGetTableFields(database, table));
+        return withCustomClassLoadeAutoClose(()->doGetTableFields(database, table));
     }
 
     @Override
     public List<TableField> getTableFields(String database, String table, String columnNamePattern) {
-        return withCustomClassLoader(()->doGetTableFields(database, table, columnNamePattern));
+        return withCustomClassLoadeAutoClose(()->doGetTableFields(database, table, columnNamePattern));
     }
 
     @Override
@@ -103,7 +103,28 @@ public abstract class AbstractTableConnector implements TableConnector {
             originalClassLoader.set(currentLoader);
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
             return action.get();
+        } finally {            
+            Thread.currentThread().setContextClassLoader(originalClassLoader.get());
+            originalClassLoader.remove();
+        }
+    }
+
+    /**
+     * Execute action with custom classloader and automatically close connection afterwards
+     */
+    private <T> T withCustomClassLoadeAutoClose(Supplier<T> action) {
+        ClassLoader currentLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            originalClassLoader.set(currentLoader);
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            T result = action.get();
+            return result;
         } finally {
+            try {
+                this.close();
+            } catch (Exception e) {
+                log.warn("Failed to close connector, {}", e.getMessage());
+            }
             Thread.currentThread().setContextClassLoader(originalClassLoader.get());
             originalClassLoader.remove();
         }

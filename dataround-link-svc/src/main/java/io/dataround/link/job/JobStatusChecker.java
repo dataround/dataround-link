@@ -99,8 +99,11 @@ public class JobStatusChecker {
     }
 
     private void updateJobStatus(JobInstance jobInstance, JsonNode jobDetail) {
-        String status = jobDetail.get("jobStatus").asText();
-        JsonNode metrics = jobDetail.get("metrics");
+        JsonNode jobStatus = jobDetail.get("jobStatus");
+        if (jobStatus == null) {
+            return;
+        }
+        String status = jobStatus.asText();        
         boolean changed = false;
         try {
             switch (status.toUpperCase()) {
@@ -130,6 +133,10 @@ public class JobStatusChecker {
                 jobInstance.setEndTime(new Date());
                 String logs = seaTunnelRestClient.getJobLogs(jobInstance.getSeatunnelId());
                 jobInstance.setLogContent(logs);
+            }
+            JsonNode metrics = jobDetail.get("metrics");
+            if (metrics == null) {
+                return;
             }
             changed = changed || parseAndUpdateMetrics(jobInstance, metrics);
             // update job instance only if properties changed, avoid unnecessary updates, especially for streaming jobs

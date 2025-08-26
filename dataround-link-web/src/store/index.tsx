@@ -50,11 +50,8 @@ export const jobStore = proxy({
     startTime: '',
     endTime: '',
     cron: '',
-    // state for job source step
-    sourceConnector: '',
     sourceConnId: '',
     sourceDbName: '',
-    targetConnector: '',
     targetConnId: '',
     targetDbName: '',
     tableMapping: [] as RecordType[],
@@ -84,18 +81,11 @@ export const jobStore = proxy({
     setEndTime: (endTime: string) => {
         jobStore.endTime = endTime
     },
-    // action for source step
-    setSourceConnector: (connector: any) => {
-        jobStore.sourceConnector = connector
-    },
     setSourceConnId: (connId: string) => {
         jobStore.sourceConnId = connId
     },
     setSourceDbName: (dbName: string) => {
         jobStore.sourceDbName = dbName
-    },
-    setTargetConnector: (connector: any) => {
-        jobStore.targetConnector = connector
     },
     setTargetConnId: (connId: string) => {
         jobStore.targetConnId = connId
@@ -116,10 +106,8 @@ export const jobStore = proxy({
         jobStore.startTime = '',
         jobStore.endTime = '',
         jobStore.cron = '',
-        jobStore.sourceConnector = '',
         jobStore.sourceConnId = '',
         jobStore.sourceDbName= '',
-        jobStore.targetConnector = '',
         jobStore.targetConnId = '',
         jobStore.targetDbName = '',
         jobStore.tableMapping = []        

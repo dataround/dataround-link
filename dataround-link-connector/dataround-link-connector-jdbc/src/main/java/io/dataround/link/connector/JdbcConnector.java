@@ -48,6 +48,12 @@ public class JdbcConnector extends AbstractTableConnector {
     private String url;
     private String user;
     private String password;
+    // Connection pool properties
+    private int maxPoolSize = 2;
+    private int minIdle = 1;
+    private int connectionTimeout = 5000;
+    private int idleTimeout = 300000;
+    private int leakDetectionThreshold = 60000;
 
     @Override
     public String getName() {
@@ -65,6 +71,11 @@ public class JdbcConnector extends AbstractTableConnector {
         this.url = props.get("url");
         this.user = getParam().getUser();
         this.password = getParam().getPassword();
+        this.maxPoolSize = Integer.parseInt(props.getOrDefault("maxPoolSize", "2"));
+        this.minIdle = Integer.parseInt(props.getOrDefault("minIdle", "1"));
+        this.connectionTimeout = Integer.parseInt(props.getOrDefault("connectionTimeout", "5000"));
+        this.idleTimeout = Integer.parseInt(props.getOrDefault("idleTimeout", "300000"));
+        this.leakDetectionThreshold = Integer.parseInt(props.getOrDefault("leakDetectionThreshold", "60000"));
         // Load JDBC driver
         Class.forName(driver);
         // Initialize connection pool
@@ -73,6 +84,17 @@ public class JdbcConnector extends AbstractTableConnector {
         config.setJdbcUrl(url);
         config.setUsername(user);
         config.setPassword(password);
+        
+        // Set connection pool size
+        config.setMaximumPoolSize(maxPoolSize); 
+        config.setMinimumIdle(minIdle);     
+        // Set connection timeout and idle timeout
+        config.setConnectionTimeout(connectionTimeout);  
+        // Set idle timeout
+        config.setIdleTimeout(idleTimeout);
+        // Set leak detection threshold
+        config.setLeakDetectionThreshold(leakDetectionThreshold); 
+        
         // Set additional properties
         props.forEach((key, value) -> {
             // database property used for Oracle will cause "Caused by: oracle.net.ns.NetException: ORA-17868: Unknown host specified"

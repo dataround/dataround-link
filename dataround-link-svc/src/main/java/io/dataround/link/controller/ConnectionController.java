@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -48,12 +49,10 @@ import io.dataround.link.connector.TableField;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.VirtualTable;
 import io.dataround.link.entity.res.ConnectionRes;
-import io.dataround.link.entity.res.FieldMapping;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
 import io.dataround.link.service.UserService;
 import io.dataround.link.service.VirtualTableService;
-import io.dataround.link.utils.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -85,15 +84,11 @@ public class ConnectionController extends BaseController {
     }
 
     @GetMapping("/list")
-    public PageResult<List<ConnectionRes>> list(@Parameter(hidden = true) Page<Connection> page, String connector, Integer type) {
+    public PageResult<List<ConnectionRes>> list(@Parameter(hidden = true) Page<Connection> page, @RequestParam(required = false) String connector, @RequestParam(required = false) ArrayList<String> types) {
         LambdaQueryWrapper<Connection> wrapper = new LambdaQueryWrapper<>();
-        if (type != null) {
+        if (types != null && !types.isEmpty()) {
             LambdaQueryWrapper<Connector> subQueryWrapper = new LambdaQueryWrapper<>();
-            if (type == 1) {
-                subQueryWrapper.eq(Connector::getType, Constants.CONNECTION_TYPE_DATABASE);
-            } else {
-                subQueryWrapper.ne(Connector::getType, Constants.CONNECTION_TYPE_DATABASE);
-            }
+            subQueryWrapper.in(Connector::getType, types);
             List<Connector> connectors = connectorService.list(subQueryWrapper);
             // extract connector name list
             List<String> connectorNames = connectors.stream().map(Connector::getName).collect(Collectors.toList());
@@ -177,49 +172,6 @@ public class ConnectionController extends BaseController {
     public Result<List<TableField>> getTableFields(@PathVariable Long id, @PathVariable String databaseName, @PathVariable String tableName) {
         List<TableField> tableFields = connectionService.getTableFields(id, databaseName, tableName);
         return Result.success(tableFields);
-    }
-
-    /**
-     * Both source table fields and target fields required when do FieldMapping
-     * If it's implement by reactjs, I don't know how to keep request sequence correctly when tabs changed quickly
-     */
-    @GetMapping("/{sourceId}/{sourceDb}/{sourceTable}/{targetId}/{targetDb}/{targetTable}")
-    public Result<List<FieldMapping>> getSourceAndTargetTableFields(@PathVariable Long sourceId, @PathVariable String sourceDb, @PathVariable String sourceTable,
-                                                                    @PathVariable Long targetId, @PathVariable String targetDb, @PathVariable String targetTable,
-                                                                    Integer matchMethod) {
-        boolean matchByName = matchMethod != null && matchMethod == Constants.FIELD_MAPPING_MATCH_BY_NAME;
-        List<FieldMapping> list = new ArrayList<>();
-        List<TableField> sourceFields = connectionService.getTableFields(sourceId, sourceDb, sourceTable);
-        List<TableField> targetFields = connectionService.getTableFields(targetId, targetDb, targetTable);
-        int idx = 0;
-        for (TableField target : targetFields) {
-            FieldMapping fm = new FieldMapping();
-            fm.setTargetFieldName(target.getName());
-            fm.setTargetFieldType(target.getType());
-            fm.setTargetNullable(target.getNullable());
-            fm.setTargetPrimaryKey(target.getPrimaryKey());
-            if (matchByName) {
-                for (TableField source : sourceFields) {
-                    if (target.getName().equalsIgnoreCase(source.getName())) {
-                        fm.setSourceFieldName(source.getName());
-                        fm.setSourceFieldType(source.getType());
-                        fm.setSourceNullable(source.getNullable());
-                        fm.setSourcePrimaryKey(source.getPrimaryKey());
-                        break;
-                    }
-                }
-            } else {
-                if (sourceFields.size() > idx) {
-                    fm.setSourceFieldName(sourceFields.get(idx).getName());
-                    fm.setSourceFieldType(sourceFields.get(idx).getType());
-                    fm.setSourceNullable(sourceFields.get(idx).getNullable());
-                    fm.setSourcePrimaryKey(sourceFields.get(idx).getPrimaryKey());
-                }
-            }
-            list.add(fm);
-            idx++;
-        }
-        return Result.success(list);
     }
 
     @GetMapping("/connectors")

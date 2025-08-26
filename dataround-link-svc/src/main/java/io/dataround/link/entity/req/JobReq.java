@@ -36,8 +36,6 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JobReq extends Job {
 
-    private String sourceConnector;
-    private String targetConnector;
     private Long sourceConnId;
     private Long targetConnId;
     private String sourceDbName;

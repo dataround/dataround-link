@@ -84,8 +84,6 @@ const S: FC<IProps> = () => {
     params.startTime = jobStore.startTime;
     params.endTime = jobStore.endTime;
 
-    params.sourceConnector = jobStore.sourceConnector;
-    params.targetConnector = jobStore.targetConnector;
     params.sourceConnId = jobStore.sourceConnId;
     params.targetConnId = jobStore.targetConnId;
     params.sourceDbName = jobStore.sourceDbName;

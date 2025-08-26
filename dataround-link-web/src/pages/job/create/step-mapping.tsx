@@ -36,7 +36,7 @@ import {
   message
 } from "antd";
 import { FC, memo, useEffect, useState } from "react";
-import { getAllTableColumns, getTableColumns } from "../../../api/connection";
+import { getTableColumns } from "../../../api/connection";
 import useRequest from "../../../hooks/useRequest";
 import { jobStore } from "../../../store";
 import { FieldType, RecordType } from "./step-source";
@@ -50,13 +50,15 @@ const S: FC<IProps> = () => {
   const [activeKey, setActiveKey] = useState<string>('');
   // used to select tag options
   const [sourceFields, setSourceFields] = useState<any[]>();
+  // target fields from target table
+  const [targetFields, setTargetFields] = useState<any[]>();
   // 1: insert, 2: upsert
   const [writeType, setWriteType] = useState(1);
   // 1: by name, 2: by sort
   const [matchMethod, setMatchMethod] = useState(1);
   const [tableData, setTableData] = useState<FieldType[]>([]);
   // e.g {table1: {writeType: 1, matchMethod: 1, tableData: []}, table2: {...}}
-  const [fieldMapping, setFieldMapping] = useState<RecordType[]>(jobStore.tableMapping);
+  const tableMapping = jobStore.tableMapping;
 
   const columns: TableProps<FieldType>["columns"] = [
     {
@@ -107,54 +109,90 @@ const S: FC<IProps> = () => {
     },
   ];
 
-  // set ActiveKey
-  useEffect(() => {
-    if (jobStore.tableMapping.length > 0) {
-      setActiveKey(jobStore.tableMapping[0].sourceTable);
+  // Use Promise.all to fetch both source and target table fields
+  const fetchBothTableFields = async (currentTableConfig: any) => {
+    try {
+      const [sourceRes, targetRes] = await Promise.all([
+        getTableColumns({
+          "connId": jobStore.sourceConnId,
+          "dbName": currentTableConfig.sourceDbName,
+          "tableName": currentTableConfig.sourceTable
+        }),
+        getTableColumns({
+          "connId": jobStore.targetConnId,
+          "dbName": currentTableConfig.targetDbName,
+          "tableName": currentTableConfig.targetTable
+        })
+      ]);
+
+      // Process source field data
+      const sourceFieldList: any[] = [];
+      const sourceData = sourceRes.data || sourceRes;
+      Object.keys(sourceData).forEach((i) => {
+        sourceFieldList.push({
+          key: sourceData[i].name,
+          label: sourceData[i].name,
+          value: sourceData[i].name,
+          type: sourceData[i].type,
+          primaryKey: sourceData[i].primaryKey,
+          nullable: sourceData[i].nullable,
+          defaultValue: sourceData[i].defaultValue,
+        });
+      });
+
+      // Process target field data
+      const targetFieldList: any[] = [];
+      const targetData = targetRes.data || targetRes;
+      Object.keys(targetData).forEach((i) => {
+        targetFieldList.push({
+          name: targetData[i].name,
+          type: targetData[i].type,
+          primaryKey: targetData[i].primaryKey,
+          nullable: targetData[i].nullable,
+          defaultValue: targetData[i].defaultValue,
+        });
+      });
+
+      // Set state
+      console.log("sourceFieldList:", sourceFieldList);
+      console.log("targetFieldList:", targetFieldList);
+      setSourceFields(sourceFieldList);
+      setTargetFields(targetFieldList);
+
+      // After both requests are completed, perform field mapping
+      performFieldMapping(sourceFieldList, targetFieldList, matchMethod);
+
+    } catch (error) {
+      console.error('Error fetching table fields:', error);
+      message.error(t('common.requestError'));
     }
-  }, [jobStore.tableMapping]);
+  };
 
   useEffect(() => {
     if (activeKey === '') {
+      // set ActiveKey - only set default on initial load
+      if (tableMapping.length > 0) {
+        setActiveKey(tableMapping[0].sourceTable);
+      }
       return;
     }
-    // request source fields, used to FieldMapping table's select options
-    console.log('request source table fields: ', activeKey);
-    reqSourceFields.caller({ "connId": jobStore.sourceConnId, "dbName": jobStore.sourceDbName, "tableName": activeKey });
 
-    // request all table fields, used to tableData
-    let params = {}
-    jobStore.tableMapping.forEach(item => {
-      if (item.sourceTable == activeKey) {
-        if (item.targetDbName == "") {
-          message.error(t('job.edit.mapping.message.targetDbRequired'));
-          return;
-        }
-        if (item.targetTable == "") {
-          message.error(t('job.edit.mapping.message.targetTableRequired'));
-          return;
-        }
-        params = {
-          "sourceConnId": jobStore.sourceConnId, "sourceDbName": item.sourceDbName, "sourceTable": item.sourceTable,
-          "targetConnId": jobStore.targetConnId, "targetDbName": item.targetDbName, "targetTable": item.targetTable, "matchMethod": matchMethod
-        }
-      }
-    })
-    // we should check using store's data or request new data
-    let needRequest = true;
-    jobStore.tableMapping.forEach(key => {
-      if (key.sourceTable === activeKey) {
-        if (key.matchMethod === matchMethod) {
-          if (key.fieldData.length != 0) {
-            needRequest = false;
-            setWriteType(key.writeType);
-            setTableData(key.fieldData);
-          }
-        }
-      }
-    });
-    if (needRequest) {
-      reqAllTableFields.caller(params);
+    // Get the configuration information for the currently active table
+    let currentTableConfig = tableMapping.find(item => item.sourceTable === activeKey);
+    if (!currentTableConfig) {
+      return;
+    }
+    // show current table's writeType and tableData
+    setWriteType(currentTableConfig.writeType);
+    setTableData(currentTableConfig.fieldData);
+    // Check if data needs to be re-requested
+    if (currentTableConfig.matchMethod != matchMethod || currentTableConfig.fieldData.length == 0) {
+      // clear current table data, avoid showing old data
+      setTableData([]);
+      setSourceFields([]);
+      setTargetFields([]);
+      // Use Promise.all to fetch both source and target table fields
+      fetchBothTableFields(currentTableConfig);
     }
   }, [activeKey, matchMethod]);
 
@@ -176,17 +214,68 @@ const S: FC<IProps> = () => {
     }
   });
 
-  const reqAllTableFields = useRequest(getAllTableColumns, {
-    wrapperFun: (res: any, excessParams: any) => {
+  const reqTargetFields = useRequest(getTableColumns, {
+    wrapperFun: (res: any) => {
       const arr: any[] = [];
-      res.forEach((item: any) => {
-        item['key'] = item.targetFieldName;
-        arr.push(item);
+      Object.keys(res).forEach((i) => {
+        arr.push({
+          name: res[i].name,
+          type: res[i].type,
+          primaryKey: res[i].primaryKey,
+          nullable: res[i].nullable,
+          defaultValue: res[i].defaultValue,
+        });
       });
-      setTableData(arr);
-      return arr;
+      setTargetFields(arr);
     }
   });
+
+  // Perform field matching logic (frontend implementation)
+  const performFieldMapping = (sourceFieldList: any[], targetFieldList: any[], method: number) => {
+    const matchByName = method === 1; // 1: match by name, 2: match by order
+    const mappedFields: FieldType[] = [];
+
+    targetFieldList.forEach((targetField, index) => {
+      const fieldMapping: FieldType = {
+        sourceFieldName: '',
+        sourceFieldType: '',
+        sourcePrimaryKey: false,
+        sourceNullable: true,
+        targetFieldName: targetField.name,
+        targetFieldType: targetField.type,
+        targetPrimaryKey: targetField.primaryKey,
+        targetNullable: targetField.nullable,
+      };
+
+      if (matchByName) {
+        // Match by field name
+        const matchedSource = sourceFieldList.find(sourceField =>
+          targetField.name.toLowerCase() === sourceField.value.toLowerCase()
+        );
+        if (matchedSource) {
+          fieldMapping.sourceFieldName = matchedSource.value;
+          fieldMapping.sourceFieldType = matchedSource.type;
+          fieldMapping.sourcePrimaryKey = matchedSource.primaryKey;
+          fieldMapping.sourceNullable = matchedSource.nullable;
+        }
+      } else {
+        // Match by field order
+        if (sourceFieldList.length > index) {
+          const sourceField = sourceFieldList[index];
+          fieldMapping.sourceFieldName = sourceField.value;
+          fieldMapping.sourceFieldType = sourceField.type;
+          fieldMapping.sourcePrimaryKey = sourceField.primaryKey;
+          fieldMapping.sourceNullable = sourceField.nullable;
+        }
+      }
+      mappedFields.push(fieldMapping);
+    });
+    console.log("fieldMapping changed:", mappedFields);
+    setTableData(mappedFields.map((field, index) => ({
+      ...field,
+      key: `${activeKey}_${field.targetFieldName}_${index}`
+    })));
+  };
 
   // handle edit
   const handleDelete = (key: string) => {
@@ -225,22 +314,21 @@ const S: FC<IProps> = () => {
     setMatchMethod(e.target.value);
   };
 
+  // sync current tab data to store
   useEffect(() => {
     if (activeKey !== '') {
-      fieldMapping.forEach(item => {
-        if (item.sourceTable === activeKey) {
-          item.fieldData = tableData;
-          item.writeType = writeType;
-          item.matchMethod = matchMethod;
-        }
-      });
-      jobStore.setTableMapping([...fieldMapping]);
+      const updatedMapping = tableMapping.map(item =>
+        item.sourceTable === activeKey
+          ? { ...item, fieldData: tableData, writeType, matchMethod }
+          : item
+      );
+      jobStore.setTableMapping(updatedMapping);
     }
-  }, [tableData, writeType, matchMethod]);
+  }, [activeKey, tableData, writeType, matchMethod]);
 
   return (
-    <Spin spinning={reqAllTableFields.loading}>
-      <Tabs type="line" activeKey={activeKey} onChange={onTabChange} items={jobStore.tableMapping.map(item => { return { key: item.sourceTable, label: item.sourceTable } })} />
+    <Spin spinning={reqSourceFields.loading || reqTargetFields.loading}>
+      <Tabs type="line" activeKey={activeKey} onChange={onTabChange} items={tableMapping.map(item => { return { key: item.sourceTable, label: item.sourceTable } })} />
       <Form>
         <Row gutter={[8, 0]}>
           <Col span={12}>
@@ -260,7 +348,14 @@ const S: FC<IProps> = () => {
             </div>
           </Col>
         </Row>
-        <Table bordered size="small" columns={columns} dataSource={tableData} />
+        <Table
+          bordered
+          size="small"
+          columns={columns}
+          dataSource={tableData}
+          pagination={false}
+          rowKey="key"
+        />
       </Form>
     </Spin>
   );

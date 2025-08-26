@@ -71,13 +71,13 @@ public class MySQLJdbcConnector extends JdbcConnector {
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
         // For MySQL: catalog = database name, schema = null
-        return getTableFieldsWithParams(null, database, table, "%");
+        return getTableFieldsWithParams(database, null, table, "%");
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
         // For MySQL: catalog = database name, schema = null
-        return getTableFieldsWithParams(null, database, table, columnNamePattern);
+        return getTableFieldsWithParams(database, null, table, columnNamePattern);
     }
 
 }

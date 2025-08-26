@@ -166,7 +166,7 @@ const S: FC<IProps> = () => {
   });
 
   useEffect(() => {
-    reqList.caller({ "type": activeKey === "Database" ? 1 : 2 });
+    reqList.caller({ "types": activeKey === "Database" ? ["Database"] : ["File", "MQ"] });
   }, [activeKey, refresh]);
 
   const onTabChange = (key: string) => {

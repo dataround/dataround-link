@@ -72,14 +72,14 @@ public class TidbJdbcConnector extends JdbcConnector {
 
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
-        // For TiDB (MySQL protocol): catalog = database name, schema = null
-        return getTableFieldsWithParams(null, database, table, "%");
+        // For TiDB (MySQL compatible): catalog = database name, schema = null
+        return getTableFieldsWithParams(database, null, table, "%");
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
-        // For TiDB (MySQL protocol): catalog = database name, schema = null
-        return getTableFieldsWithParams(null, database, table, columnNamePattern);
+        // For TiDB (MySQL compatible): catalog = database name, schema = null
+        return getTableFieldsWithParams(database, null, table, columnNamePattern);
     }
 
 }

@@ -18,30 +18,28 @@ package io.dataround.link.connector;
 
 import java.util.HashMap;
 import java.util.List;
+import io.dataround.link.common.connector.Param;
 
 import org.junit.Test;
 
-import io.dataround.link.common.connector.Param;
-
 /**
- * Oracle JDBC connector test
+ * MySQL JDBC connector test
  * 
  * @author yuehan124@gmail.com
- * @since 2025-08-03
+ * @since 2025-08-26
  */
-public class OracleJdbcConnectorTest {
-
+public class MySQLJdbcConnectorTest {
     @Test
     public void testDoGetDatabases() {
         Param param = new Param();
-        param.setUser("tpcds");
-        param.setPassword("tpcds1234@56");
+        param.setUser("root");
+        param.setPassword("test1234zxcv....");
         param.setConfig(new HashMap<>());
-        param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
-        param.getConfig().put("url", "jdbc:oracle:thin:@//10.8.0.1:1521/XEPDB1");
-        try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
+        param.getConfig().put("driver", "com.mysql.cj.jdbc.Driver");
+        param.getConfig().put("url", "jdbc:mysql://10.8.0.1:3306/test");
+        try (MySQLJdbcConnector connector = new MySQLJdbcConnector()) {
             connector.initialize(param);
-            List<String> databases = connector.getDatabases();
+            List<String> databases = connector.doGetDatabases();
             System.out.println(databases);
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,19 +47,24 @@ public class OracleJdbcConnectorTest {
     }
 
     @Test
-    public void testDoGetTables() {
+    public void testDoGetTableFields() {
         Param param = new Param();
-        param.setUser("tpcds");
-        param.setPassword("tpcds1234@56");
+        param.setUser("root");
+        param.setPassword("test1234zxcv....");
         param.setConfig(new HashMap<>());
-        param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
-        param.getConfig().put("url", "jdbc:oracle:thin:@//10.8.0.1:1521/XEPDB1");
-        try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
+        param.getConfig().put("driver", "com.mysql.cj.jdbc.Driver");
+        param.getConfig().put("url", "jdbc:mysql://10.8.0.1:3306/test");
+        try (MySQLJdbcConnector connector = new MySQLJdbcConnector()) {
             connector.initialize(param);
-            List<String> tables = connector.getTables("tpcds");
-            System.out.println(tables);
+            List<TableField> tableFields = connector.doGetTableFields("test", "gen_table");
+            System.out.println(tableFields);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testDoGetTables() {
+
     }
 }

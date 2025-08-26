@@ -62,26 +62,28 @@ public class SQLServerJdbcConnector extends JdbcConnector {
 
     @Override
     public List<String> doGetTables(String database) {
-        // For SQL Server: catalog = database name, schema = "dbo" (default schema)
-        return getTablesWithParams(database, "dbo", "%", new String[]{"TABLE", "VIEW"});
+        // For SQL Server: catalog = database name, schema = null (get tables from all schemas)
+        return getTablesWithParams(database, null, "%", new String[]{"TABLE", "VIEW"});
     }
 
     @Override
     public List<String> doGetTables(String database, String tableNamePattern) {
-        // For SQL Server: catalog = database name, schema = "dbo" (default schema)
-        return getTablesWithParams(database, "dbo", tableNamePattern, new String[]{"TABLE", "VIEW"});
+        // For SQL Server: catalog = database name, schema = null (get tables from all schemas)
+        return getTablesWithParams(database, null, tableNamePattern, new String[]{"TABLE", "VIEW"});
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
-        // For SQL Server: catalog = database name, schema = "dbo" (default schema)
-        return getTableFieldsWithParams(null, database, table, "%");
+        // For SQL Server: catalog = database name, schema = null (search in all schemas)
+        // This will find the table regardless of which schema it's in
+        return getTableFieldsWithParams(database, null, table, "%");
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
-        // For SQL Server: catalog = database name, schema = "dbo" (default schema)
-        return getTableFieldsWithParams(null, database, table, columnNamePattern);
+        // For SQL Server: catalog = database name, schema = null (search in all schemas)
+        // This will find the table regardless of which schema it's in
+        return getTableFieldsWithParams(database, null, table, columnNamePattern);
     }
 
 }

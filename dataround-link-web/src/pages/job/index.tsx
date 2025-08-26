@@ -204,8 +204,6 @@ const S: FC<IProps> = () => {
       jobStore.setEndTime(res.endTime);
       jobStore.setCron(res.cron);
 
-      jobStore.setSourceConnector(res.sourceConnector);
-      jobStore.setTargetConnector(res.targetConnector);
       jobStore.setSourceConnId(res.sourceConnId);
       jobStore.setTargetConnId(res.targetConnId);
       jobStore.setSourceDbName(res.sourceDbName);
