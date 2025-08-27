@@ -19,24 +19,14 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-06-05
  */
-import {
-  Checkbox,
-  Col,
-  Form, Input, List,
-  Popconfirm,
-  Row,
-  Select,
-  Table,
-  Tabs
-} from "antd";
-import { FC, memo, useEffect, useState } from "react";
+import { Checkbox, Col, Form, Input, List, Popconfirm, Row, Select, Table, Tabs } from "antd";
+import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import useRequest from "../../../hooks/useRequest";
 import { useNavigate } from "react-router-dom";
 import { getConnections, getDatabaseList, getTableList } from "../../../api/connection";
 import { CheckboxChangeEventTarget, CheckboxProps } from "antd/es/checkbox/Checkbox";
-import { JOB_TYPE_STREAM, jobStore } from "../../../store";
 import { useTranslation } from 'react-i18next';
-
+import { JobFormData, StepRef } from './index';
 
 interface ListType {
   idx: number;
@@ -62,88 +52,86 @@ export interface RecordType {
   whereClause: string;
   writeType: number;
   matchMethod: number;
-  fieldData: FieldType[]
+  fieldMapping: FieldType[]
 }
 
-interface IProps { }
-const S: FC<IProps> = (props) => {
+interface IProps { 
+  data: JobFormData;
+  onDataChange: (updates: Partial<JobFormData>) => void;
+}
+
+const S = forwardRef<StepRef, IProps>((props, ref) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const jobType = jobStore.jobType;
-  // request from store
-  const [sourceConnId, setSourceConnId] = useState<string>(jobStore.sourceConnId);
-  const [sourceDbName, setSourceDbName] = useState<string>(jobStore.sourceDbName);
-  const [targetConnId, setTargetConnId] = useState<string>(jobStore.targetConnId);
-  const [targetDbName, setTargetDbName] = useState<string>(jobStore.targetDbName);
-  // request new data
+  const { data, onDataChange } = props;
+  const jobType = data.jobType;
+  const [sourceConnId, setSourceConnId] = useState<string>(data.sourceConnId || '');
+  const [sourceDbName, setSourceDbName] = useState<string>(data.sourceDbName || '');
+  const [targetConnId, setTargetConnId] = useState<string>(data.targetConnId || '');
+  const [targetDbName, setTargetDbName] = useState<string>(data.targetDbName || '');
   const [sourceTables, setSourceTables] = useState<any[]>([]);
   const [sourceConnOptions, setSourceConnOptions] = useState<object[]>([]);
   const [sourceDbOptions, setSourceDbOptions] = useState<object[]>([]);
   const [targetTables, setTargetTables] = useState<object[]>([]);
   const [targetConnOptions, setTargetConnOptions] = useState<object[]>([]);
   const [targetDbOptions, setTargetDbOptions] = useState<object[]>([]);
-
-  // table mapping
-  const [tableData, setTableData] = useState<RecordType[]>(jobStore.tableMapping);
-  // maintain a state to record whether all items are selected
+  const [tableMapping, setTableMapping] = useState<RecordType[]>(data.tableMapping || []);
   const [checkedAll, setCheckedAll] = useState(false);
-  // maintain a state to record whether some items are selected
   const [indeterminate, setIndeterminate] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // expose validate and get data method
+  useImperativeHandle(ref, () => ({
+    validateFields: async () => {
+      try {
+        await form.validateFields();
+        const isValid = tableMapping.length > 0 && tableMapping.every(item => item.targetTable);
+        if (isValid) {
+          console.log("step-source form values changed");
+          onDataChange({ sourceConnId, sourceDbName, targetConnId, targetDbName, tableMapping: tableMapping });
+        }
+        return isValid;
+      } catch (error) {
+        return false;
+      }
+    },
+    getFieldsValue: () => ({ sourceConnId, sourceDbName, targetConnId, targetDbName, tableMapping: tableMapping })
+  }));
 
   const columns = [
-    {
-      key: 'sourceDbName',
-      title: t('job.edit.source.table.sourceDb'),
-      dataIndex: 'sourceDbName',
-    },
-    {
-      key: 'sourceTable',
-      title: t('job.edit.source.table.sourceTable'),
-      dataIndex: 'sourceTable',
-    },
-    {
-      key: 'targetDbName',
-      title: t('job.edit.source.table.targetDb'),
-      dataIndex: 'targetDbName',
-    },
+    { key: 'sourceDbName', title: t('job.edit.source.table.sourceDb'), dataIndex: 'sourceDbName' },
+    { key: 'sourceTable', title: t('job.edit.source.table.sourceTable'), dataIndex: 'sourceTable' },
+    { key: 'targetDbName', title: t('job.edit.source.table.targetDb'), dataIndex: 'targetDbName' },
     {
       key: 'targetTable',
-      title: t('job.edit.source.table.targetTable'),
+      title: <span><span style={{ color: 'red', marginRight: '4px' }}>*</span>{t('job.edit.source.table.targetTable')}</span>,
       dataIndex: 'targetTable',
-      render: (text: string, record: any) => {
-        return <Select 
-          size="small" 
-          style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
-          showSearch 
-          options={targetTables} 
-          defaultValue={text} 
-          onChange={(val: string) => { record.targetTable = val }}
-        />;
-      }
+      render: (text: string, record: any) => (
+        <Select size="small" style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
+          showSearch options={targetTables} value={record.targetTable || undefined} 
+          placeholder={t('job.edit.source.placeholder.selectTable')} 
+          onChange={(val: string) => { record.targetTable = val; setTableMapping([...tableMapping]); }} />
+      )
     },
     {
       key: 'whereClause',
       title: t('job.edit.source.table.filter'),
       dataIndex: 'whereClause',
-      render: (text: string, record: any) => {
-        return <Input 
-          size="small" 
-          style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
-          defaultValue={text} 
-          onChange={(e) => { record.whereClause = e.target.value; }}
-        />;
-      }
+      render: (text: string, record: any) => (
+        <Input size="small" style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
+          defaultValue={text} placeholder={t('job.edit.source.placeholder.whereClause')} 
+          onChange={(e) => { record.whereClause = e.target.value; setTableMapping([...tableMapping]); }} />
+      )
     },
     {
       key: 'op',
       title: t('job.edit.source.table.operation'),
-      render: (_: any, record: any) =>
-        tableData.length >= 1 ? (
-          <Popconfirm title={t('job.edit.source.modal.deleteConfirm')} onConfirm={() => handleDelete(record.sourceTable)}>
-            <a>{t('common.delete')}</a>
-          </Popconfirm>
-        ) : null,
+      render: (_: any, record: any) => tableMapping.length >= 1 ? (
+        <Popconfirm title={t('job.edit.source.modal.deleteConfirm')} onConfirm={() => handleDelete(record.sourceTable)}>
+          <a>{t('common.delete')}</a>
+        </Popconfirm>
+      ) : null,
     },
   ];
 
@@ -152,21 +140,47 @@ const S: FC<IProps> = (props) => {
     reqTargetConnection.caller({"types":["Database", "MQ"]});
   }, []);
 
-  // request connections
+  // only initialize once in edit mode (when data changes from empty to non-empty)
+  useEffect(() => {
+    if (!isInitialized) {
+      console.log("isInitialized", isInitialized);
+      // update form
+      form.setFieldsValue({
+        sourceConnection: data.sourceConnId,
+        sourceDatabase: data.sourceDbName,
+        targetConnection: data.targetConnId,
+        targetDatabase: data.targetDbName,
+      });
+      
+      // load dropdown options for edit mode
+      if (data.sourceConnId) reqSourceDatabase.caller(data.sourceConnId);
+      if (data.targetConnId) reqTargetDatabase.caller(data.targetConnId);
+      if (data.sourceDbName && data.sourceConnId) {
+        reqSourceTables.caller({ dbName: data.sourceDbName, connId: data.sourceConnId });
+      }
+      if (data.targetDbName && data.targetConnId) {
+        reqTargetTables.caller({ dbName: data.targetDbName, connId: data.targetConnId });
+      }
+      
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
+
   const formatConnections = (res: any) => {
     const arr: object[] = [];
     Object.keys(res).forEach((i) => {
-      // res[i].id is the connection id, used to get database/table list
       arr.push({ value: res[i].id, label: `${res[i].name} (${res[i].connector})` });
     });
     return arr;
   };
+
   const reqSourceConnection = useRequest(getConnections, {
     wrapperFun: (res: any) => {
       const arr: object[] = formatConnections(res);
       setSourceConnOptions(arr);
     }
   });
+
   const reqTargetConnection = useRequest(getConnections, {
     wrapperFun: (res: any) => {
       const arr: object[] = formatConnections(res);
@@ -174,19 +188,6 @@ const S: FC<IProps> = (props) => {
     }
   });
 
-  useEffect(() => {
-    if (sourceConnId) {
-      reqSourceDatabase.caller(sourceConnId);
-    }
-  }, [sourceConnId]);
-
-  useEffect(() => {
-    if (targetConnId) {
-      reqTargetDatabase.caller(targetConnId);
-    }
-  }, [targetConnId]);
-
-  // request databases
   const formatDatabases = (res: any) => {
     const arr: object[] = [];
     Object.keys(res).forEach((i) => {
@@ -194,12 +195,14 @@ const S: FC<IProps> = (props) => {
     });
     return arr;
   };
+
   const reqSourceDatabase = useRequest(getDatabaseList, {
     wrapperFun: (res: any) => {
       const arr: object[] = formatDatabases(res);
       setSourceDbOptions(arr);
     }
   });
+
   const reqTargetDatabase = useRequest(getDatabaseList, {
     wrapperFun: (res: any) => {
       const arr: object[] = formatDatabases(res);
@@ -207,32 +210,18 @@ const S: FC<IProps> = (props) => {
     }
   });
 
-  // request tables if database changed
-  useEffect(() => {
-    if (sourceDbName) {
-      reqSourceTables.caller({ dbName: sourceDbName, connId: sourceConnId });
-    }
-  }, [sourceDbName]);
-
-  useEffect(() => {
-    if (targetDbName) {
-      reqTargetTables.caller({ dbName: targetDbName, connId: targetConnId });
-    }
-  }, [targetDbName]);
-
-  // request tables
   const reqSourceTables = useRequest(getTableList, {
     wrapperFun: (res: any) => {
       const arr: ListType[] = [];
       Object.keys(res).forEach((i) => {
-        // If tableData exists in store, we should init sourceTables checked status
-        let ischeck: boolean = tableData.find(item => item.sourceTable === res[i]) ? true : false;
+        let ischeck: boolean = tableMapping.find(item => item.sourceTable === res[i]) ? true : false;
         arr.push({ idx: Number(i), label: res[i], value: res[i], checked: ischeck });
       });
       setSourceTables(arr);
       return arr;
     }
   });
+
   const reqTargetTables = useRequest(getTableList, {
     wrapperFun: (res: any) => {
       const arr: any[] = [];
@@ -245,166 +234,149 @@ const S: FC<IProps> = (props) => {
   });
 
   const onCheckedChange = (target: CheckboxChangeEventTarget, item: ListType) => {
-    // update sourceTables
     item.checked = target.checked;
-    // update checkAll status
     updateCheckAllBySourceTables();
-    // update right table rows
     const row: RecordType = listItem2Row(item);
     if (target.checked) {
-      let index = tableData.findIndex(item => item.sourceTable > row.sourceTable);
-      if (index === -1) {
-        index = tableData.length;
-      }
-      tableData.splice(index, 0, row);
+      let index = tableMapping.findIndex(item => item.sourceTable > row.sourceTable);
+      if (index === -1) { index = tableMapping.length; }
+      tableMapping.splice(index, 0, row);
     } else {
-      let index = tableData.findIndex(item => item.sourceTable == row.sourceTable);
-      if (index != -1) {
-        tableData.splice(index, 1);
-      }
+      let index = tableMapping.findIndex(item => item.sourceTable == row.sourceTable);
+      if (index != -1) { tableMapping.splice(index, 1); }
     }
-    setTableData([...tableData]);
+    setTableMapping([...tableMapping]);
   };
 
-  // update checkAll status by sourceTables
   const updateCheckAllBySourceTables = () => {
     let hasChecked = false;
     let allChecked = true;
-    // if sourceTables length equals zero, both indeterminate and checkedAll is false
     if (sourceTables.length > 0) {
       Object.values(sourceTables).forEach(item => {
-        if (item.checked) {
-          hasChecked = true;
-        }
+        if (item.checked) { hasChecked = true; }
         allChecked = allChecked && item.checked;
       });
       setCheckedAll(allChecked);
-      if (!allChecked) {
-        setIndeterminate(hasChecked);
-      } else {
-        setIndeterminate(false);
-      }
+      if (!allChecked) { setIndeterminate(hasChecked); } else { setIndeterminate(false); }
     }
   }
 
   const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
     const isChecked: boolean = e.target.checked;
-    sourceTables.forEach((item, index) => {
-      item.checked = isChecked;
-    });
-    // handle table records
+    sourceTables.forEach((item, index) => { item.checked = isChecked; });
     if (!isChecked) {
-      setTableData([]);
+      setTableMapping([]);
     } else {
       const arr: RecordType[] = [];
-      sourceTables.forEach((item, index) => {
-        arr.push(listItem2Row(item));
-      });
-      setTableData(arr);
+      sourceTables.forEach((item, index) => { arr.push(listItem2Row(item)); });
+      setTableMapping(arr);
     }
     setCheckedAll(isChecked);
   };
 
   const listItem2Row = (item: ListType) => {
-    const row: RecordType = { sourceDbName: sourceDbName, sourceTable: item.value, targetDbName: targetDbName, targetTable: "", whereClause: "", writeType: 1, matchMethod: 1, fieldData: []}
+    const row: RecordType = { sourceDbName: sourceDbName, sourceTable: item.value, targetDbName: targetDbName, targetTable: "", whereClause: "", writeType: 1, matchMethod: 1, fieldMapping: []}
     return row;
   };
 
-  // delete right table row
   const handleDelete = (key: React.Key) => {
-    setTableData(tableData.filter(item => item.sourceTable !== key));
+    setTableMapping(tableMapping.filter(item => item.sourceTable !== key));
     sourceTables.forEach(item => {
-      if (item.label === key) {
-        item.checked = false;
-      }
+      if (item.label === key) { item.checked = false; }
     });
   };
 
-  // jobstore
-  useEffect(() => {
-    jobStore.setSourceConnId(sourceConnId);
-    jobStore.setSourceDbName(sourceDbName);
-    jobStore.setTargetConnId(targetConnId);
-    jobStore.setTargetDbName(targetDbName);
-    console.log("tableMapping changed===>", tableData);
-    jobStore.setTableMapping(tableData);
-  }, [sourceConnId, sourceDbName, targetConnId, targetDbName, tableData]);
-
-  const initialValues = {
-    sourceConnection: sourceConnId,
-    sourceDatabase: sourceDbName,
-    targetConnection: targetConnId,
-    targetDatabase: targetDbName,
-  };
   return (
     <>
-      <Form
-        form={form}
-        labelCol={{ span: 3 }}
-        wrapperCol={{ span: 10 }}
-        initialValues={initialValues}
-      >
+      <Form form={form} labelCol={{ span: 3 }} wrapperCol={{ span: 10 }}>
         <Tabs defaultActiveKey="tabList" items={[{ key: "tabSource", label: t('job.edit.source.tabs.source') }]} />
-        <Form.Item name="sourceConnection" label={t('job.edit.source.form.sourceConnection')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectConnection')} options={sourceConnOptions} onChange={val => setSourceConnId(val)} 
-            showSearch
-            filterOption={(input, option: any) =>
+        <Form.Item name="sourceConnection" label={t('job.edit.source.form.sourceConnection')} 
+          rules={[{ required: true, message: t('job.edit.source.placeholder.selectConnection') }]}>
+          <Select 
+            placeholder={t('job.edit.source.placeholder.selectConnection')} 
+            options={sourceConnOptions} 
+            onChange={val => { 
+              setSourceConnId(val); 
+              setSourceDbOptions([]); 
+              setSourceDbName(''); 
+              form.setFieldsValue({ sourceConnection: val, sourceDatabase: undefined }); 
+              if (val) reqSourceDatabase.caller(val); 
+            }} 
+            showSearch 
+            filterOption={(input, option: any) => 
               (option?.label as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-            }></Select>
+            } 
+          />
         </Form.Item>
-        <Form.Item name="sourceDatabase" label={t('job.edit.source.form.sourceDatabase')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectDatabase')} showSearch options={sourceDbOptions} onChange={val => setSourceDbName(val)}></Select>
+        <Form.Item name="sourceDatabase" label={t('job.edit.source.form.sourceDatabase')} 
+          rules={[{ required: true, message: t('job.edit.source.placeholder.selectDatabase') }]}>
+          <Select 
+            placeholder={t('job.edit.source.placeholder.selectDatabase')} 
+            showSearch 
+            options={sourceDbOptions} 
+            onChange={val => {
+              setSourceDbName(val); 
+              form.setFieldsValue({ sourceDatabase: val }); 
+              if (val) reqSourceTables.caller({ dbName: val, connId: sourceConnId });
+            }} 
+          />
         </Form.Item>
 
         <Tabs defaultActiveKey="tabList" items={[{ key: "tabTarget", label: t('job.edit.source.tabs.target') }]} />
-        <Form.Item name="targetConnection" label={t('job.edit.source.form.targetConnection')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectConnection')} options={targetConnOptions} onChange={val => setTargetConnId(val)}
-            showSearch
-            filterOption={(input, option: any) =>
+        <Form.Item name="targetConnection" label={t('job.edit.source.form.targetConnection')} 
+          rules={[{ required: true, message: t('job.edit.source.placeholder.selectConnection') }]}>
+          <Select 
+            placeholder={t('job.edit.source.placeholder.selectConnection')} 
+            options={targetConnOptions} 
+            onChange={val => { 
+              setTargetConnId(val); 
+              setTargetDbOptions([]); 
+              setTargetDbName(''); 
+              form.setFieldsValue({ targetConnection: val, targetDatabase: undefined }); 
+              if (val) reqTargetDatabase.caller(val); 
+            }} 
+            showSearch 
+            filterOption={(input, option: any) => 
               (option?.label as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-            }></Select>
+            } 
+          />
         </Form.Item>
-        <Form.Item name="targetDatabase" label={t('job.edit.source.form.targetDatabase')}>
-          <Select placeholder={t('job.edit.source.placeholder.selectDatabase')} showSearch options={targetDbOptions} onChange={val => setTargetDbName(val)}></Select>
+        <Form.Item name="targetDatabase" label={t('job.edit.source.form.targetDatabase')} 
+          rules={[{ required: true, message: t('job.edit.source.placeholder.selectDatabase') }]}>
+          <Select 
+            placeholder={t('job.edit.source.placeholder.selectDatabase')} 
+            showSearch 
+            options={targetDbOptions} 
+            onChange={val => { 
+              setTargetDbName(val); 
+              form.setFieldsValue({ targetDatabase: val }); 
+              if (val) reqTargetTables.caller({ dbName: val, connId: targetConnId }); 
+            }} 
+          />
         </Form.Item>
 
         <Tabs defaultActiveKey="tabList" items={[{ key: "tabMapping", label: t('job.edit.source.tabs.mapping') }]} />
         <Row>
           <Col span={6}>
-            <Table 
-              size="small" 
-              bordered 
-              dataSource={sourceTables} 
-              pagination={{ pageSize: 15 }}
-              showHeader={true}
-              columns={[
-                {
-                  title: (
-                    <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkedAll}>
-                      {t('job.edit.source.list.selectAll')}
-                    </Checkbox>
-                  ),
-                  dataIndex: 'value',
-                  key: 'value',
-                  render: (text: string, record: ListType) => (
-                    <Checkbox checked={record.checked} onChange={(e) => onCheckedChange(e.target, record)}>
-                      {record.value}
-                    </Checkbox>
-                  )
-                }
-              ]}
-            />
+            <Table size="small" bordered dataSource={sourceTables} pagination={{ pageSize: 15 }} showHeader={true} columns={[
+              {
+                title: (<Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkedAll}>{t('job.edit.source.list.selectAll')}</Checkbox>),
+                dataIndex: 'value',
+                key: 'value',
+                render: (text: string, record: ListType) => (
+                  <Checkbox checked={record.checked} onChange={(e) => onCheckedChange(e.target, record)}>{record.value}</Checkbox>)
+              }
+            ]} />
           </Col>
           <Col span={1}></Col>
           <Col span={16}>
-            <Table bordered size="small" columns={columns} dataSource={tableData} pagination={{ pageSize: 15 }} />
+            <Table bordered size="small" columns={columns} dataSource={tableMapping} pagination={{ pageSize: 15 }} />
           </Col>
         </Row>
       </Form>
-
     </>
   );
-};
+});
 
 const StepSource = memo(S);
 

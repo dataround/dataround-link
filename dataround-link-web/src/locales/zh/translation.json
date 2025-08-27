@@ -104,7 +104,9 @@
         "placeholder": {
           "selectType": "请选择",
           "selectConnection": "请选择连接名",
-          "selectDatabase": "请选择数据库名"
+          "selectDatabase": "请选择数据库名",
+          "selectTable": "请选择表名",
+          "whereClause": "sql where条件"
         },
         "table": {
           "sourceDb": "源库名",

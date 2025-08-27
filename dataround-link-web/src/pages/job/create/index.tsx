@@ -19,13 +19,11 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-06-05
  */
-import {
-  Button, Form, Steps, message
-} from "antd";
-import { FC, memo, useEffect, useState } from "react";
+import { Button, Form, Spin, Steps, message } from "antd";
+import { FC, memo, useEffect, useState, useRef, useCallback } from "react";
 import { getJobId, saveJob } from "../../../api/job";
 import useRequest from "../../../hooks/useRequest";
-import { JOB_TYPE_BATCH, jobStore } from "../../../store";
+import { JOB_TYPE_BATCH } from "../../../store";
 import "./index.less";
 import StepMapping from "./step-mapping";
 import StepSave from "./step-save";
@@ -35,61 +33,151 @@ import { useTranslation } from 'react-i18next';
 
 interface IProps { }
 
+// define form data structure
+export interface JobFormData {
+  id?: string;
+  name?: string;
+  description?: string;
+  jobType?: number;
+  scheduleType?: number;
+  cron?: string;
+  startTime?: string;
+  endTime?: string;
+  sourceConnId?: string;
+  targetConnId?: string;
+  sourceDbName?: string;
+  targetDbName?: string;
+  tableMapping?: any[];
+}
+
+export interface StepRef {
+  validateFields: () => Promise<boolean>;
+  getFieldsValue: () => any;
+}
+
 const S: FC<IProps> = () => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
-  // retrieve the value of the 'jobType' parameter from the URL
-  var urlParams = new URLSearchParams(window.location.search);
+  const stepSourceRef = useRef<StepRef>(null);
+  const stepMappingRef = useRef<StepRef>(null);
+  const stepSaveRef = useRef<StepRef>(null);
+  
+  const urlParams = new URLSearchParams(window.location.search);
   const jobId = urlParams.get("id");
+  const isEdit = jobId != null;
+  const [isLoading, setIsLoading] = useState(isEdit);
   let jobTypeParam = urlParams.get('jobType');
   jobTypeParam = jobTypeParam == null ? "" : jobTypeParam;
-  const jobType = urlParams.get('jobType') ? parseInt(jobTypeParam) : jobStore.jobType;
-  // StepSource need access jobType from jobStore
-  jobStore.jobType = jobType;
+  const jobType = urlParams.get('jobType') ? parseInt(jobTypeParam) : JOB_TYPE_BATCH;
+  
+  // use local state to manage form data
+  const [formData, setFormData] = useState<JobFormData>({
+    jobType: jobType,
+    sourceConnId: '',
+    sourceDbName: '',
+    targetConnId: '',
+    targetDbName: '',
+    tableMapping: [],
+    name: '',
+    description: '',
+    scheduleType: 1,
+    cron: '',
+    startTime: '',
+    endTime: ''
+  });
+
+  // update form data (memoized to prevent infinite loops)
+  const updateFormData = useCallback((updates: Partial<JobFormData>) => {
+    console.log("updateFormData", updates);
+    setFormData(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  // get job detail in edit mode
+  const reqJobDetail = useRequest(getJobId, {
+    wrapperFun: (res: any) => {
+      const jobDetail = res.data || res;
+      const initData: JobFormData = {
+        id: jobDetail.id,
+        name: jobDetail.name,
+        description: jobDetail.description,
+        jobType: jobDetail.jobType,
+        scheduleType: jobDetail.scheduleType,
+        cron: jobDetail.cron,
+        startTime: jobDetail.startTime,
+        endTime: jobDetail.endTime,
+        sourceConnId: jobDetail.sourceConnId,
+        targetConnId: jobDetail.targetConnId,
+        sourceDbName: jobDetail.sourceDbName,
+        targetDbName: jobDetail.targetDbName,
+        tableMapping: jobDetail.tableMapping || []
+      };
+      setFormData(initData);
+    }
+  });
+
+  useEffect(() => {
+    if (isEdit && jobId) {
+      reqJobDetail.caller(jobId).then(() => {
+        setIsLoading(false);
+      });
+    }
+  }, [jobId, isEdit]);
 
   const steps = [
-    {
-      title: t('job.edit.steps.source'),
-      content: <StepSource />,
-      description: ''
-    },
-    {
-      title: t('job.edit.steps.mapping'),
-      content: <StepMapping />,
-    },
-    {
-      title: t('job.edit.steps.save'),
-      content: <StepSave />,
-    },
+    { title: t('job.edit.steps.source'), content: <StepSource ref={stepSourceRef} data={formData} onDataChange={updateFormData} />, description: '' },
+    { title: t('job.edit.steps.mapping'), content: <StepMapping ref={stepMappingRef} data={formData} onDataChange={updateFormData} /> },
+    { title: t('job.edit.steps.save'), content: <StepSave ref={stepSaveRef} data={formData} onDataChange={updateFormData} /> }
   ];
 
-  const next = () => {
-    setCurrent(current + 1);
+  const next = async () => {
+    try {
+      const currentStepRef = [stepSourceRef, stepMappingRef, stepSaveRef][current];
+      if (currentStepRef.current) {
+        const isValid = await currentStepRef.current.validateFields();
+        if (isValid) {
+          setCurrent(current + 1);
+        }
+      } else {
+        setCurrent(current + 1);
+      }
+    } catch (error) {
+      console.error('Step validation failed:', error);
+    }
   };
 
   const prev = () => {
     setCurrent(current - 1);
   };
 
-  const onSaveJob = ()=> {
-    const params:any = {};
-    params.id = jobStore.id;
-    params.name = jobStore.name;
-    params.description = jobStore.description;
-    params.jobType = jobType;
-    params.scheduleType = jobStore.scheduleType;
-    params.cron = jobStore.cron;
-    params.startTime = jobStore.startTime;
-    params.endTime = jobStore.endTime;
-
-    params.sourceConnId = jobStore.sourceConnId;
-    params.targetConnId = jobStore.targetConnId;
-    params.sourceDbName = jobStore.sourceDbName;
-    params.targetDbName = jobStore.targetDbName;
-    params.tableMapping = jobStore.tableMapping;
-    reqSaveJob.caller(params);
+  const onSaveJob = async () => {
+    try {
+      // validate last step
+      if (stepSaveRef.current) {
+        const isValid = await stepSaveRef.current.validateFields();
+        if (!isValid) return;
+      }
+      
+      const params: any = {
+        id: formData.id,
+        name: formData.name,
+        description: formData.description,
+        jobType: formData.jobType,
+        scheduleType: formData.scheduleType,
+        cron: formData.cron,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        sourceConnId: formData.sourceConnId,
+        targetConnId: formData.targetConnId,
+        sourceDbName: formData.sourceDbName,
+        targetDbName: formData.targetDbName,
+        tableMapping: formData.tableMapping,
+      };
+      reqSaveJob.caller(params);
+    } catch (error) {
+      console.error('Save validation failed:', error);
+    }
   }
 
   const reqSaveJob = useRequest(saveJob, {
@@ -100,14 +188,19 @@ const S: FC<IProps> = () => {
   });
 
   const items = steps.map((item) => ({ key: item.title, title: item.title, description: item.description }));
+  const contentStyle: React.CSSProperties = { textAlign: 'left', marginTop: 16, marginLeft: 20 };
+  // when edit mode, make sure job detail request finished before render
+  if (isLoading) {
+    return (
+      <div style={{ padding: '50px', textAlign: 'center' }}>
+        <Spin size="large" />
+        <div style={{ marginTop: 16 }}>{t('common.loading')}</div>
+      </div>
+    );
+  }
 
-  const contentStyle: React.CSSProperties = {
-    textAlign: 'left',
-    marginTop: 16,
-    marginLeft: 20,
-  };
   return (
-    <>
+    <Spin spinning={isLoading}>
       <Steps current={current} items={items} style={{ padding: "10px 20px 10px 20px" }} />
       <div style={contentStyle}>{steps[current].content}</div>
       <div style={{ marginTop: 0, lineHeight: 5 }}>
@@ -127,7 +220,7 @@ const S: FC<IProps> = () => {
           </Button>
         )}
       </div>
-    </>
+    </Spin>
   );
 };
 

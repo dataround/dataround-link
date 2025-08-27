@@ -19,149 +19,129 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-06-05
  */
-import {
-  Checkbox,
-  Col,
-  Form,
-  Popconfirm,
-  Radio,
-  RadioChangeEvent,
-  Row,
-  Select,
-  Space,
-  Spin,
-  TableProps,
-  Tabs,
-  message
-} from "antd";
+import { Checkbox, Col, Form, Popconfirm, Radio, RadioChangeEvent, Row, Select, Space, Spin, TableProps, Tabs, message } from "antd";
 import CommonTable from "../../../components/common-table";
-import { FC, memo, useEffect, useState } from "react";
+import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { getTableColumns } from "../../../api/connection";
 import useRequest from "../../../hooks/useRequest";
-import { jobStore } from "../../../store";
-import { FieldType, RecordType } from "./step-source";
 import { useTranslation } from 'react-i18next';
+import { JobFormData, StepRef } from './index';
 
-interface IProps { }
+interface FieldType {
+  sourceFieldName: string;
+  sourceFieldType: string;
+  sourcePrimaryKey: boolean;
+  sourceNullable: boolean;
+  targetFieldName: string;
+  targetFieldType: string;
+  targetPrimaryKey: boolean;
+  targetNullable: boolean;
+}
 
-const S: FC<IProps> = () => {
+interface IProps {
+  data: JobFormData;
+  onDataChange: (updates: Partial<JobFormData>) => void;
+}
+
+const S = forwardRef<StepRef, IProps>((props, ref) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
+  const { data, onDataChange } = props;
   const [activeKey, setActiveKey] = useState<string>('');
-  // used to select tag options
   const [sourceFields, setSourceFields] = useState<any[]>();
-  // target fields from target table
   const [targetFields, setTargetFields] = useState<any[]>();
-  // 1: insert, 2: upsert
   const [writeType, setWriteType] = useState(1);
-  // 1: by name, 2: by sort
   const [matchMethod, setMatchMethod] = useState(1);
-  const [tableData, setTableData] = useState<FieldType[]>([]);
-  // e.g {table1: {writeType: 1, matchMethod: 1, tableData: []}, table2: {...}}
-  const tableMapping = jobStore.tableMapping;
+  const [fieldMapping, setFieldMapping] = useState<FieldType[]>([]);
+  const [tableMapping, setTableMapping] = useState(data.tableMapping || []);
+
+  // expose validate method
+  useImperativeHandle(ref, () => ({
+    validateFields: async () => {
+      try {
+        // save current tab data first
+        if (activeKey) {
+          saveCurrentTabData(activeKey);
+        }
+
+        const isValid = tableMapping.length > 0 && tableMapping.every((table: any) => table.fieldData && table.fieldData.length > 0);
+        // only sync data to parent component when validation passes
+        if (isValid) {
+          console.log("step-mapping validation passed, syncing data:", tableMapping);
+          onDataChange({ tableMapping });
+        }
+        return isValid;
+      } catch (error) {
+        return false;
+      }
+    },
+    getFieldsValue: () => ({ tableMapping })
+  }));
+
+  // save current tab data before switching
+  const saveCurrentTabData = (currentKey: string) => {
+    if (currentKey && tableMapping.length > 0) {
+      const updatedMapping = tableMapping.map((table: any) => {
+        if (table.sourceTable === currentKey) {
+          return { ...table, writeType, matchMethod, fieldMapping: fieldMapping };
+        }
+        return table;
+      });
+      setTableMapping(updatedMapping);
+    }
+  };
 
   const columns: TableProps<FieldType>["columns"] = [
     {
-      title: t('job.edit.mapping.table.sourceFieldName'),
-      dataIndex: "sourceFieldName",
-      key: "sourceFieldName",
-      render: (text: string, record: FieldType) => {
-        return <Select size="middle" style={{ width: 150 }} options={sourceFields} defaultValue={text} onChange={(val: string) => { onFieldChanged(val, record) }}></Select>;
-      }
+      title: t('job.edit.mapping.table.sourceFieldName'), dataIndex: "sourceFieldName", key: "sourceFieldName",
+      render: (text: string, record: FieldType) => (
+        <Select size="middle" style={{ width: 150 }} options={sourceFields} defaultValue={text}
+          onChange={(val: string) => { onFieldChanged(val, record) }} />)
     },
+    { title: t('job.edit.mapping.table.sourceFieldType'), dataIndex: "sourceFieldType", key: "sourceFieldType" },
     {
-      title: t('job.edit.mapping.table.sourceFieldType'),
-      dataIndex: "sourceFieldType",
-      key: "sourceFieldType"
+      title: t('job.edit.mapping.table.sourcePrimaryKey'), dataIndex: "sourcePrimaryKey", key: "sourcePrimaryKey",
+      render: (text: boolean) => <Checkbox checked={text} />
     },
+    { title: t('job.edit.mapping.table.targetFieldName'), dataIndex: "targetFieldName", key: "targetFieldName" },
+    { title: t('job.edit.mapping.table.targetFieldType'), dataIndex: "targetFieldType", key: "targetFieldType" },
     {
-      title: t('job.edit.mapping.table.sourcePrimaryKey'),
-      dataIndex: "sourcePrimaryKey",
-      key: "sourcePrimaryKey",
+      title: t('job.edit.mapping.table.targetPrimaryKey'), dataIndex: "targetPrimaryKey", key: "targetPrimaryKey",
       render: (text: boolean) => <Checkbox checked={text} />
     },
     {
-      title: t('job.edit.mapping.table.targetFieldName'),
-      dataIndex: "targetFieldName",
-      key: "targetFieldName",
-    },
-    {
-      title: t('job.edit.mapping.table.targetFieldType'),
-      dataIndex: "targetFieldType",
-      key: "targetFieldType",
-    },
-    {
-      title: t('job.edit.mapping.table.targetPrimaryKey'),
-      dataIndex: "targetPrimaryKey",
-      key: "targetPrimaryKey",
-      render: (text: boolean) => <Checkbox checked={text} />
-    },
-    {
-      title: t('job.edit.mapping.table.operation'),
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <Popconfirm title={t('job.edit.mapping.modal.deleteConfirm')} onConfirm={() => handleDelete(record.targetFieldName)}>
-            <a>{t('common.delete')}</a>
-          </Popconfirm>
-        </Space>
-      ),
-    },
+      title: t('job.edit.mapping.table.operation'), key: "operation",
+      render: (_: any, record: FieldType) => (
+        <Space size="middle"><Popconfirm title={t('job.edit.mapping.modal.deleteConfirm')}
+          onConfirm={() => handleDelete(record)}><a>{t('common.delete')}</a></Popconfirm></Space>)
+    }
   ];
 
-  // Use Promise.all to fetch both source and target table fields
   const fetchBothTableFields = async (currentTableConfig: any) => {
     try {
+      const sourceParams = { dbName: currentTableConfig.sourceDbName, connId: data.sourceConnId, tableName: currentTableConfig.sourceTable };
+      const targetParams = { dbName: currentTableConfig.targetDbName, connId: data.targetConnId, tableName: currentTableConfig.targetTable };
+
       const [sourceRes, targetRes] = await Promise.all([
-        getTableColumns({
-          "connId": jobStore.sourceConnId,
-          "dbName": currentTableConfig.sourceDbName,
-          "tableName": currentTableConfig.sourceTable
-        }),
-        getTableColumns({
-          "connId": jobStore.targetConnId,
-          "dbName": currentTableConfig.targetDbName,
-          "tableName": currentTableConfig.targetTable
-        })
+        getTableColumns(sourceParams),
+        getTableColumns(targetParams)
       ]);
 
-      // Process source field data
       const sourceFieldList: any[] = [];
       const sourceData = sourceRes.data || sourceRes;
       Object.keys(sourceData).forEach((i) => {
-        sourceFieldList.push({
-          key: sourceData[i].name,
-          label: sourceData[i].name,
-          value: sourceData[i].name,
-          type: sourceData[i].type,
-          primaryKey: sourceData[i].primaryKey,
-          nullable: sourceData[i].nullable,
-          defaultValue: sourceData[i].defaultValue,
-        });
+        sourceFieldList.push({ key: sourceData[i].name, label: sourceData[i].name, value: sourceData[i].name, type: sourceData[i].type, primaryKey: sourceData[i].primaryKey, nullable: sourceData[i].nullable, defaultValue: sourceData[i].defaultValue });
       });
 
-      // Process target field data
       const targetFieldList: any[] = [];
       const targetData = targetRes.data || targetRes;
       Object.keys(targetData).forEach((i) => {
-        targetFieldList.push({
-          name: targetData[i].name,
-          type: targetData[i].type,
-          primaryKey: targetData[i].primaryKey,
-          nullable: targetData[i].nullable,
-          defaultValue: targetData[i].defaultValue,
-        });
+        targetFieldList.push({ name: targetData[i].name, type: targetData[i].type, primaryKey: targetData[i].primaryKey, nullable: targetData[i].nullable, defaultValue: targetData[i].defaultValue });
       });
 
-      // Set state
-      console.log("sourceFieldList:", sourceFieldList);
-      console.log("targetFieldList:", targetFieldList);
       setSourceFields(sourceFieldList);
       setTargetFields(targetFieldList);
-
-      // After both requests are completed, perform field mapping
       performFieldMapping(sourceFieldList, targetFieldList, matchMethod);
-
     } catch (error) {
       console.error('Error fetching table fields:', error);
       message.error(t('common.requestError'));
@@ -170,69 +150,27 @@ const S: FC<IProps> = () => {
 
   useEffect(() => {
     if (activeKey === '') {
-      // set ActiveKey - only set default on initial load
-      if (tableMapping.length > 0) {
-        setActiveKey(tableMapping[0].sourceTable);
-      }
+      if (tableMapping.length > 0) { setActiveKey(tableMapping[0].sourceTable); }
       return;
     }
 
-    // Get the configuration information for the currently active table
-    let currentTableConfig = tableMapping.find(item => item.sourceTable === activeKey);
-    if (!currentTableConfig) {
-      return;
-    }
-    // show current table's writeType and tableData
+    let currentTableConfig = tableMapping.find((item: any) => item.sourceTable === activeKey);
+    if (!currentTableConfig) { return; }
+
     setWriteType(currentTableConfig.writeType);
-    setTableData(currentTableConfig.fieldData);
-    // Check if data needs to be re-requested
-    if (currentTableConfig.matchMethod != matchMethod || currentTableConfig.fieldData.length == 0) {
-      // clear current table data, avoid showing old data
-      setTableData([]);
+    setMatchMethod(currentTableConfig.matchMethod || 1);
+    setFieldMapping(currentTableConfig.fieldData || []);
+
+    if ((currentTableConfig.matchMethod || 1) !== matchMethod || (currentTableConfig.fieldData || []).length === 0) {
+      setFieldMapping([]);
       setSourceFields([]);
       setTargetFields([]);
-      // Use Promise.all to fetch both source and target table fields
       fetchBothTableFields(currentTableConfig);
     }
-  }, [activeKey, matchMethod]);
+  }, [activeKey]);
 
-  const reqSourceFields = useRequest(getTableColumns, {
-    wrapperFun: (res: any) => {
-      const arr: any[] = [];
-      Object.keys(res).forEach((i) => {
-        arr.push({
-          key: res[i].name,
-          label: res[i].name,
-          value: res[i].name,
-          type: res[i].type,
-          primaryKey: res[i].primaryKey,
-          nullable: res[i].nullable,
-          defaultValue: res[i].defaultValue,
-        })
-      });
-      setSourceFields(arr);
-    }
-  });
-
-  const reqTargetFields = useRequest(getTableColumns, {
-    wrapperFun: (res: any) => {
-      const arr: any[] = [];
-      Object.keys(res).forEach((i) => {
-        arr.push({
-          name: res[i].name,
-          type: res[i].type,
-          primaryKey: res[i].primaryKey,
-          nullable: res[i].nullable,
-          defaultValue: res[i].defaultValue,
-        });
-      });
-      setTargetFields(arr);
-    }
-  });
-
-  // Perform field matching logic (frontend implementation)
   const performFieldMapping = (sourceFieldList: any[], targetFieldList: any[], method: number) => {
-    const matchByName = method === 1; // 1: match by name, 2: match by order
+    const matchByName = method === 1;
     const mappedFields: FieldType[] = [];
 
     targetFieldList.forEach((targetField, index) => {
@@ -248,10 +186,7 @@ const S: FC<IProps> = () => {
       };
 
       if (matchByName) {
-        // Match by field name
-        const matchedSource = sourceFieldList.find(sourceField =>
-          targetField.name.toLowerCase() === sourceField.value.toLowerCase()
-        );
+        const matchedSource = sourceFieldList.find(sourceField => targetField.name.toLowerCase() === sourceField.value.toLowerCase());
         if (matchedSource) {
           fieldMapping.sourceFieldName = matchedSource.value;
           fieldMapping.sourceFieldType = matchedSource.type;
@@ -259,7 +194,6 @@ const S: FC<IProps> = () => {
           fieldMapping.sourceNullable = matchedSource.nullable;
         }
       } else {
-        // Match by field order
         if (sourceFieldList.length > index) {
           const sourceField = sourceFieldList[index];
           fieldMapping.sourceFieldName = sourceField.value;
@@ -268,95 +202,94 @@ const S: FC<IProps> = () => {
           fieldMapping.sourceNullable = sourceField.nullable;
         }
       }
+
       mappedFields.push(fieldMapping);
     });
-    console.log("fieldMapping changed:", mappedFields);
-    setTableData(mappedFields.map((field, index) => ({
-      ...field,
-      key: `${activeKey}_${field.targetFieldName}_${index}`
-    })));
+
+    setFieldMapping(mappedFields);
   };
 
-  // handle edit
-  const handleDelete = (key: string) => {
-    setTableData(tableData.filter(item => item.targetFieldName !== key));
-  };
-
-  const onFieldChanged = (val: string, record: any) => {
-    // change tableData
-    const arr: FieldType[] = [];
-    tableData.forEach((item) => {
-      if (item.targetFieldName == record.targetFieldName) {
-        sourceFields?.forEach((f) => {
-          if (f.label == val) {
-            item.sourceFieldType = f.type;
-            item.sourcePrimaryKey = f.primaryKey;
-            item.sourceNullable = f.nullable;
-          }
-        })
-        arr.push(item);
-      } else {
-        arr.push(item);
-      }
-    })
-    setTableData(arr);
-  }
-
-  const onTabChange = (key: string) => {
-    setActiveKey(key);
+  const onFieldChanged = (val: string, record: FieldType) => {
+    const sourceField = sourceFields?.find(field => field.value === val);
+    if (sourceField) {
+      // update the specific record in tableData array correctly
+      const updatedTableData = fieldMapping.map(item => {
+        if (item.targetFieldName === record.targetFieldName) {
+          return {
+            ...item,
+            sourceFieldName: sourceField.value,
+            sourceFieldType: sourceField.type,
+            sourcePrimaryKey: sourceField.primaryKey,
+            sourceNullable: sourceField.nullable
+          };
+        }
+        return item;
+      });
+      setFieldMapping(updatedTableData);
+    }
   };
 
   const onWriteTypeChange = (e: RadioChangeEvent) => {
-    setWriteType(e.target.value);
+    const newWriteType = e.target.value;
+    setWriteType(newWriteType);
   };
 
   const onMatchMethodChange = (e: RadioChangeEvent) => {
-    setMatchMethod(e.target.value);
+    const newMatchMethod = e.target.value;
+    setMatchMethod(newMatchMethod);
   };
 
-  // sync current tab data to store
-  useEffect(() => {
-    if (activeKey !== '') {
-      const updatedMapping = tableMapping.map(item =>
-        item.sourceTable === activeKey
-          ? { ...item, fieldData: tableData, writeType, matchMethod }
-          : item
-      );
-      jobStore.setTableMapping(updatedMapping);
+  const handleDelete = (record: FieldType) => {
+    const newFieldMapping = fieldMapping.filter(item => item.targetFieldName !== record.targetFieldName);
+    setFieldMapping(newFieldMapping);
+  };
+
+  const handleTabChange = (newActiveKey: string) => {
+    // save current tab data before switching
+    if (activeKey) {
+      saveCurrentTabData(activeKey);
     }
-  }, [activeKey, tableData, writeType, matchMethod]);
+    setActiveKey(newActiveKey);
+  };
+
+  const getTabList = () => {
+    return tableMapping.map((item: any) => ({
+      key: item.sourceTable,
+      label: item.sourceTable,
+      children: (
+        <Form form={form}>
+          <Row gutter={[8, 0]}>
+            <Col span={12}>
+              <Form.Item label={t('job.edit.mapping.form.writeType')}>
+                <Radio.Group onChange={onWriteTypeChange} value={writeType}>
+                  <Radio value={1}>{t('job.edit.mapping.writeType.insert')}</Radio>
+                  <Radio value={2}>{t('job.edit.mapping.writeType.upsert')}</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <div style={{ float: "right", marginRight: "20" }}>
+                <Form.Item label={t('job.edit.mapping.form.matchMethod')}>
+                  <Radio.Group onChange={onMatchMethodChange} value={matchMethod}>
+                    <Radio value={1}>{t('job.edit.mapping.matchMethod.byName')}</Radio>
+                    <Radio value={2}>{t('job.edit.mapping.matchMethod.byOrder')}</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+          <CommonTable columns={columns} dataSource={fieldMapping} size="small" />
+        </Form>
+      )
+    }));
+  };
 
   return (
-    <Spin spinning={reqSourceFields.loading || reqTargetFields.loading}>
-      <Tabs type="line" activeKey={activeKey} onChange={onTabChange} items={tableMapping.map(item => { return { key: item.sourceTable, label: item.sourceTable } })} />
-      <Form>
-        <Row gutter={[8, 0]}>
-          <Col span={12}>
-            <Form.Item label={t('job.edit.mapping.form.writeType')}>
-              <Radio.Group onChange={onWriteTypeChange} value={writeType}>
-                <Radio value={1}>{t('job.edit.mapping.writeType.insert')}</Radio>
-                <Radio value={2}>{t('job.edit.mapping.writeType.upsert')}</Radio>
-              </Radio.Group>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <div style={{ float: "right", marginRight: "20" }}>
-              <Radio.Group onChange={onMatchMethodChange} value={matchMethod}>
-                <Radio value={1}>{t('job.edit.mapping.matchMethod.byName')}</Radio>
-                <Radio value={2}>{t('job.edit.mapping.matchMethod.byOrder')}</Radio>
-              </Radio.Group>
-            </div>
-          </Col>
-        </Row>
-        <CommonTable 
-          bordered 
-          columns={columns} 
-          dataSource={tableData}
-        />
-      </Form>
-    </Spin>
+    <>
+      <Tabs activeKey={activeKey} onChange={handleTabChange} items={getTabList()} />
+    </>
   );
-};
+});
 
 const StepMapping = memo(S);
 

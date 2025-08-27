@@ -25,7 +25,7 @@ import dayjs from "dayjs";
 import type { Dayjs } from 'dayjs';
 import type { TimePickerProps } from 'antd';
 import { FC, memo, useEffect, useState } from "react";
-import { CRON_PER_DAY, CRON_PER_HOUR, CRON_PER_MIN, CRON_PER_MONTH, CRON_PER_WEEK, jobStore } from "../store";
+import { CRON_PER_DAY, CRON_PER_HOUR, CRON_PER_MIN, CRON_PER_MONTH, CRON_PER_WEEK } from "../store";
 import { useTranslation } from 'react-i18next';
 
 interface IProps {
@@ -131,8 +131,6 @@ const C: FC<IProps> = ({ cron, onChange }) => {
             array[3] = cronDaySelect.join(",");
         }
         const cronExpression = array.join(" ");
-        // TODO could not modify global state
-        jobStore.setCron(cronExpression);        
         // call the onChange callback
         if (onChange) {
             onChange(cronExpression);

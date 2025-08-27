@@ -104,7 +104,9 @@
         "placeholder": {
           "selectType": "Please select",
           "selectConnection": "Please select connection name",
-          "selectDatabase": "Please select database name"
+          "selectDatabase": "Please select database name",
+          "selectTable": "Please select target table",
+          "whereClause": "sql where clause"
         },
         "table": {
           "sourceDb": "Source Database",

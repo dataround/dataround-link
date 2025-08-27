@@ -19,65 +19,92 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-06-05
  */
-import {
-  Col,
-  DatePicker,
-  DatePickerProps,
-  Form,
-  Input,
-  Radio,
-  RadioChangeEvent,
-  Row,
-  Select,
-  TimePicker,
-} from "antd";
-import { FC, memo, useEffect, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
-import { CRON_PER_DAY, CRON_PER_HOUR, CRON_PER_MIN, CRON_PER_MONTH, CRON_PER_WEEK, JOB_TYPE_BATCH, jobStore } from "../../../store";
+import { DatePicker, DatePickerProps, Form, Input, Radio, RadioChangeEvent } from "antd";
+import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import CronExpression from "../../../components/cron";
+import { JOB_TYPE_BATCH } from "../../../store";
+import dayjs, { Dayjs } from "dayjs";
 import { useTranslation } from 'react-i18next';
+import { JobFormData, StepRef } from './index';
 
 interface IProps {
+  data: JobFormData;
+  onDataChange: (updates: Partial<JobFormData>) => void;
 }
 
-const S: FC<IProps> = () => {
+const S = forwardRef<StepRef, IProps>((props, ref) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const jobType = jobStore.jobType;
-  const [name, setName] = useState<string>(jobStore.name);
-  const [description, setDescription] = useState<string>(jobStore.description);
-  const [scheduleType, setScheduleType] = useState(jobStore.scheduleType);
-  const [cron, setCron] = useState<string>(jobStore.cron);
+  const { data, onDataChange } = props;
+  const jobType = data.jobType;
 
-  const [startTime, setStartTime] = useState<string>(jobStore.startTime);
-  const [endTime, setEndTime] = useState<string>(jobStore.endTime);
+  // expose validateFields and getFieldsValue
+  useImperativeHandle(ref, () => ({
+    validateFields: async () => {
+      try {
+        await form.validateFields();
+        const formValues = form.getFieldsValue();
+        onDataChange({
+          name: formValues.name,
+          description: formValues.description,
+          scheduleType: localData.scheduleType,
+          startTime: localData.startTime,
+          endTime: localData.endTime,
+          cron: localData.cron
+        });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    getFieldsValue: () => form.getFieldsValue()
+  }));
+
+  // sync external data to form
+  useEffect(() => {
+    const formData = {
+      name: data.name,
+      description: data.description,
+      scheduleType: data.scheduleType,
+      startTime: data.startTime ? dayjs(data.startTime) : undefined,
+      endTime: data.endTime ? dayjs(data.endTime) : undefined
+    };
+    form.setFieldsValue(formData);
+
+    setLocalData({
+      scheduleType: data.scheduleType,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      cron: data.cron
+    });
+  }, [data, form]);
+
+  const [localData, setLocalData] = useState({
+    scheduleType: data.scheduleType,
+    startTime: data.startTime,
+    endTime: data.endTime,
+    cron: data.cron
+  });
 
   const onScheduleTypeChange = (e: RadioChangeEvent) => {
-    setScheduleType(e.target.value);
+    const scheduleType = e.target.value;
+    setLocalData(prev => ({ ...prev, scheduleType }));
   };
 
   const onStartTimeChange: DatePickerProps['onChange'] = (date, dateString) => {
-    setStartTime(dateString + ":00");
+    const startTime = dateString ? dateString + ":00" : '';
+    setLocalData(prev => ({ ...prev, startTime }));
   };
 
   const onEndTimeChange: DatePickerProps['onChange'] = (date, dateString) => {
-    setEndTime(dateString + ":00");
+    const endTime = dateString ? dateString + ":00" : '';
+    setLocalData(prev => ({ ...prev, endTime }));
   };
 
-  const disabledEndTime = (current: Dayjs) => {
-    if (!startTime) {
-      return false;
-    }
-    // If the current time is less than startTime, do disable
-    return current.valueOf() < dayjs(startTime).valueOf();
+  const disabledEndTime = (current: any) => {
+    if (!localData.startTime) { return false; }
+    return current && current.valueOf() < dayjs(localData.startTime).valueOf();
   };
-
-  useEffect(() => {
-    jobStore.setName(name);
-    jobStore.setDescription(description);
-    jobStore.setScheduleType(scheduleType);
-    jobStore.setStartTime(startTime);
-  }, [name, description, scheduleType, cron, startTime, endTime]);
 
   return (
     <>
@@ -86,60 +113,33 @@ const S: FC<IProps> = () => {
         labelCol={{ span: 3 }}
         wrapperCol={{ span: 12 }}
         style={{ marginTop: 35 }}>
-        <Form.Item 
-          name="name" 
-          label={t('job.edit.save.form.name')} 
+        <Form.Item name="name" label={t('job.edit.save.form.name')}
           rules={[{ required: true, message: t('job.edit.save.message.nameRequired') }]}>
-          <Input 
-            placeholder={t('job.edit.save.placeholder.name')} 
-            defaultValue={name} 
-            onChange={(e) => setName(e.target.value)}>
-          </Input>
+          <Input placeholder={t('job.edit.save.placeholder.name')} />
         </Form.Item>
-        <Form.Item 
-          name="description" 
-          label={t('job.edit.save.form.description')}>
-          <Input.TextArea 
-            placeholder={t('job.edit.save.placeholder.description')} 
-            defaultValue={description} 
-            onChange={(e) => setDescription(e.target.value)}>
-          </Input.TextArea>
+        <Form.Item name="description" label={t('job.edit.save.form.description')}>
+          <Input.TextArea placeholder={t('job.edit.save.placeholder.description')} />
         </Form.Item>
-        <Form.Item 
-          name="scheduleType" 
-          label={t('job.edit.save.form.scheduleType')} 
+        <Form.Item name="scheduleType" label={t('job.edit.save.form.scheduleType')}
           rules={[{ required: true, message: t('job.edit.save.message.scheduleTypeRequired') }]}>
-          <Radio.Group onChange={onScheduleTypeChange} defaultValue={scheduleType}>
+          <Radio.Group onChange={onScheduleTypeChange} value={localData.scheduleType}>
             <Radio value={1}>{t('job.edit.save.scheduleType.immediate')}</Radio>
-            {jobType === JOB_TYPE_BATCH && (
-              <Radio value={2}>{t('job.edit.save.scheduleType.periodic')}</Radio>
-            )}            
+            {jobType === JOB_TYPE_BATCH && (<Radio value={2}>{t('job.edit.save.scheduleType.periodic')}</Radio>)}
             <Radio value={3}>{t('job.edit.save.scheduleType.none')}</Radio>
           </Radio.Group>
         </Form.Item>
-        {scheduleType === 2 && (<CronExpression cron={cron}></CronExpression>)}
+        {localData.scheduleType === 2 && (<CronExpression cron={localData.cron || ''}
+          onChange={(cron: string) => setLocalData(prev => ({ ...prev, cron }))} />)}
         <Form.Item name="expire" label={t('job.edit.save.form.validPeriod')}>
-          <DatePicker 
-            name="startTime" 
-            showTime={{ format: 'HH:mm' }} 
-            format="YYYY-MM-DD HH:mm" 
-            defaultValue={startTime ? dayjs(startTime) : null} 
-            onChange={onStartTimeChange} 
-          />
-          &nbsp;{t('job.edit.save.validPeriod.to')}&nbsp;
-          <DatePicker 
-            name="endTime" 
-            showTime={{ format: 'HH:mm' }} 
-            format="YYYY-MM-DD HH:mm" 
-            defaultValue={endTime ? dayjs(endTime) : null} 
-            onChange={onEndTimeChange} 
-            disabledDate={disabledEndTime} 
-          />
+          <DatePicker name="startTime" placeholder={t('job.edit.save.placeholder.startTime')}
+            showTime format="YYYY-MM-DD HH:mm" onChange={onStartTimeChange} style={{ marginRight: 8 }} />
+          <DatePicker name="endTime" placeholder={t('job.edit.save.placeholder.endTime')}
+            showTime format="YYYY-MM-DD HH:mm" onChange={onEndTimeChange} disabledDate={disabledEndTime} />
         </Form.Item>
       </Form>
     </>
   );
-};
+});
 
 const StepSave = memo(S);
 

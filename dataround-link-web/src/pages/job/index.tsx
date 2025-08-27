@@ -34,7 +34,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { deleteJob, executeJob, getJobId, getJobList } from "../../api/job";
 import useRequest from "../../hooks/useRequest";
-import { JOB_TYPE_BATCH, JOB_TYPE_FILESYNC, JOB_TYPE_STREAM, jobStore } from "../../store";
+import { JOB_TYPE_BATCH, JOB_TYPE_FILESYNC, JOB_TYPE_STREAM } from "../../store";
 import { formatConnector, getConnector } from "../../api/connection";
 
 interface IProps { }
@@ -62,8 +62,6 @@ const S: FC<IProps> = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   // retrive jobType from path
   const jobType = window.location.pathname.includes("/batch") ? JOB_TYPE_BATCH : window.location.pathname.includes("/stream") ? JOB_TYPE_STREAM : JOB_TYPE_FILESYNC;
-  // clean all store
-  jobStore.cleanAll();
 
   const columns: TableProps<DataType>["columns"] = [
     {
@@ -195,24 +193,10 @@ const S: FC<IProps> = () => {
 
   const detailRequest = useRequest(getJobId, {
     wrapperFun: (res: any) => {
-      jobStore.setId(res.id);
-      jobStore.setName(res.name);
-      jobStore.setDescription(res.description);
-      jobStore.setJobType(res.jobType);
-      jobStore.setScheduleType(res.scheduleType);
-      jobStore.setStartTime(res.startTime);
-      jobStore.setEndTime(res.endTime);
-      jobStore.setCron(res.cron);
-
-      jobStore.setSourceConnId(res.sourceConnId);
-      jobStore.setTargetConnId(res.targetConnId);
-      jobStore.setSourceDbName(res.sourceDbName);
-      jobStore.setTargetDbName(res.targetDbName);
-      jobStore.setTableMapping(res.tableMapping);
       if (jobType == JOB_TYPE_FILESYNC) {
         navigate('/fileSync/create?id=' + res.id);
       } else {
-        navigate('/batch/job/create?id=' + res.id);
+        navigate('/batch/job/create?id=' + res.id + '&jobType=' + res.jobType);
       }
     },
   });
