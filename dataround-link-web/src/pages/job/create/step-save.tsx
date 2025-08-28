@@ -44,16 +44,18 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
       try {
         await form.validateFields();
         const formValues = form.getFieldsValue();
+        console.log("Step-save form values:", formValues);
         onDataChange({
           name: formValues.name,
           description: formValues.description,
-          scheduleType: localData.scheduleType,
+          scheduleType: formValues.scheduleType,
           startTime: localData.startTime,
           endTime: localData.endTime,
           cron: localData.cron
         });
         return true;
       } catch (error) {
+        console.error("Step-save validation error:", error);
         return false;
       }
     },
@@ -89,6 +91,8 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   const onScheduleTypeChange = (e: RadioChangeEvent) => {
     const scheduleType = e.target.value;
     setLocalData(prev => ({ ...prev, scheduleType }));
+    // 确保表单值也同步更新
+    form.setFieldsValue({ scheduleType });
   };
 
   const onStartTimeChange: DatePickerProps['onChange'] = (date, dateString) => {
@@ -122,7 +126,7 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
         </Form.Item>
         <Form.Item name="scheduleType" label={t('job.edit.save.form.scheduleType')}
           rules={[{ required: true, message: t('job.edit.save.message.scheduleTypeRequired') }]}>
-          <Radio.Group onChange={onScheduleTypeChange} value={localData.scheduleType}>
+          <Radio.Group onChange={onScheduleTypeChange}>
             <Radio value={1}>{t('job.edit.save.scheduleType.immediate')}</Radio>
             {jobType === JOB_TYPE_BATCH && (<Radio value={2}>{t('job.edit.save.scheduleType.periodic')}</Radio>)}
             <Radio value={3}>{t('job.edit.save.scheduleType.none')}</Radio>
@@ -131,9 +135,9 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
         {localData.scheduleType === 2 && (<CronExpression cron={localData.cron || ''}
           onChange={(cron: string) => setLocalData(prev => ({ ...prev, cron }))} />)}
         <Form.Item name="expire" label={t('job.edit.save.form.validPeriod')}>
-          <DatePicker name="startTime" placeholder={t('job.edit.save.placeholder.startTime')}
+          <DatePicker name="startTime" 
             showTime format="YYYY-MM-DD HH:mm" onChange={onStartTimeChange} style={{ marginRight: 8 }} />
-          <DatePicker name="endTime" placeholder={t('job.edit.save.placeholder.endTime')}
+          <DatePicker name="endTime" 
             showTime format="YYYY-MM-DD HH:mm" onChange={onEndTimeChange} disabledDate={disabledEndTime} />
         </Form.Item>
       </Form>

@@ -7,6 +7,7 @@
     "forbidden": "禁止访问",
     "badRequest": "请求错误",
     "serverError": "服务器错误",
+    "requestError": "请求失败",
     "confirm": "确认",
     "cancel": "取消",
     "save": "保存",
@@ -106,7 +107,7 @@
           "selectConnection": "请选择连接名",
           "selectDatabase": "请选择数据库名",
           "selectTable": "请选择表名",
-          "whereClause": "sql where条件"
+          "whereClause": "sql where条件, 如: id > 100"
         },
         "table": {
           "sourceDb": "源库名",
@@ -144,6 +145,9 @@
           "targetFieldType": "目标类型",
           "targetPrimaryKey": "目标表主键",
           "operation": "操作"
+        },
+        "placeholder": {
+          "selectSourceField": "请选择源字段"
         },
         "modal": {
           "deleteConfirm": "确认删除？"

@@ -21,7 +21,7 @@
  */
 import { Checkbox, Col, Form, Popconfirm, Radio, RadioChangeEvent, Row, Select, Space, Spin, TableProps, Tabs, message } from "antd";
 import CommonTable from "../../../components/common-table";
-import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { getTableColumns } from "../../../api/connection";
 import useRequest from "../../../hooks/useRequest";
 import { useTranslation } from 'react-i18next';
@@ -54,21 +54,62 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   const [matchMethod, setMatchMethod] = useState(1);
   const [fieldMapping, setFieldMapping] = useState<FieldType[]>([]);
   const [tableMapping, setTableMapping] = useState(data.tableMapping || []);
+  // add validation errors state for sourceFieldName
+  const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set());
+  // cache for table fields to avoid repeated requests
+  const fieldsCache = useRef<Map<string, { sourceFields: any[], targetFields: any[] }>>(new Map());
 
   // expose validate method
   useImperativeHandle(ref, () => ({
     validateFields: async () => {
       try {
-        // save current tab data first
-        if (activeKey) {
-          saveCurrentTabData(activeKey);
-        }
+        // validate each table's field mappings
+        const invalidFields = new Set<string>();
+        const updatedTableMapping = tableMapping.map((table: any) => {
+          if (table.sourceTable === activeKey) {
+            // use current fieldMapping state for active tab
+            return { ...table, writeType, matchMethod, fieldMapping };
+          }
+          return table;
+        });
 
-        const isValid = tableMapping.length > 0 && tableMapping.every((table: any) => table.fieldData && table.fieldData.length > 0);
+        // check all tables for empty sourceFieldName
+        let invalidTab = "";
+        updatedTableMapping.forEach((table: any) => {
+          console.log("Validating table:", table.sourceTable, "fieldMapping:", table.fieldMapping);
+          if (table.fieldMapping && table.fieldMapping.length > 0) {
+            table.fieldMapping.forEach((field: FieldType) => {
+              if (!field.sourceFieldName || field.sourceFieldName.trim() === '') {
+                console.log("Found invalid field in table:", table.sourceTable, "field:", field.targetFieldName);
+                invalidTab = table.sourceTable;
+                invalidFields.add(`${table.sourceTable}-${field.targetFieldName}`);
+              }
+            });
+          }
+        });
+
+        setValidationErrors(invalidFields);
+        const isValid = updatedTableMapping.length > 0 &&
+          updatedTableMapping.every((table: any) => {
+            const valid = table.fieldMapping && table.fieldMapping.length > 0;
+            if (!valid) {
+              console.log("invalid table:", table.sourceTable, table.fieldMapping);
+              invalidTab = table.sourceTable;
+            }
+            return valid;
+          }) &&
+          invalidFields.size === 0;
+
         // only sync data to parent component when validation passes
         if (isValid) {
-          console.log("step-mapping validation passed, syncing data:", tableMapping);
-          onDataChange({ tableMapping });
+          console.log("step-mapping validation passed, syncing data:", updatedTableMapping);
+          onDataChange({ tableMapping: updatedTableMapping });
+        } else {
+          // switch to the first invalid table
+          console.log("change tab to invalidTab:", invalidTab);
+          if (activeKey !== invalidTab) {
+            handleTabChange(invalidTab);
+          }
         }
         return isValid;
       } catch (error) {
@@ -83,7 +124,7 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
     if (currentKey && tableMapping.length > 0) {
       const updatedMapping = tableMapping.map((table: any) => {
         if (table.sourceTable === currentKey) {
-          return { ...table, writeType, matchMethod, fieldMapping: fieldMapping };
+          return { ...table, writeType, matchMethod, fieldMapping };
         }
         return table;
       });
@@ -93,10 +134,33 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
 
   const columns: TableProps<FieldType>["columns"] = [
     {
-      title: t('job.edit.mapping.table.sourceFieldName'), dataIndex: "sourceFieldName", key: "sourceFieldName",
-      render: (text: string, record: FieldType) => (
-        <Select size="middle" style={{ width: 150 }} options={sourceFields} defaultValue={text}
-          onChange={(val: string) => { onFieldChanged(val, record) }} />)
+      title: <span><span style={{ color: 'red', marginRight: '4px' }}>*</span>{t('job.edit.mapping.table.sourceFieldName')}</span>,
+      dataIndex: "sourceFieldName",
+      key: "sourceFieldName",
+      render: (text: string, record: FieldType) => {
+        const fieldKey = `${activeKey}-${record.targetFieldName}`;
+        const hasError = validationErrors.has(fieldKey);
+        return (
+          <Select
+            size="middle"
+            style={{ width: 150 }}
+            options={sourceFields}
+            value={text || undefined}
+            key={fieldKey}
+            status={hasError ? 'error' : undefined}
+            placeholder={t('job.edit.mapping.placeholder.selectSourceField')}
+            onChange={(val: string) => {
+              onFieldChanged(val, record);
+              // clear validation error when user selects a value
+              if (val && validationErrors.has(fieldKey)) {
+                const newErrors = new Set(validationErrors);
+                newErrors.delete(fieldKey);
+                setValidationErrors(newErrors);
+              }
+            }}
+          />
+        );
+      }
     },
     { title: t('job.edit.mapping.table.sourceFieldType'), dataIndex: "sourceFieldType", key: "sourceFieldType" },
     {
@@ -117,7 +181,21 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
     }
   ];
 
-  const fetchBothTableFields = async (currentTableConfig: any) => {
+  const fetchBothTableFields = async (currentTableConfig: any, shouldPerformMapping: boolean = true) => {
+    const cacheKey = `${currentTableConfig.sourceTable}-${currentTableConfig.targetTable}`;
+    
+    // Check if there is data in the cache
+    if (fieldsCache.current.has(cacheKey)) {
+      const cachedData = fieldsCache.current.get(cacheKey)!;
+      console.log("Using cached fields for:", cacheKey);
+      setSourceFields(cachedData.sourceFields);
+      setTargetFields(cachedData.targetFields);
+      if (shouldPerformMapping) {
+        performFieldMapping(cachedData.sourceFields, cachedData.targetFields, matchMethod);
+      }
+      return;
+    }
+
     try {
       const sourceParams = { dbName: currentTableConfig.sourceDbName, connId: data.sourceConnId, tableName: currentTableConfig.sourceTable };
       const targetParams = { dbName: currentTableConfig.targetDbName, connId: data.targetConnId, tableName: currentTableConfig.targetTable };
@@ -139,6 +217,9 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
         targetFieldList.push({ name: targetData[i].name, type: targetData[i].type, primaryKey: targetData[i].primaryKey, nullable: targetData[i].nullable, defaultValue: targetData[i].defaultValue });
       });
 
+      // Cache field data
+      fieldsCache.current.set(cacheKey, { sourceFields: sourceFieldList, targetFields: targetFieldList });
+
       setSourceFields(sourceFieldList);
       setTargetFields(targetFieldList);
       performFieldMapping(sourceFieldList, targetFieldList, matchMethod);
@@ -159,13 +240,19 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
 
     setWriteType(currentTableConfig.writeType);
     setMatchMethod(currentTableConfig.matchMethod || 1);
-    setFieldMapping(currentTableConfig.fieldData || []);
-
-    if ((currentTableConfig.matchMethod || 1) !== matchMethod || (currentTableConfig.fieldData || []).length === 0) {
-      setFieldMapping([]);
-      setSourceFields([]);
-      setTargetFields([]);
-      fetchBothTableFields(currentTableConfig);
+    
+    // set field mapping data (if there is any)
+    setFieldMapping(currentTableConfig.fieldMapping || []);
+    
+    // load field options data
+    const cacheKey = `${currentTableConfig.sourceTable}-${currentTableConfig.targetTable}`;
+    if (fieldsCache.current.has(cacheKey)) {
+      const cachedData = fieldsCache.current.get(cacheKey)!;
+      setSourceFields(cachedData.sourceFields);
+      setTargetFields(cachedData.targetFields);
+    } else {
+      // if there is no data in the cache, request
+      fetchBothTableFields(currentTableConfig, !currentTableConfig.fieldMapping || currentTableConfig.fieldMapping.length === 0);
     }
   }, [activeKey]);
 
@@ -237,6 +324,9 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   const onMatchMethodChange = (e: RadioChangeEvent) => {
     const newMatchMethod = e.target.value;
     setMatchMethod(newMatchMethod);
+    if (sourceFields && targetFields) {
+      performFieldMapping(sourceFields, targetFields, newMatchMethod);
+    }
   };
 
   const handleDelete = (record: FieldType) => {
@@ -249,6 +339,8 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
     if (activeKey) {
       saveCurrentTabData(activeKey);
     }
+    // avoid cache, should display new field list
+    setFieldMapping([]);
     setActiveKey(newActiveKey);
   };
 

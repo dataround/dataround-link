@@ -27,7 +27,7 @@ import { JOB_TYPE_BATCH } from "../../../store";
 import "./index.less";
 import StepMapping from "./step-mapping";
 import StepSave from "./step-save";
-import StepSource from "./step-source";
+import StepSource, { RecordType } from "./step-source";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 
@@ -47,7 +47,7 @@ export interface JobFormData {
   targetConnId?: string;
   sourceDbName?: string;
   targetDbName?: string;
-  tableMapping?: any[];
+  tableMapping?: RecordType[];
 }
 
 export interface StepRef {
@@ -72,8 +72,8 @@ const S: FC<IProps> = () => {
   jobTypeParam = jobTypeParam == null ? "" : jobTypeParam;
   const jobType = urlParams.get('jobType') ? parseInt(jobTypeParam) : JOB_TYPE_BATCH;
   
-  // use local state to manage form data
-  const [formData, setFormData] = useState<JobFormData>({
+  // use ref to manage form data to avoid async update issues
+  const formDataRef = useRef<JobFormData>({
     jobType: jobType,
     sourceConnId: '',
     sourceDbName: '',
@@ -88,10 +88,16 @@ const S: FC<IProps> = () => {
     endTime: ''
   });
 
+  // use state for UI updates
+  const [formData, setFormData] = useState<JobFormData>(formDataRef.current);
+
   // update form data (memoized to prevent infinite loops)
   const updateFormData = useCallback((updates: Partial<JobFormData>) => {
     console.log("updateFormData", updates);
-    setFormData(prev => ({ ...prev, ...updates }));
+    // 同时更新 ref 和 state
+    const newData = { ...formDataRef.current, ...updates };
+    formDataRef.current = newData;
+    setFormData(newData);
   }, []);
 
   // get job detail in edit mode
@@ -113,6 +119,8 @@ const S: FC<IProps> = () => {
         targetDbName: jobDetail.targetDbName,
         tableMapping: jobDetail.tableMapping || []
       };
+      // 同时更新 ref 和 state
+      formDataRef.current = initData;
       setFormData(initData);
     }
   });
@@ -158,23 +166,8 @@ const S: FC<IProps> = () => {
         const isValid = await stepSaveRef.current.validateFields();
         if (!isValid) return;
       }
-      
-      const params: any = {
-        id: formData.id,
-        name: formData.name,
-        description: formData.description,
-        jobType: formData.jobType,
-        scheduleType: formData.scheduleType,
-        cron: formData.cron,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        sourceConnId: formData.sourceConnId,
-        targetConnId: formData.targetConnId,
-        sourceDbName: formData.sourceDbName,
-        targetDbName: formData.targetDbName,
-        tableMapping: formData.tableMapping,
-      };
-      reqSaveJob.caller(params);
+      console.log("onSaveJob", formDataRef.current);
+      reqSaveJob.caller(formDataRef.current);
     } catch (error) {
       console.error('Save validation failed:', error);
     }

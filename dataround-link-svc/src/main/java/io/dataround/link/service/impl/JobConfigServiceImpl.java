@@ -241,7 +241,7 @@ public class JobConfigServiceImpl implements JobConfigService {
         List<String> fields = new ArrayList<>();
         for (TableMapping tableMapping : jobVo.getTableMapping()) {
             if (tableMapping.getSourceTable().equals(tableName)) {
-                List<FieldMapping> fieldMappings = tableMapping.getFieldData();
+                List<FieldMapping> fieldMappings = tableMapping.getFieldMapping();
                 for (FieldMapping fm : fieldMappings) {
                     String fieldName = fm.getSourceFieldName();
                     fields.add(sqlDialect(null, fieldName));

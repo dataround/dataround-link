@@ -39,6 +39,6 @@ public class TableMapping {
     private Integer writeType;
     // 1: by name, 2: by sort
     private Integer matchMethod;
-    //
-    private List<FieldMapping> fieldData;
+    // field mapping
+    private List<FieldMapping> fieldMapping;
 }

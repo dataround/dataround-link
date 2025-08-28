@@ -80,15 +80,27 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   const [checkedAll, setCheckedAll] = useState(false);
   const [indeterminate, setIndeterminate] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  // add validation errors state for targetTable
+  const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set());
 
   // expose validate and get data method
   useImperativeHandle(ref, () => ({
     validateFields: async () => {
       try {
         await form.validateFields();
-        const isValid = tableMapping.length > 0 && tableMapping.every(item => item.targetTable);
+        
+        // validate tableMapping targetTable manually
+        const invalidTables = new Set<string>();
+        tableMapping.forEach(item => {
+          if (!item.targetTable) {
+            invalidTables.add(item.sourceTable);
+          }
+        });
+        
+        setValidationErrors(invalidTables);
+        const isValid = tableMapping.length > 0 && invalidTables.size === 0;
+        
         if (isValid) {
-          console.log("step-source form values changed");
           onDataChange({ sourceConnId, sourceDbName, targetConnId, targetDbName, tableMapping: tableMapping });
         }
         return isValid;
@@ -107,12 +119,35 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
       key: 'targetTable',
       title: <span><span style={{ color: 'red', marginRight: '4px' }}>*</span>{t('job.edit.source.table.targetTable')}</span>,
       dataIndex: 'targetTable',
-      render: (text: string, record: any) => (
-        <Select size="small" style={{ width: '100%', height: '32px', lineHeight: '32px', margin: '-6px 0 -6px 0' }} 
-          showSearch options={targetTables} value={record.targetTable || undefined} 
-          placeholder={t('job.edit.source.placeholder.selectTable')} 
-          onChange={(val: string) => { record.targetTable = val; setTableMapping([...tableMapping]); }} />
-      )
+      render: (text: string, record: any) => {
+        const hasError = validationErrors.has(record.sourceTable);
+        return (
+          <Select 
+            size="small" 
+            style={{ 
+              width: '100%', 
+              height: '32px', 
+              lineHeight: '32px', 
+              margin: '-6px 0 -6px 0' 
+            }} 
+            status={hasError ? 'error' : undefined}
+            showSearch 
+            options={targetTables} 
+            value={record.targetTable || undefined} 
+            placeholder={t('job.edit.source.placeholder.selectTable')} 
+            onChange={(val: string) => { 
+              record.targetTable = val; 
+              // clear validation error when user selects a value
+              if (val && validationErrors.has(record.sourceTable)) {
+                const newErrors = new Set(validationErrors);
+                newErrors.delete(record.sourceTable);
+                setValidationErrors(newErrors);
+              }
+              setTableMapping([...tableMapping]); 
+            }} 
+          />
+        );
+      }
     },
     {
       key: 'whereClause',
@@ -143,7 +178,6 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   // only initialize once in edit mode (when data changes from empty to non-empty)
   useEffect(() => {
     if (!isInitialized) {
-      console.log("isInitialized", isInitialized);
       // update form
       form.setFieldsValue({
         sourceConnection: data.sourceConnId,
