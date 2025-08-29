@@ -281,7 +281,7 @@ const S: FC<IProps> = () => {
 
   return (
     <>
-      <Card style={{ marginBottom: 20 }} bodyStyle={{ padding: '10px' }}>
+      <div className="module">
         <Form
           form={form}
           labelCol={{ span: 6 }}
@@ -323,33 +323,35 @@ const S: FC<IProps> = () => {
             </Col>
           </Row>
         </Form>
-      </Card>
+      </div>
 
-      <Tabs defaultActiveKey="tabInstance" items={items} />      
-      <CommonTable 
-        columns={columns} 
-        dataSource={tabData} 
-        pageSize={pageSize} 
-        total={totalCount} 
-        onPageChange={onPageChange}
-      />
-      <Modal title={t('instance.modal.logTitle')} open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onOk={() => setIsModalOpen(false)}
-        cancelButtonProps={{ style: { display: 'none' } }}
-        width="80%"
-        style={{ top: 100, height: '80vh' }}
-        bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
-      >
-        <Card style={{ width: 'fit-content' }}>
-          <pre>
-            <code
-              className="language-java code"
-              dangerouslySetInnerHTML={{ __html: highlightLogs(logContent) }}
-            />
-          </pre>
-        </Card>
-      </Modal>
+      <div className="module">
+        <Tabs defaultActiveKey="tabInstance" items={items} />      
+        <CommonTable 
+          columns={columns} 
+          dataSource={tabData} 
+          pageSize={pageSize} 
+          total={totalCount} 
+          onPageChange={onPageChange}
+        />
+        <Modal title={t('instance.modal.logTitle')} open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          onOk={() => setIsModalOpen(false)}
+          cancelButtonProps={{ style: { display: 'none' } }}
+          width="80%"
+          style={{ top: 100, height: '80vh' }}
+          bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
+        >
+          <Card style={{ width: 'fit-content' }}>
+            <pre>
+              <code
+                className="language-java code"
+                dangerouslySetInnerHTML={{ __html: highlightLogs(logContent) }}
+              />
+            </pre>
+          </Card>
+        </Modal>
+      </div>
     </>
   );
 };

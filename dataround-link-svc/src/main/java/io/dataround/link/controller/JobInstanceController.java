@@ -65,9 +65,9 @@ public class JobInstanceController extends BaseController {
     private JobInstanceService jobInstanceService;
 
     @PostMapping("/list")
-    public Result<Page<JobInstanceRes>> list(@RequestBody JobInstanceReq jobInstanceRequest) {
-        jobInstanceRequest.setProjectId(getCurrentProjectId());
-        Page<JobInstance> page = jobInstanceService.selectPage(jobInstanceRequest);
+    public Result<Page<JobInstanceRes>> list(@RequestBody JobInstanceReq request) {
+        request.setProjectId(getCurrentProjectId());
+        Page<JobInstance> page = jobInstanceService.selectPage(request);
         if (page.getRecords().isEmpty()) {
             return Result.success(new Page<>());
         }
@@ -87,7 +87,7 @@ public class JobInstanceController extends BaseController {
         Page<JobInstanceRes> jobInstanceResPage = new Page<>();
         jobInstanceResPage.setRecords(jobInstanceResList);
         jobInstanceResPage.setTotal(page.getTotal());
-        jobInstanceResPage.setSize(page.getSize());
+        jobInstanceResPage.setSize(request.getSize());
         jobInstanceResPage.setCurrent(page.getCurrent());
         return Result.success(jobInstanceResPage);
     }

@@ -25,10 +25,17 @@
 .content-wrap {
   width: 100%;
   min-height: 200px;
-  padding: 20px;
-  //text-align: center;
-  //line-height: 200px;
-  background-color: #fff;
   box-shadow: @boxShadow;
   border-radius: 4px;
+  
+  .content-body {
+    .module{
+      background-color: #fff;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .ant-card {
+      border-radius: 0px;
+    }
+  }
 }

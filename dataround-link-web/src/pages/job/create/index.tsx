@@ -194,24 +194,26 @@ const S: FC<IProps> = () => {
 
   return (
     <Spin spinning={isLoading}>
-      <Steps current={current} items={items} style={{ padding: "10px 20px 10px 20px" }} />
-      <div style={contentStyle}>{steps[current].content}</div>
-      <div style={{ marginTop: 0, lineHeight: 5 }}>
-        {current > 0 && (
-          <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-            {t('job.edit.buttons.prev')}
-          </Button>
-        )}
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            {t('job.edit.buttons.next')}
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button type="primary" onClick={onSaveJob}>
-            {t('job.edit.buttons.save')}
-          </Button>
-        )}
+      <div className="module">  
+        <Steps current={current} items={items} style={{ padding: "10px 20px 10px 20px" }} />
+        <div style={contentStyle}>{steps[current].content}</div>
+        <div style={{ marginTop: 0, lineHeight: 5 }}>
+          {current > 0 && (
+            <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+              {t('job.edit.buttons.prev')}
+            </Button>
+          )}
+          {current < steps.length - 1 && (
+            <Button type="primary" onClick={() => next()}>
+              {t('job.edit.buttons.next')}
+            </Button>
+          )}
+          {current === steps.length - 1 && (
+            <Button type="primary" onClick={onSaveJob}>
+              {t('job.edit.buttons.save')}
+            </Button>
+          )}
+        </div>
       </div>
     </Spin>
   );

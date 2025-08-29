@@ -268,7 +268,7 @@ const S: FC<IProps> = () => {
 
   return (
     <>
-      <Card style={{ marginBottom: 20 }} bodyStyle={{ padding: '10px' }}>
+      <div className="module">
         <Form
           form={form}
           labelCol={{ span: 8 }}
@@ -342,18 +342,20 @@ const S: FC<IProps> = () => {
             </Col>
           </Row>
         </Form>
-      </Card>
-      <Tabs defaultActiveKey="tabBatch" items={items} tabBarExtraContent={
-        <Button type="primary" htmlType="submit" onClick={newBatchJob}>{jobType == JOB_TYPE_BATCH ? t('job.list.newBatchJob') : jobType == JOB_TYPE_STREAM ? t('job.list.newStreamJob') : t('job.list.newFileSyncJob')}</Button>
-      }
-      />
-      <CommonTable 
-        columns={columns} 
-        dataSource={tabData} 
-        pageSize={pageSize} 
-        total={totalCount} 
-        onPageChange={onPageChange}
-      />
+      </div>
+      <div className="module">
+        <Tabs defaultActiveKey="tabBatch" items={items} tabBarExtraContent={
+          <Button type="primary" htmlType="submit" onClick={newBatchJob}>{jobType == JOB_TYPE_BATCH ? t('job.list.newBatchJob') : jobType == JOB_TYPE_STREAM ? t('job.list.newStreamJob') : t('job.list.newFileSyncJob')}</Button>
+        }
+        />
+        <CommonTable 
+          columns={columns} 
+          dataSource={tabData} 
+          pageSize={pageSize} 
+          total={totalCount} 
+          onPageChange={onPageChange}
+        />
+      </div>
     </>
   );
 };

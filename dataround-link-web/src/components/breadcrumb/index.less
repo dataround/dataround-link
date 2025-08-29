@@ -1,0 +1,38 @@
+.breadcrumb-container {
+  padding: 8px 0;
+
+  .ant-breadcrumb {
+    font-size: 14px;
+    
+    .anticon {
+      font-size: 14px;
+    }
+    
+    .breadcrumb-link {
+      color: #1890ff;
+      cursor: pointer;
+      transition: color 0.3s;
+      
+      &:hover {
+        color: #40a9ff;
+        text-decoration: underline;
+      }
+    }
+    
+    .breadcrumb-current {
+      color: #262626;
+      font-weight: 500;
+      
+      &.breadcrumb-clickable {
+        color: #1890ff;
+        cursor: pointer;
+        transition: color 0.3s;
+        
+        &:hover {
+          color: #40a9ff;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+} 

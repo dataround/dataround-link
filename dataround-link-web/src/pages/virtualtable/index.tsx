@@ -188,13 +188,13 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <>
+    <div className="module">
       <Tabs defaultActiveKey="tabList" items={items} tabBarExtraContent={
         <Button type="primary" htmlType="submit" onClick={newConnection}>{t('virtualTable.new')}</Button>
       }
       />
       <Table size="small" columns={columns} dataSource={tabData} />
-    </>
+    </div>
   );
 };
 

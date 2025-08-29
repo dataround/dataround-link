@@ -25,6 +25,7 @@ import {
   memo,
   ReactNode,
 } from 'react';
+import BreadcrumbComponent from '../breadcrumb/index';
 
 import './index.less';
 
@@ -34,7 +35,12 @@ interface IProps {
 
 const C: FC<IProps> = (props) => {
   return (
-    <div className="content-wrap">{ props.children }</div>
+    <div className="content-wrap">
+      <BreadcrumbComponent />
+      <div className="content-body">
+        { props.children }
+      </div>
+    </div>
   );
 };
 

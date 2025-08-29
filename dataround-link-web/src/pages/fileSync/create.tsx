@@ -109,7 +109,7 @@ const FileSyncCreate: FC<IProps> = () => {
   };
 
   return (
-    <div className="file-sync-create">
+    <div className="file-sync-create module">
       <Form
         form={form}
         labelCol={{ span: 3 }}

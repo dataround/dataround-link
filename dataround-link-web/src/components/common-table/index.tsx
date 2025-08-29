@@ -66,9 +66,9 @@ const T: FC<CommonTableProps> = ({
         total,
         onChange: onPageChange,
         showSizeChanger: true,
-        showQuickJumper: true,
+        showQuickJumper: false,
         showTotal: (total: number, range: [number, number]) =>
-            `Page ${range[0]}-${range[1]} of ${total}`,
+            `Total ${total}`,
         pageSizeOptions: ['10', '20', '50', '100'],
     } : false;
 

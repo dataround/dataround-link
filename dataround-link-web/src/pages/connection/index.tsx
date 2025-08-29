@@ -210,7 +210,7 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <>
+    <div className="module">
       <Tabs activeKey={activeKey} onChange={onTabChange} tabBarExtraContent={
         <Button type="primary" htmlType="submit" onClick={newConnection}>{t('connection.new')}</Button>
       }
@@ -223,7 +223,7 @@ const S: FC<IProps> = () => {
         </TabPane>
       </Tabs>
 
-    </>
+    </div>
   );
 };
 

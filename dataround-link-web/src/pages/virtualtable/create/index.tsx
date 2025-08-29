@@ -156,7 +156,7 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <>
+    <div className="module">
       <Form
         form={form}
         labelCol={{ span: 3 }}
@@ -275,7 +275,7 @@ const S: FC<IProps> = () => {
           </Col>
         </Row>
       </Form>
-    </>
+    </div>
   );
 };
 

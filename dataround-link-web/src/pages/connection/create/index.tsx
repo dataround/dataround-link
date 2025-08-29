@@ -274,7 +274,7 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <>
+    <div className="module connection-create">
       <Form
         form={form}
         labelCol={{ span: 3 }}
@@ -340,7 +340,7 @@ const S: FC<IProps> = () => {
           </Col>
         </Row>
       </Form>
-    </>
+    </div>
   );
 };
 
