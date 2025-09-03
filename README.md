@@ -1,63 +1,39 @@
-# DataRound Link
+# Dataround link
 
-DataRound Link is a powerful data integration and synchronization platform that enables seamless data transfer between different databases and systems. What sets it apart is its **zero-code, fully visual** approach to data synchronization - no configuration files or programming required. Users can easily configure and manage complex data synchronization tasks through an intuitive web interface.
+Dataround link is an **open-source data integration tool** designed for multi-source heterogeneous data synchronization. It supports seamless integration and synchronization of **structured, semi-structured, and unstructured data**.
+
+Dataround link adopts a **zero-code visual** design philosophy, eliminating the need for configuration files or programming. Users can easily configure and manage complex data synchronization tasks through an intuitive web interface, truly democratizing data synchronization.
 
 ## Key Features
 
-- **Zero-Code Data Synchronization**
-  - No programming or configuration files needed
-  - Visual job configuration through intuitive UI
-  - Drag-and-drop interface for field mapping
-  - One-click deployment and execution
+- **Multi-source Heterogeneous Support** - Unified support for structured, semi-structured, and unstructured data sources
+- **Structured Data Support** - Traditional relational databases (MySQL, PostgreSQL, Oracle, SQL Server, TiDB, etc.)
+- **Semi-structured Data Support** - MongoDB, Kafka, JSON, XML, and more
+- **Unstructured Data Support** - Images, videos, model files, documents, and other file types
+- **Zero-Code Visual Interface** - No configuration files or programming required, pure visual operations
+- **Virtual Table Support** - Map semi-structured data from Kafka, Redis, etc. to structured data through virtual tables, enabling synchronization with relational databases
+- **Based on SeaTunnel** - Dataround link table data synchronization is implemented based on Apache SeaTunnel, providing stable and reliable data transmission capabilities
 
-- **Cross-Platform Data Integration**
-  - Support for multiple database types (MySQL, PostgreSQL, Oracle, SQL Server, TiDB, etc.)
-  - Heterogeneous data source synchronization
-  - Real-time and batch data transfer
-  - Flexible data transformation options
 
-- **Database Connection Management**
-  - Visual connection testing and validation
-  - Secure credential management
-  - Connection pool optimization
-  - Connection health monitoring
 
-- **Job Management**
-  - Visual job configuration
-  - Flexible scheduling options
-  - Real-time job monitoring
-  - Job history and metrics
+## Product Screenshots
 
-- **Virtual Table Management**
-  - Create and manage virtual tables
-  - Field mapping and transformation
-  - Data preview and validation
+### Job Management Dashboard
+![Job Management](docs/imgs/joblist.png)
 
-- **User Interface**
-  - Modern, responsive web interface
-  - Multi-language support (English/Chinese)
-  - Intuitive navigation and operation
-  - Real-time monitoring dashboard
+### Table Mapping Interface
+![Table Mapping](docs/imgs/tablemapping.png)
 
-## Project Structure
+### Field Mapping Configuration
+![Field Mapping](docs/imgs/fieldmapping.png)
 
-```
-dataround-link/
-├── dataround-link-common/     # Common utilities and shared code
-├── dataround-link-connector/  # Database connectors
-├── dataround-link-svc/        # Backend service
-└── dataround-link-web/        # Frontend application
-```
 
-## Prerequisites
+## Building dataround link from source
+
+Prerequisites for building Flink:
 
 - Java 17 or higher
-- Node.js 16 or higher
 - Maven 3.8 or higher
-- Yarn package manager
-- Modern web browser
-
-## Quick Start
 
 1. Clone the repository:
 ```bash
@@ -65,38 +41,21 @@ git clone https://github.com/dataround/dataround-link.git
 cd dataround-link
 ```
 
-2. Build the project:
+2. Build the backend:
 ```bash
-mvn clean install
+cd dataround-link
+mvn clean package -DskipTests
 ```
 
-3. Start the backend service:
+3. Start dataround link server:
 ```bash
-cd dataround-link-svc
-mvn spring-boot:run
-```
-
-4. Start the frontend development server:
-```bash
-cd dataround-link-web
-yarn install
-yarn start
+tar zxvf dataround-link-1.0.tar.gz
+cd dataround-link-1.0
+./bin/start.sh
 ```
 
 The application will be available at `http://localhost:5600/datalink`
 
-## Building for Production
-
-1. Build the backend:
-```bash
-mvn clean package -Pprod
-```
-
-2. Build the frontend:
-```bash
-cd dataround-link-web
-yarn run build
-```
 
 ## Documentation
 
@@ -107,7 +66,7 @@ For detailed documentation, please refer to the following:
 
 ## Contributing
 
-We welcome contributions to DataRound Link! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
+We welcome contributions to Dataround link! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
 
 ## License
 
@@ -117,6 +76,11 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 For support, please contact yuehan124@gmail.com or open an issue in the GitHub repository.
 
+wechat support
+![wechat qr code](docs/imgs/author_wechat.png)
+
+Scan the QR code above to add us on WeChat for direct support and communication.
+
 ## Acknowledgments
 
-Thanks to all contributors who have helped make DataRound Link better! 
+Thanks to all contributors who have helped make Dataround link better! 

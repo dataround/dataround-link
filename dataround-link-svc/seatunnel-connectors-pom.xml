@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.dataround</groupId>
+    <artifactId>seatunnel-connectors-downloader</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    
+    <name>SeaTunnel Connectors Downloader</name>
+    <description>Download SeaTunnel connectors for DataRound Link integration</description>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <seatunnel.version>2.3.9</seatunnel.version>
+    </properties>
+
+    <dependencies>
+        <!-- mysql connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.28</version>
+        </dependency>
+        <!-- seatunnel default lib -->
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>seatunnel-hadoop3-3.1.4-uber</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <!-- seatunnel default lib -->
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>seatunnel-hadoop-aws</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        
+        <!-- CDC Connectors (Real-time data capture) -->
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-cdc-mysql</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-cdc-postgres</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-cdc-oracle</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-cdc-sqlserver</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        
+        <!-- Database Connectors -->
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-jdbc</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-hive</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        
+        <!-- Big Data Connectors 
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-kafka</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-pulsar</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-hudi</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-iceberg</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>-->
+        
+        <!-- NoSQL Connectors 
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-mongodb</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-redis</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-elasticsearch</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>-->
+        
+        <!-- IoT and Time Series 
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-iotdb</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-influxdb</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>-->
+        
+        <!-- Utility Connectors 
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-socket</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seatunnel</groupId>
+            <artifactId>connector-http-base</artifactId>
+            <version>${seatunnel.version}</version>
+        </dependency>-->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Dependency Plugin to copy connectors -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-seatunnel-connectors</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/seatunnel-connectors</outputDirectory>
+                            <includeScope>compile</includeScope>
+                            <stripVersion>false</stripVersion>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -23,7 +23,7 @@ const baseUrl = '/datalink';
 export default defineConfig({
   base: baseUrl,
   build: {
-    outDir: '../mydp-datalink-svc/src/main/resources/static',
+    outDir: '../dataround-link-svc/src/main/resources/static',
   },
   server: {
     proxy: {

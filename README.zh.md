@@ -1,63 +1,36 @@
-# DataRound Link
+# Dataround link
 
-DataRound Link 是一个强大的数据集成和同步平台，能够实现不同数据库和系统之间的无缝数据传输。其最大的特点是采用**零代码、全可视化**的数据同步方式 - 无需编写配置文件或编程。用户可以通过直观的Web界面轻松配置和管理复杂的数据同步任务。
+Dataround link 是一个**开源数据集成工具**，专为多源异构数据同步而设计。它支持**结构化、半结构化和非结构化数据**的无缝集成和同步。
 
-## 核心特点
+Dataround link 采用**零代码可视化**设计理念，无需配置文件或编程。用户可以通过直观的Web界面轻松配置和管理复杂的数据同步任务，真正实现数据同步的民主化。
 
-- **零代码数据同步**
-  - 无需编程或配置文件
-  - 通过直观界面进行可视化任务配置
-  - 拖拽式字段映射
-  - 一键部署和执行
+## 核心特性
 
-- **跨平台数据集成**
-  - 支持多种数据库类型（MySQL、PostgreSQL、Oracle、SQL Server、TiDB等）
-  - 异构数据源同步
-  - 实时和批量数据传输
-  - 灵活的数据转换选项
+- **多源异构支持** - 统一支持结构化、半结构化和非结构化数据源
+- **结构化数据支持** - 传统关系型数据库（MySQL、PostgreSQL、Oracle、SQL Server、TiDB等）
+- **半结构化数据支持** - MongoDB、Kafka、JSON、XML等
+- **非结构化数据支持** - 图片、视频、模型文件、文档和其他文件类型
+- **零代码可视化界面** - 无需配置文件或编程，纯可视化操作
+- **虚拟表支持** - 通过虚拟表将来自Kafka、Redis等的半结构化数据映射为结构化数据，实现与关系型数据库的同步
+- **基于SeaTunnel** - Dataround link表数据同步功能基于Apache SeaTunnel实现，提供稳定可靠的数据传输能力
 
-- **数据库连接管理**
-  - 可视化连接测试和验证
-  - 安全的凭证管理
-  - 连接池优化
-  - 连接健康监控
+## 产品截图
 
-- **任务管理**
-  - 可视化任务配置
-  - 灵活的调度选项
-  - 实时任务监控
-  - 任务历史和指标
+### 作业管理仪表板
+![作业管理](docs/imgs/joblist.png)
 
-- **虚拟表管理**
-  - 创建和管理虚拟表
-  - 字段映射和转换
-  - 数据预览和验证
+### 表映射界面
+![表映射](docs/imgs/tablemapping.png)
 
-- **用户界面**
-  - 现代化响应式Web界面
-  - 多语言支持（英文/中文）
-  - 直观的导航和操作
-  - 实时监控仪表板
+### 字段映射配置
+![字段映射](docs/imgs/fieldmapping.png)
 
-## 项目结构
+## 从源码构建 dataround link
 
-```
-dataround-link/
-├── dataround-link-common/     # 通用工具和共享代码
-├── dataround-link-connector/  # 数据库连接器
-├── dataround-link-svc/        # 后端服务
-└── dataround-link-web/        # 前端应用
-```
-
-## 系统要求
+构建 Flink 的先决条件：
 
 - Java 17 或更高版本
-- Node.js 16 或更高版本
 - Maven 3.8 或更高版本
-- Yarn 包管理器
-- 现代网页浏览器
-
-## 快速开始
 
 1. 克隆仓库：
 ```bash
@@ -65,58 +38,45 @@ git clone https://github.com/dataround/dataround-link.git
 cd dataround-link
 ```
 
-2. 构建项目：
+2. 构建后端：
 ```bash
-mvn clean install
+cd dataround-link
+mvn clean package -DskipTests
 ```
 
-3. 启动后端服务：
+3. 启动 dataround link 服务器：
 ```bash
-cd dataround-link-svc
-mvn spring-boot:run
+tar zxvf dataround-link-1.0.tar.gz
+cd dataround-link-1.0
+./bin/start.sh
 ```
 
-4. 启动前端开发服务器：
-```bash
-cd dataround-link-web
-yarn install
-yarn start
-```
-
-应用将在 `http://localhost:5600/datalink` 可用
-
-## 生产环境构建
-
-1. 构建后端：
-```bash
-mvn clean package -Pprod
-```
-
-2. 构建前端：
-```bash
-cd dataround-link-web
-yarn run build
-```
+应用程序将在 `http://localhost:5600/datalink` 上可用
 
 ## 文档
 
-详细文档请参考：
+详细文档请参考以下内容：
 - [用户指南](docs/user-guide.md)
 - [开发者指南](docs/developer-guide.md)
 - [API文档](docs/api-documentation.md)
 
-## 贡献指南
+## 贡献
 
-我们欢迎对DataRound Link的贡献！请查看我们的[贡献指南](CONTRIBUTING.md)了解如何提交拉取请求、报告问题和参与项目开发。
+我们欢迎对 Dataround link 的贡献！请查看我们的[贡献指南](CONTRIBUTING.md)，了解如何提交拉取请求、报告问题和为项目做出贡献的详细信息。
 
 ## 许可证
 
-本项目采用GNU通用公共许可证v3.0 - 详见[LICENSE](LICENSE)文件。
+本项目采用 GNU General Public License v3.0 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件。
 
 ## 支持
 
-如需支持，请联系yuehan124@gmail.com或在GitHub仓库中提交issue。
+如需支持，请联系 yuehan124@gmail.com 或在 GitHub 仓库中提出issue。
+
+微信支持
+![微信二维码](docs/imgs/author_wechat.png)
+
+扫描上方二维码添加我们的微信，获得直接支持和沟通。
 
 ## 致谢
 
-感谢所有帮助改进DataRound Link的贡献者！ 
+感谢所有帮助使 Dataround link 变得更好的贡献者！ 

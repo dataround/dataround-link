@@ -26,7 +26,7 @@ import { FC, memo, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useRequest from '../../hooks/useRequest';
 import './index.less';
-import logoImage from '/public/logo.v20250728.png';
+import logoImage from '../../assets/logo.v20250728.png';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 //import { ItemType, MenuItemGroupType, MenuItemType, SubMenuType } from 'antd/es/menu/interface';

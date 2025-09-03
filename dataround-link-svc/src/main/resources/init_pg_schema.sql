@@ -12,7 +12,7 @@ CREATE TABLE public.connection (
     description varchar NULL,
     create_by int8 NOT NULL,
     update_by int8 NOT NULL,
-	create_time timestamp with time zone NOT NULL,
+    create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
 CREATE TABLE public.virtual_table (
@@ -115,3 +115,9 @@ INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink
 -- Insert nonstructural connectors
 INSERT INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by) VALUES
 (9, 'Kafka', 'MQ', 'KAFKA', true, true, true, true, '{"bootstrap.servers":"localhost:9092","topics":"topic1"}', 1000, 1000); 
+
+INSERT INTO connector ("id", "name", "type", "plugin_name", "support_source", "support_sink", "is_stream", "virtual_table", "properties", "create_by", "update_by", "create_time", "update_time") VALUES 
+(10, 'FTP', 'File', 'FTP', 't', 't', 'f', 'f', '{}', 1000, 1000, '2025-07-18 17:28:17', '2025-07-18 17:28:20'),
+(11, 'S3', 'File', 'S3', 't', 't', 'f', 'f', '{}', 1000, 1000, '2025-07-20 21:14:22', '2025-07-20 21:14:25'),
+(12, 'LocalFile', 'File', 'Local', 't', 't', 'f', 'f', '{}', 1000, 1000, '2025-07-22 10:59:37', '2025-07-22 10:59:40'),
+(13, 'SFTP', 'File', 'SFTP', 't', 't', 'f', 'f', '{}', 1000, 1000, '2025-07-27 08:40:38', '2025-07-27 08:40:41');

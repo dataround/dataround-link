@@ -12,7 +12,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://10.8.0.1:5432/dataround_link?currentSchema=public"
+    url: "jdbc:postgresql://localhost:5432/dataround_link?currentSchema=public"
     username: postgres
     password: "dataround.io"
     sql:
@@ -29,9 +29,9 @@ dataround:
       threadPoolSize: 10
   seatunnel:
     api:
-      base-url: http://10.8.0.1:8080
+      base-url: http://localhost:8080
 
 logging:
   level:
-    io.dataround.link: debug
+    io.dataround.link: info
     io.dataround.link.mapper: info

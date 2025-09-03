@@ -6,9 +6,9 @@
   <artifactId>dataround-link</artifactId>
   <version>1.0</version>
   <modules>
-    <module>dataround-link-svc</module>
     <module>dataround-link-common</module>
     <module>dataround-link-connector</module>
+    <module>dataround-link-svc</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -211,6 +211,14 @@
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>1.18.26</version>
+      </dependency>
+
+      <!-- Frontend Maven Plugin -->
+      <dependency>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.15.0</version>
+        <type>maven-plugin</type>
       </dependency>
     </dependencies>
   </dependencyManagement>

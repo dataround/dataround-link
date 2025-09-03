@@ -15,6 +15,7 @@
         <dependency>
             <groupId>io.dataround</groupId>
             <artifactId>dataround-link-connector-base</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- HikariCP for connection pooling -->
         <dependency>
@@ -68,6 +69,27 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            
+            <!-- Copy runtime dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                            <excludeArtifactIds>lombok</excludeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

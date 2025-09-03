@@ -5,10 +5,115 @@
     <formats>
         <format>tar.gz</format>
     </formats>
+    
+    <!-- Copy connector modules and their filtered dependencies -->
     <fileSets>
+        <!-- Copy JDBC connector JAR -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target</directory>
+            <outputDirectory>lib/connector/jdbc</outputDirectory>
+            <includes>
+                <include>dataround-link-connector-jdbc-*.jar</include>
+            </includes>
+            <excludes>
+                <exclude>*-sources.jar</exclude>
+                <exclude>*-javadoc.jar</exclude>
+            </excludes>
+        </fileSet>
+        
+        <!-- Copy JDBC dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/jdbc</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+        
+        <!-- Copy Hive connector JAR -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-hive/target</directory>
+            <outputDirectory>lib/connector/hive</outputDirectory>
+            <includes>
+                <include>dataround-link-connector-hive-*.jar</include>
+            </includes>
+            <excludes>
+                <exclude>*-sources.jar</exclude>
+                <exclude>*-javadoc.jar</exclude>
+            </excludes>
+        </fileSet>
+        
+        <!-- Copy Hive dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-hive/target/connector-lib</directory>
+            <outputDirectory>lib/connector/hive</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+        
+        <!-- Copy Kafka connector JAR -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-kafka/target</directory>
+            <outputDirectory>lib/connector/kafka</outputDirectory>
+            <includes>
+                <include>dataround-link-connector-kafka-*.jar</include>
+            </includes>
+            <excludes>
+                <exclude>*-sources.jar</exclude>
+                <exclude>*-javadoc.jar</exclude>
+            </excludes>
+        </fileSet>
+        
+        <!-- Copy Kafka dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-kafka/target/connector-lib</directory>
+            <outputDirectory>lib/connector/kafka</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+
+        <!-- SeaTunnel complete distribution -->
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/seatunnel</directory>
+            <outputDirectory>seatunnel</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude>logs/**</exclude>
+                <exclude>tmp/**</exclude>
+                <exclude>*.log</exclude>
+            </excludes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        
+        <!-- SeaTunnel downloaded connectors -->
+        <fileSet>
+            <directory>${project.basedir}/target/seatunnel-connectors</directory>
+            <outputDirectory>seatunnel/connectors</outputDirectory>
+            <includes>
+                <include>connector-*.jar</include>
+            </includes>
+            <fileMode>0644</fileMode>
+        </fileSet>
+
+        <!-- Seatunnel lib-->
+        <fileSet>
+            <directory>${project.basedir}/target/seatunnel-connectors</directory>
+            <outputDirectory>seatunnel/lib</outputDirectory>
+            <includes>
+                <include>seatunnel-hadoop*.jar</include>
+                <include>mysql-connector-java*.jar</include>
+            </includes>
+            <fileMode>0644</fileMode>
+        </fileSet>
+
+        <!-- script files -->
         <fileSet>
             <directory>${project.basedir}/src/main/resources/script/</directory>
-            <outputDirectory>dataround_link/bin</outputDirectory>
+            <outputDirectory>bin</outputDirectory>
             <includes>
                 <include>*.sh</include>
             </includes>
@@ -16,11 +121,22 @@
             <fileMode>0755</fileMode>
             <lineEnding>unix</lineEnding>
         </fileSet>
+        
+        <!-- config files -->
         <fileSet>
             <directory>${project.basedir}/src/main/resources/</directory>
-            <outputDirectory>dataround_link/conf</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>application.yaml</include>
+            </includes>
+        </fileSet>
+        
+        <!-- main application JAR file -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>${project.build.finalName}.jar</include>
             </includes>
         </fileSet>
     </fileSets>

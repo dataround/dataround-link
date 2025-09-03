@@ -1,7 +1,5 @@
 # DataRound Link Web
 
-DataRound Link Web is the frontend application for DataRound Link, a data integration and synchronization platform. It provides a user-friendly interface for managing database connections, jobs, and data synchronization tasks.
-
 ## Features
 
 - Database connection management
@@ -12,7 +10,7 @@ DataRound Link Web is the frontend application for DataRound Link, a data integr
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js (v18 or higher)
 - Yarn package manager
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 
@@ -44,10 +42,10 @@ The application will be available at `http://localhost:5173/datalink`
 To build the application for production:
 
 ```bash
-yarn run build
+yarn build
 ```
 
-The build artifacts will be stored in the `../mydp-datalink-svc/src/main/resources/static` directory.
+The build artifacts will be stored in the `../dataround-link-svc/src/main/resources/static` directory.
 
 ## Project Structure
 
