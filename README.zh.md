@@ -22,8 +22,6 @@ Dataround link 采用**零代码可视化**设计理念，无需配置文件或�
 ### 表映射界面
 ![表映射](docs/imgs/tablemapping.png)
 
-### 字段映射配置
-![字段映射](docs/imgs/fieldmapping.png)
 
 ## 从源码构建 dataround link
 

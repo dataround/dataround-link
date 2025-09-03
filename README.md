@@ -24,9 +24,6 @@ Dataround link adopts a **zero-code visual** design philosophy, eliminating the 
 ### Table Mapping Interface
 ![Table Mapping](docs/imgs/tablemapping.png)
 
-### Field Mapping Configuration
-![Field Mapping](docs/imgs/fieldmapping.png)
-
 
 ## Building dataround link from source
 
