@@ -8,10 +8,10 @@ Dataround link 采用**零代码可视化**设计理念，无需配置文件或�
 
 - **多源异构支持** - 统一支持结构化、半结构化和非结构化数据源
 - **结构化数据支持** - 传统关系型数据库（MySQL、PostgreSQL、Oracle、SQL Server、TiDB等）
-- **半结构化数据支持** - MongoDB、Kafka、JSON、XML等
+- **半结构化数据支持** - Kafka、JSON等
 - **非结构化数据支持** - 图片、视频、模型文件、文档和其他文件类型
 - **零代码可视化界面** - 无需配置文件或编程，纯可视化操作
-- **虚拟表支持** - 通过虚拟表将来自Kafka、Redis等的半结构化数据映射为结构化数据，实现与关系型数据库的同步
+- **虚拟表支持** - 通过虚拟表将来自Kafka、JSON等的半结构化数据映射为结构化数据，实现与关系型数据库的同步
 - **基于SeaTunnel** - Dataround link表数据同步功能基于Apache SeaTunnel实现，提供稳定可靠的数据传输能力
 
 ## 产品截图
@@ -84,7 +84,7 @@ psql -d dataround_link -f $DATAROUND_HOME/conf/init_pg_schema.sql
 1. **GitHub Discussions** - 在我们的 [GitHub Discussions](https://github.com/dataround/dataround-link/discussions) 中分享您的想法并获得社区帮助
 2. **直接联系** - 扫描下方二维码加入我们的微信群（加入时请注明"dataround"）
 
-![微信二维码](docs/imgs/author_wechat.png)
+    ![微信二维码](docs/imgs/author_wechat.png)
 
 ## 致谢
 

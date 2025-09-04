@@ -8,10 +8,10 @@ Dataround link adopts a **zero-code visual** design philosophy, eliminating the 
 
 - **Multi-source Heterogeneous Support** - Unified support for structured, semi-structured, and unstructured data sources
 - **Structured Data Support** - Traditional relational databases (MySQL, PostgreSQL, Oracle, SQL Server, TiDB, etc.)
-- **Semi-structured Data Support** - MongoDB, Kafka, JSON, XML, and more
+- **Semi-structured Data Support** - Kafka, JSON, and more
 - **Unstructured Data Support** - Images, videos, model files, documents, and other file types
 - **Zero-Code Visual Interface** - No configuration files or programming required, pure visual operations
-- **Virtual Table Support** - Map semi-structured data from Kafka, Redis, etc. to structured data through virtual tables, enabling synchronization with relational databases
+- **Virtual Table Support** - Map semi-structured data from Kafka, JSON, etc. to structured data through virtual tables, enabling synchronization with relational databases
 - **Based on SeaTunnel** - Dataround link table data synchronization is implemented based on Apache SeaTunnel, providing stable and reliable data transmission capabilities
 
 
@@ -35,7 +35,6 @@ Prerequisites for building Dataround:
 1. Clone the repository:
 ```bash
 git clone https://github.com/dataround/dataround-link.git
-cd dataround-link
 ```
 
 2. Build the backend:
@@ -89,7 +88,7 @@ If you have any questions or suggestions, we encourage you to:
 1. **GitHub Discussions** - Share your thoughts and get help from the community in our [GitHub Discussions](https://github.com/dataround/dataround-link/discussions)
 2. **Direct Contact** - Scan the QR code below to join our WeChat support group (please mention "dataround" when joining)
 
-![wechat qr code](docs/imgs/author_wechat.png)
+    ![wechat qr code](docs/imgs/author_wechat.png)
 
 ## Acknowledgments
 
