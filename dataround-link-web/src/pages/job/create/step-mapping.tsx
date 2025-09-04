@@ -183,7 +183,7 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
 
   const fetchBothTableFields = async (currentTableConfig: any, shouldPerformMapping: boolean = true) => {
     const cacheKey = `${currentTableConfig.sourceTable}-${currentTableConfig.targetTable}`;
-    
+
     // Check if there is data in the cache
     if (fieldsCache.current.has(cacheKey)) {
       const cachedData = fieldsCache.current.get(cacheKey)!;
@@ -240,10 +240,10 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
 
     setWriteType(currentTableConfig.writeType);
     setMatchMethod(currentTableConfig.matchMethod || 1);
-    
+
     // set field mapping data (if there is any)
     setFieldMapping(currentTableConfig.fieldMapping || []);
-    
+
     // load field options data
     const cacheKey = `${currentTableConfig.sourceTable}-${currentTableConfig.targetTable}`;
     if (fieldsCache.current.has(cacheKey)) {
@@ -377,9 +377,13 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   };
 
   return (
-    <>
+    <div style={{
+      width: '100%',
+      maxWidth: 'calc(100vw - 360px)', // leftNavWidth(240px) + contentStyle.marginLeft(20px) + rightPadding(100px)
+      overflow: 'hidden'
+    }}>
       <Tabs activeKey={activeKey} onChange={handleTabChange} items={getTabList()} />
-    </>
+    </div>
   );
 });
 
