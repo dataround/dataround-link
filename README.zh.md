@@ -16,16 +16,16 @@ Dataround link 采用**零代码可视化**设计理念，无需配置文件或�
 
 ## 产品截图
 
-### 作业管理仪表板
+### 作业管理
 ![作业管理](docs/imgs/joblist.png)
 
-### 表映射界面
+### 表映射
 ![表映射](docs/imgs/tablemapping.png)
 
 
 ## 从源码构建 dataround link
 
-构建 Flink 的先决条件：
+构建 Dataround 的先决条件：
 
 - Java 17 或更高版本
 - Maven 3.8 或更高版本
@@ -33,7 +33,6 @@ Dataround link 采用**零代码可视化**设计理念，无需配置文件或�
 1. 克隆仓库：
 ```bash
 git clone https://github.com/dataround/dataround-link.git
-cd dataround-link
 ```
 
 2. 构建后端：
@@ -42,10 +41,22 @@ cd dataround-link
 mvn clean package -DskipTests
 ```
 
-3. 启动 dataround link 服务器：
+最终程序包将生成在 `dataround-link-svc/target/dataround-link-xxx.tar.gz`
+
+3. 初始化数据库：
+- 安装PostgreSQL并创建数据库：
+```sql
+CREATE DATABASE dataround_link;
+```
+- 运行初始化脚本创建表：
 ```bash
-tar zxvf dataround-link-1.0.tar.gz
-cd dataround-link-1.0
+psql -d dataround_link -f $DATAROUND_HOME/conf/init_pg_schema.sql
+```
+
+4. 启动 dataround link 服务器：
+
+修改 `$DATAROUND_HOME/conf/application.yaml` 中的数据库IP、名称和密码，启动服务：
+```bash
 ./bin/start.sh
 ```
 
@@ -68,12 +79,12 @@ cd dataround-link-1.0
 
 ## 支持
 
-如需支持，请联系 yuehan124@gmail.com 或在 GitHub 仓库中提出issue。
+如果您有任何疑问或建议，我们建议您：
 
-微信支持
+1. **GitHub Discussions** - 在我们的 [GitHub Discussions](https://github.com/dataround/dataround-link/discussions) 中分享您的想法并获得社区帮助
+2. **直接联系** - 扫描下方二维码加入我们的微信群（加入时请注明"dataround"）
+
 ![微信二维码](docs/imgs/author_wechat.png)
-
-扫描上方二维码添加我们的微信，获得直接支持和沟通。
 
 ## 致谢
 

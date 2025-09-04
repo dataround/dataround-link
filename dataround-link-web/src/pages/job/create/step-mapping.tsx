@@ -379,7 +379,8 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   return (
     <div style={{
       width: '100%',
-      maxWidth: 'calc(100vw - 360px)', // leftNavWidth(240px) + contentStyle.marginLeft(20px) + rightPadding(100px)
+      // leftNavWidth(240px) + contentStyle.marginLeft(20px) + rightPadding(100px)
+      maxWidth: 'calc(100vw - 360px)', 
       overflow: 'hidden'
     }}>
       <Tabs activeKey={activeKey} onChange={handleTabChange} items={getTabList()} />

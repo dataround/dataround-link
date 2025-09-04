@@ -18,16 +18,16 @@ Dataround link adopts a **zero-code visual** design philosophy, eliminating the 
 
 ## Product Screenshots
 
-### Job Management Dashboard
+### Job Management
 ![Job Management](docs/imgs/joblist.png)
 
-### Table Mapping Interface
+### Table Mapping
 ![Table Mapping](docs/imgs/tablemapping.png)
 
 
 ## Building dataround link from source
 
-Prerequisites for building Flink:
+Prerequisites for building Dataround:
 
 - Java 17 or higher
 - Maven 3.8 or higher
@@ -44,10 +44,23 @@ cd dataround-link
 mvn clean package -DskipTests
 ```
 
-3. Start dataround link server:
+The final package will be generated at `dataround-link-svc/target/dataround-link-xxx.tar.gz`
+
+3. Initialize the database:
+
+- Install PostgreSQL and create a database:
+```sql
+CREATE DATABASE dataround_link;
+```
+- Run the initialization script to create tables:
 ```bash
-tar zxvf dataround-link-1.0.tar.gz
-cd dataround-link-1.0
+psql -d dataround_link -f $DATAROUND_HOME/conf/init_pg_schema.sql
+```
+
+4. Start dataround link server:
+
+Modify database IP, name and password conf in `$DATAROUND_HOME/conf/application.yaml`, Start the service:
+```bash
 ./bin/start.sh
 ```
 
@@ -71,12 +84,12 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## Support
 
-For support, please contact yuehan124@gmail.com or open an issue in the GitHub repository.
+If you have any questions or suggestions, we encourage you to:
 
-wechat support
+1. **GitHub Discussions** - Share your thoughts and get help from the community in our [GitHub Discussions](https://github.com/dataround/dataround-link/discussions)
+2. **Direct Contact** - Scan the QR code below to join our WeChat support group (please mention "dataround" when joining)
+
 ![wechat qr code](docs/imgs/author_wechat.png)
-
-Scan the QR code above to add us on WeChat for direct support and communication.
 
 ## Acknowledgments
 
