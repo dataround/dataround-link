@@ -17,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <seatunnel.version>2.3.9</seatunnel.version>
+        <seatunnel.version>2.3.11</seatunnel.version>
     </properties>
 
     <dependencies>
@@ -32,12 +32,14 @@
             <groupId>org.apache.seatunnel</groupId>
             <artifactId>seatunnel-hadoop3-3.1.4-uber</artifactId>
             <version>${seatunnel.version}</version>
+            <classifier>optional</classifier>
         </dependency>
         <!-- seatunnel default lib -->
         <dependency>
             <groupId>org.apache.seatunnel</groupId>
             <artifactId>seatunnel-hadoop-aws</artifactId>
             <version>${seatunnel.version}</version>
+            <classifier>optional</classifier>
         </dependency>
         
         <!-- CDC Connectors (Real-time data capture) -->
