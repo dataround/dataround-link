@@ -39,6 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Component for checking job statuses.
  * Monitors all running jobs and updates their status in the database.
+ * 
+ * @author yuehan124@gmail.com
+ * @since 2025-09-07
  */
 @Slf4j
 @Component
@@ -131,8 +134,11 @@ public class JobStatusChecker {
             if (JobInstanceStatusEnum.SUBMITTED.getCode() != jobInstance.getStatus()
                     && JobInstanceStatusEnum.RUNNING.getCode() != jobInstance.getStatus()) {
                 jobInstance.setEndTime(new Date());
+                // if errorMsg key not exists, asText() result will be "null"
+                String errorMsg = jobDetail.get("errorMsg").asText();
                 String logs = seaTunnelRestClient.getJobLogs(jobInstance.getSeatunnelId());
-                jobInstance.setLogContent(logs);
+                String logContent = "null".equals(errorMsg) ? logs : errorMsg + "\n\n" + logs;
+                jobInstance.setLogContent(logContent);
             }
             JsonNode metrics = jobDetail.get("metrics");
             if (metrics == null) {

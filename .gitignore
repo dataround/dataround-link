@@ -24,4 +24,5 @@ target
 
 ### logs ###
 logs
+dataround-link-web/yarn.lock
 dataround-link-svc/src/main/resources/static

@@ -41,7 +41,6 @@ import io.dataround.link.mapper.VirtualTableMapper;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
 import io.dataround.link.service.VirtualFieldService;
-import io.dataround.link.utils.Constants;
 import io.dataround.link.utils.ParamParser;
 import lombok.extern.slf4j.Slf4j;
 
@@ -145,34 +144,6 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
             tableField.setPrimaryKey(field.getPrimaryKey());
             return tableField;
         }).collect(Collectors.toList());
-    }
-
-    public Map<String, String> connection2Map(Connection connection) {
-        Map<String, String> map = connection.getConfig();
-        Connector connector = connectorService.getConnector(connection.getConnector());
-        Map<String, String> properties = connector.getProperties();
-        if (properties != null) {
-            map.put("driver", properties.get("driver"));
-        }
-        map.put("type", connector.getType());
-        map.put("host", connection.getHost());
-        if (connection.getPort() != null) {
-            map.put("port", connection.getPort().toString());
-        }
-        map.put("user", connection.getUser());
-        map.put("password", connection.getPasswd());
-        // rename broker to bootstrap.servers
-        if (map.containsKey("broker")) {
-            map.put("\"bootstrap.servers\"", map.get("broker"));
-            map.remove("broker");
-        }
-        // MYSQL-CDC use base-url and username, different property key
-        String pluginName = connector.getPluginName();
-        if (Constants.PlUGIN_NAME_MYSQL_CDC.equals(pluginName)) {
-            map.put("base-url", map.get("url"));
-            map.put("username", map.get("user"));
-        }
-        return map;
     }
 
 }

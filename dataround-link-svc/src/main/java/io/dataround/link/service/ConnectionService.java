@@ -47,7 +47,5 @@ public interface ConnectionService extends IService<Connection> {
 
     Map<Long, String> listNameByIds(Set<Long> connectionIds);
 
-    Map<String, String> connection2Map(Connection connection);
-
     boolean checkProjectUsed(Long projectId);
 }

@@ -40,6 +40,14 @@ public class SeaTunnelRestClient {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    // seatunnel log be of no use when return the following string
+    private static final String EMPTY_LOG = "<html><head><title>Seatunnel log</title></head>\n" +
+            "<body>\n" +
+            " <h2>Seatunnel log</h2>\n" +
+            " <ul>\n" +
+            " </ul>\n" +
+            "</body></html>";
+
     public SeaTunnelRestClient() {
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
@@ -121,20 +129,19 @@ public class SeaTunnelRestClient {
         }
     }
 
-
     /**
      * Stop a running job
      *
      * @param jobId Job ID
      */
     public void stopJob(String jobId) {
-        stopJob(jobId, true);
+        stopJob(jobId, false);
     }
 
     /**
      * Stop a running job
      *
-     * @param jobId Job ID
+     * @param jobId             Job ID
      * @param stopWithSavePoint Whether to stop with save point
      */
     public void stopJob(String jobId, boolean stopWithSavePoint) {
@@ -142,7 +149,8 @@ public class SeaTunnelRestClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             // Create request body
-            String requestBody = String.format("{\"jobId\": %s, \"isStopWithSavePoint\": %b}", jobId, stopWithSavePoint);
+            String requestBody = String.format("{\"jobId\": %s, \"isStopWithSavePoint\": %b}", jobId,
+                    stopWithSavePoint);
             HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
             restTemplate.postForObject(baseUrl + "/stop-job", request, String.class);
         } catch (Exception e) {
@@ -159,10 +167,12 @@ public class SeaTunnelRestClient {
      */
     public String getJobLogs(String jobId) {
         try {
-            return restTemplate.getForObject(baseUrl + "/logs/" + jobId, String.class);
+            String logs = restTemplate.getForObject(baseUrl + "/logs/" + jobId, String.class);
+            // EMPTY_LOG be of no use, return empty string
+            return EMPTY_LOG.equals(logs) ? "" : logs;
         } catch (Exception e) {
             log.error("Failed to get logs for job {}", jobId, e);
             throw new RuntimeException("Failed to get job logs", e);
         }
     }
-} 
+}

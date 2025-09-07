@@ -17,6 +17,7 @@
 
 package io.dataround.link.service.impl;
 
+import io.dataround.link.job.JobConfigService;
 import java.util.Date;
 import java.util.List;
 
@@ -38,8 +39,8 @@ import io.dataround.link.job.JobStatusChecker;
 import io.dataround.link.mapper.JobInstanceMapper;
 import io.dataround.link.mapper.JobMapper;
 import io.dataround.link.service.FileSyncService;
-import io.dataround.link.service.JobConfigService;
 import io.dataround.link.service.JobInstanceService;
+import io.dataround.link.utils.BeanConvertor;
 import io.dataround.link.utils.SeaTunnelRestClient;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,7 +83,7 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
     @Override
     public void execute(Long userId, Long jobId, Long instanceId) {
         Job job = jobMapper.selectById(jobId);
-        JobRes vo = jobConfigService.getJobVo(job);
+        JobRes vo = BeanConvertor.job2JobRes(job);
         if (job.getJobType() == JobTypeEnum.FILESYNC.getCode()) {
             executeByFileSync(vo, instanceId);
         } else {

@@ -28,6 +28,7 @@ import io.dataround.link.common.entity.res.UserResponse;
 import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.User;
 import io.dataround.link.service.UserService;
+import io.dataround.link.utils.BeanConvertor;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.JobInstance;
@@ -36,7 +37,6 @@ import io.dataround.link.entity.req.JobReq;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.quartz.SchedulerService;
 import io.dataround.link.service.ConnectionService;
-import io.dataround.link.service.JobConfigService;
 import io.dataround.link.service.JobService;
 import io.dataround.link.service.JobInstanceService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -80,8 +80,6 @@ public class JobController extends BaseController {
     @Autowired
     private SchedulerService schedulerService;
     @Autowired
-    private JobConfigService jobConfigService;
-    @Autowired
     private ConnectionService connectionService;
     @Autowired
     private UserService userService;
@@ -109,7 +107,7 @@ public class JobController extends BaseController {
         }
         Page<Job> page = jobService.page(params, queryWrapper);
         Map<Long, JobRes> jobResMap = new LinkedHashMap<>();
-        page.getRecords().forEach(job -> jobResMap.put(job.getId(), jobConfigService.getJobVo(job)));
+        page.getRecords().forEach(job -> jobResMap.put(job.getId(), BeanConvertor.job2JobRes(job)));
 
         // get connection name and user name
         Set<Long> creatorIds = new HashSet<>();
@@ -150,7 +148,7 @@ public class JobController extends BaseController {
     @GetMapping("/{id}")
     public Result<JobRes> get(@PathVariable Long id) {
         Job job = jobService.getById(id);
-        return Result.success(jobConfigService.getJobVo(job));
+        return Result.success(BeanConvertor.job2JobRes(job));
     }
 
     @PostMapping("/saveOrUpdate")

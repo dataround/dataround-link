@@ -19,20 +19,16 @@ package io.dataround.link.job;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.Connection;
-import io.dataround.link.entity.Job;
 import io.dataround.link.entity.enums.JobTypeEnum;
 import io.dataround.link.entity.res.JobRes;
-import io.dataround.link.entity.res.TableMapping;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,11 +39,11 @@ import lombok.extern.slf4j.Slf4j;
  * and job value object conversion for different data source types.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-09-07
  */
 @Slf4j
 @Component
-public class JobConfigServiceImpl {
+public class JobConfigService {
 
     @Autowired
     private ConnectorService connectorService;
@@ -70,11 +66,8 @@ public class JobConfigServiceImpl {
         Long sourceConnId = jobVo.getSourceConnId();
         Connection sourceConn = connectionService.getById(sourceConnId);
         Connector sourceConnector = connectorService.getConnector(sourceConn.getConnector());
-        Map<String, String> sourceMap = connectionService.connection2Map(sourceConn);
-        List<TableMapping> tableMappings = jobVo.getTableMapping();
 
-        List<JSONObject> sources = configGeneratorFactory.generateSourceConfigs(
-            jobVo, sourceConn, sourceConnector, sourceMap, tableMappings);
+        List<JSONObject> sources = configGeneratorFactory.generateSourceConfig(jobVo, sourceConn, sourceConnector);
         jsonConfig.put("source", sources);
 
         // Add empty transform section
@@ -84,30 +77,11 @@ public class JobConfigServiceImpl {
         Long targetConnId = jobVo.getTargetConnId();
         Connection targetConn = connectionService.getById(targetConnId);
         Connector targetConnector = connectorService.getConnector(targetConn.getConnector());
-        Map<String, String> targetMap = connectionService.connection2Map(targetConn);
 
-        List<JSONObject> sinks = configGeneratorFactory.generateSinkConfigs(
-            jobVo, targetConn, targetConnector, targetMap, tableMappings);
+        List<JSONObject> sinks = configGeneratorFactory.generateSinkConfig(jobVo, targetConn, targetConnector);
         jsonConfig.put("sink", sinks);
 
         return jsonConfig.toJSONString();
     }
 
-    public JobRes getJobVo(Job job) {
-        // Convert Map config to JobRes object
-        String configJson = JSONObject.toJSONString(job.getConfig());
-        JobRes vo = JSONObject.parseObject(configJson, JobRes.class);
-        
-        // Override with actual job entity values
-        vo.setId(job.getId());
-        vo.setName(job.getName());
-        vo.setDescription(job.getDescription());
-        vo.setJobType(job.getJobType());
-        vo.setScheduleType(job.getScheduleType());
-        vo.setCron(job.getCron());
-        vo.setStartTime(job.getStartTime());
-        vo.setEndTime(job.getEndTime());
-        vo.setConfig(job.getConfig());
-        return vo;
-    }
 }
