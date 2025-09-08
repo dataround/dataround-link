@@ -88,7 +88,7 @@ public class JobInstanceServiceImpl extends ServiceImpl<JobInstanceMapper, JobIn
             executeByFileSync(vo, instanceId);
         } else {
             String config = jobConfigService.getJobJson(vo, instanceId);
-            log.debug("Job Config:\n {}", config);
+            log.info("Job Config:\n {}", config);
             executeBySeaTunnel(config, instanceId);
         }
     }

@@ -17,6 +17,7 @@
 
 package io.dataround.link.job;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,10 +56,12 @@ public class JobStatusChecker {
 
     private final ExecutorService executorService;
     private final ConcurrentHashMap<String, JobInstance> runningJobs;
+    private final ConcurrentHashMap<String, Boolean> checkingJobs;
 
     public JobStatusChecker() {
         this.executorService = Executors.newFixedThreadPool(5);
         this.runningJobs = new ConcurrentHashMap<>();
+        this.checkingJobs = new ConcurrentHashMap<>();
     }
 
     @PostConstruct
@@ -75,7 +78,7 @@ public class JobStatusChecker {
 
     /**
      * Add a job to be monitored
-     * 
+     *
      * @param jobInstance Job instance to monitor
      */
     public void addJobToMonitor(JobInstance jobInstance) {
@@ -92,10 +95,17 @@ public class JobStatusChecker {
         runningJobs.forEach((seatunnelId, jobInstance) -> {
             executorService.submit(() -> {
                 try {
+                    // Check if this job is already being checked
+                    if (checkingJobs.putIfAbsent(seatunnelId, true) != null) {
+                        return;
+                    }
                     JsonNode jobDetail = seaTunnelRestClient.getJobDetail(seatunnelId);
                     updateJobStatus(jobInstance, jobDetail);
                 } catch (Exception e) {
                     log.error("Failed to check status for job {}", seatunnelId, e);
+                } finally {
+                    // Remove the checking flag when done
+                    checkingJobs.remove(seatunnelId);
                 }
             });
         });
@@ -129,22 +139,42 @@ public class JobStatusChecker {
                     changed = jobInstance.getStatus() != JobInstanceStatusEnum.RUNNING.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.RUNNING.getCode());
             }
+            JsonNode metrics = jobDetail.get("metrics");
+            changed = parseAndUpdateMetrics(jobInstance, metrics) || changed;
             jobInstance.setUpdateTime(new Date());
-            // If job is finished, update end time
-            if (JobInstanceStatusEnum.SUBMITTED.getCode() != jobInstance.getStatus()
-                    && JobInstanceStatusEnum.RUNNING.getCode() != jobInstance.getStatus()) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            StringBuilder logContent = new StringBuilder();
+            // Add job start time at the beginning
+            if (jobInstance.getStartTime() != null) {
+                logContent.append("=== Job Start Time: " + sdf.format(jobInstance.getStartTime()) + " ===\n");
+            }
+            // Add table-level metrics information
+            if (metrics != null) {
+                String tableMetricsInfo = buildTableMetricsInfo(metrics);
+                if (!tableMetricsInfo.isEmpty()) {
+                    logContent.append("=== Table Metrics Info ===\n");
+                    logContent.append(tableMetricsInfo);
+                }
+            }
+            // If job is finished, update end time and add logs
+            if (JobInstanceStatusEnum.SUBMITTED.getCode() != jobInstance.getStatus() && JobInstanceStatusEnum.RUNNING.getCode() != jobInstance.getStatus()) {
                 jobInstance.setEndTime(new Date());
+                // Add job end time at the end
+                logContent.append("=== Job End Time: " + sdf.format(jobInstance.getEndTime()) + " ===\n\n");
+
                 // if errorMsg key not exists, asText() result will be "null"
                 String errorMsg = jobDetail.get("errorMsg").asText();
                 String logs = seaTunnelRestClient.getJobLogs(jobInstance.getSeatunnelId());
-                String logContent = "null".equals(errorMsg) ? logs : errorMsg + "\n\n" + logs;
-                jobInstance.setLogContent(logContent);
+                logContent.append("=== Job Detail Logs:\n" + (null == errorMsg ? logs : errorMsg + "\n\n" + logs) + " ===\n");
+                logContent.append("null".equals(errorMsg) ? logs : errorMsg + "\n\n" + logs);
+
+                jobInstance.setLogContent(logContent.toString());
+                changed = true;
+            } else {
+                // For running jobs, update log content with current metrics
+                jobInstance.setLogContent(logContent.toString());
             }
-            JsonNode metrics = jobDetail.get("metrics");
-            if (metrics == null) {
-                return;
-            }
-            changed = changed || parseAndUpdateMetrics(jobInstance, metrics);
             // update job instance only if properties changed, avoid unnecessary updates, especially for streaming jobs
             if (changed) {
                 jobInstanceService.updateById(jobInstance);
@@ -197,6 +227,39 @@ public class JobStatusChecker {
         jobInstance.setReadBytes(totalReadBytes);
         jobInstance.setWriteBytes(totalWriteBytes);
         return changed;
+    }
+
+    /**
+     * Build table-level metrics information from metrics JSON
+     *
+     * @param metricsJson the metrics JSON node
+     * @return formatted table metrics information
+     */
+    private String buildTableMetricsInfo(JsonNode metricsJson) {
+        StringBuilder tableInfo = new StringBuilder();
+        // Process TableSourceReceivedCount
+        if (metricsJson.get("TableSourceReceivedCount") != null) {
+            JsonNode sourceCount = metricsJson.get("TableSourceReceivedCount");
+            if (sourceCount.isObject()) {
+                sourceCount.fields().forEachRemaining(entry -> {
+                    tableInfo.append("Table ").append(entry.getKey()).append(" received: ")
+                             .append(entry.getValue().asText()).append(" rows\n");
+                });
+            }
+        }
+
+        // Process TableSinkWriteCount
+        if (metricsJson.get("TableSinkWriteCount") != null) {
+            JsonNode sinkCount = metricsJson.get("TableSinkWriteCount");
+            if (sinkCount.isObject()) {
+                sinkCount.fields().forEachRemaining(entry -> {
+                    tableInfo.append("Table ").append(entry.getKey()).append(" written: ")
+                             .append(entry.getValue().asText()).append(" rows\n");
+                });
+            }
+        }
+
+        return tableInfo.toString();
     }
 
 }

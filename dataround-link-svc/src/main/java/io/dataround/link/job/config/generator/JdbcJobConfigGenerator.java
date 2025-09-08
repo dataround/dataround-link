@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.enums.TableWriteTypeEnum;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.res.FieldMapping;
 import io.dataround.link.entity.res.JobRes;
@@ -77,13 +78,27 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         List<JSONObject> sinks = new ArrayList<>();
         
         for (TableMapping table : tableMappings) {
+            List<FieldMapping> fieldMappings = table.getFieldMapping();
+            List<String> primaryKeys = new ArrayList<>();
+            for (FieldMapping fieldMapping : fieldMappings) {
+                if (fieldMapping.getTargetPrimaryKey()) {
+                    primaryKeys.add(fieldMapping.getTargetFieldName());
+                }
+            }
             JSONObject sink = new JSONObject();
             sink.put("plugin_name", "Jdbc");
             sink.put("connection_check_timeout_sec", 30);
             sink.put("batch_size", 1000);
             sink.put("max_commit_attempts", 3);
             sink.put("max_retries", 1);
-            sink.put("support_upsert_by_query_primary_key_exist", false);
+            // jdbc connector support upsert by primary key
+            if (TableWriteTypeEnum.UPSERT.getCode() == table.getWriteType()) {
+                sink.put("primary_keys", primaryKeys.toArray());
+                sink.put("enable_upsert", !primaryKeys.isEmpty() ? true : false);
+            } else {
+                // can speed up the job by disabling upsert
+                sink.put("enable_upsert", false);
+            }
             sink.put("source_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
             sink.put("database", table.getTargetDbName());
             sink.put("table", table.getTargetTable());
