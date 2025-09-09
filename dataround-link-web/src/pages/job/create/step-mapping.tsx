@@ -181,6 +181,32 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
     }
   ];
 
+  const doRequestBothTableFields = async (currentTableConfig: any) => {
+    const sourceParams = { dbName: currentTableConfig.sourceDbName, connId: data.sourceConnId, tableName: currentTableConfig.sourceTable };
+    const targetParams = { dbName: currentTableConfig.targetDbName, connId: data.targetConnId, tableName: currentTableConfig.targetTable };
+    const [sourceRes, targetRes] = await Promise.all([
+      getTableColumns(sourceParams),
+      getTableColumns(targetParams)
+    ]);
+    return { data: { sourceData: sourceRes.data, targetData: targetRes.data} };
+  };
+
+  const reqBothTableFields = useRequest(doRequestBothTableFields, { wrapperFun: (result) => {
+      const sourceFieldList: any[] = [];
+      const sourceData = result.sourceData;
+      Object.keys(sourceData).forEach((i) => {
+        sourceFieldList.push({ key: sourceData[i].name, label: sourceData[i].name, value: sourceData[i].name, type: sourceData[i].type, primaryKey: sourceData[i].primaryKey, nullable: sourceData[i].nullable, defaultValue: sourceData[i].defaultValue });
+      });
+
+      const targetFieldList: any[] = [];
+      const targetData = result.targetData;
+      Object.keys(targetData).forEach((i) => {
+        targetFieldList.push({ name: targetData[i].name, type: targetData[i].type, primaryKey: targetData[i].primaryKey, nullable: targetData[i].nullable, defaultValue: targetData[i].defaultValue });
+      });
+      return { sourceFields: sourceFieldList, targetFields: targetFieldList };
+    } 
+  });
+
   const fetchBothTableFields = async (currentTableConfig: any, shouldPerformMapping: boolean = true) => {
     const cacheKey = `${currentTableConfig.sourceTable}-${currentTableConfig.targetTable}`;
 
@@ -197,32 +223,13 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
     }
 
     try {
-      const sourceParams = { dbName: currentTableConfig.sourceDbName, connId: data.sourceConnId, tableName: currentTableConfig.sourceTable };
-      const targetParams = { dbName: currentTableConfig.targetDbName, connId: data.targetConnId, tableName: currentTableConfig.targetTable };
-
-      const [sourceRes, targetRes] = await Promise.all([
-        getTableColumns(sourceParams),
-        getTableColumns(targetParams)
-      ]);
-
-      const sourceFieldList: any[] = [];
-      const sourceData = sourceRes.data || sourceRes;
-      Object.keys(sourceData).forEach((i) => {
-        sourceFieldList.push({ key: sourceData[i].name, label: sourceData[i].name, value: sourceData[i].name, type: sourceData[i].type, primaryKey: sourceData[i].primaryKey, nullable: sourceData[i].nullable, defaultValue: sourceData[i].defaultValue });
+      reqBothTableFields.caller(currentTableConfig).then((result) => {
+        // Cache field data
+        fieldsCache.current.set(cacheKey, result);
+        setSourceFields(result.sourceFields);
+        setTargetFields(result.targetFields);
+        performFieldMapping(result.sourceFields, result.targetFields, matchMethod);
       });
-
-      const targetFieldList: any[] = [];
-      const targetData = targetRes.data || targetRes;
-      Object.keys(targetData).forEach((i) => {
-        targetFieldList.push({ name: targetData[i].name, type: targetData[i].type, primaryKey: targetData[i].primaryKey, nullable: targetData[i].nullable, defaultValue: targetData[i].defaultValue });
-      });
-
-      // Cache field data
-      fieldsCache.current.set(cacheKey, { sourceFields: sourceFieldList, targetFields: targetFieldList });
-
-      setSourceFields(sourceFieldList);
-      setTargetFields(targetFieldList);
-      performFieldMapping(sourceFieldList, targetFieldList, matchMethod);
     } catch (error) {
       console.error('Error fetching table fields:', error);
       message.error(t('common.requestError'));
@@ -377,14 +384,16 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   };
 
   return (
-    <div style={{
-      width: '100%',
-      // leftNavWidth(240px) + contentStyle.marginLeft(20px) + rightPadding(100px)
-      maxWidth: 'calc(100vw - 360px)', 
-      overflow: 'hidden'
-    }}>
-      <Tabs activeKey={activeKey} onChange={handleTabChange} items={getTabList()} />
-    </div>
+    <Spin spinning={reqBothTableFields.loading}>
+      <div style={{
+        width: '100%',
+        // leftNavWidth(240px) + contentStyle.marginLeft(20px) + rightPadding(100px)
+        maxWidth: 'calc(100vw - 360px)', 
+        overflow: 'hidden'
+      }}>
+        <Tabs activeKey={activeKey} onChange={handleTabChange} items={getTabList()} />
+      </div>
+    </Spin>
   );
 });
 
