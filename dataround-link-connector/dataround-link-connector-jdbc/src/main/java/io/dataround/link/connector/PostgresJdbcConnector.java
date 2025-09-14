@@ -90,16 +90,32 @@ public class PostgresJdbcConnector extends JdbcConnector {
         return getTablesWithParams(database, null, tableNamePattern, new String[] { "TABLE", "VIEW" });
     }
 
+    /**
+     * The parameter of PostgreSQL table must have schema, so we need to get table fields from the schema
+     */
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
-        // For PostgreSQL: catalog = database name, schema = "public" (default schema)
-        return getTableFieldsWithParams(database, null, table, "%");
+        int idx = table.indexOf(".");
+        if (idx == -1) {
+            return getTableFieldsWithParams(database, null, table, "%");
+        }
+        String schema = table.substring(0, idx);
+        String tableName = table.substring(idx + 1);
+        return getTableFieldsWithParams(database, schema, tableName, "%");
     }
 
+    /**
+     * The parameter of PostgreSQL table must have schema, so we need to get table fields from the schema
+     */
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
-        // For PostgreSQL: catalog = database name, schema = "public" (default schema)
-        return getTableFieldsWithParams(database, null, table, columnNamePattern);
+        int idx = table.indexOf(".");
+        if (idx == -1) {
+            return getTableFieldsWithParams(database, null, table, columnNamePattern);
+        }
+        String schema = table.substring(0, idx);
+        String tableName = table.substring(idx + 1);
+        return getTableFieldsWithParams(database, schema, tableName, columnNamePattern);
     }
  
 }
