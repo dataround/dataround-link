@@ -106,6 +106,9 @@
             <includes>
                 <include>seatunnel-hadoop*.jar</include>
                 <include>mysql-connector-java*.jar</include>
+                <include>postgresql-*.jar</include>
+                <include>ojdbc8*.jar</include>
+                <include>mssql-jdbc*.jar</include>
             </includes>
             <fileMode>0644</fileMode>
         </fileSet>

@@ -19,29 +19,37 @@ package io.dataround.link.connector;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import io.dataround.link.common.connector.Param;
 
 /**
- * Oracle JDBC connector test
+ * Postgres Jdbc Connector Test
  * 
  * @author yuehan124@gmail.com
- * @since 2025-08-03
+ * @since 2025-09-13
  */
-public class OracleJdbcConnectorTest {
+public class PostgresJdbcConnectorTest {
+
+    private Param param;
+
+    @Before
+    public void before() {
+        Param param = new Param();
+        param.setUser("postgres");
+        param.setPassword("dataround.io");
+        param.setConfig(new HashMap<>());
+        param.getConfig().put("driver", "org.postgresql.Driver");
+        param.getConfig().put("url", "jdbc:postgresql://localhost:5432/tpcds_tst");
+        this.param = param;
+    }
 
     @Test
     public void testDoGetDatabases() {
-        Param param = new Param();
-        param.setUser("tpcds");
-        param.setPassword("tpcds1234@56");
-        param.setConfig(new HashMap<>());
-        param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
-        param.getConfig().put("url", "jdbc:oracle:thin:@//localhost:1521/XEPDB1");
-        try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
+        try (PostgresJdbcConnector connector = new PostgresJdbcConnector()) {
             connector.initialize(param);
-            List<String> databases = connector.getDatabases();
+            List<String> databases = connector.doGetDatabases();
             System.out.println(databases);
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,18 +58,24 @@ public class OracleJdbcConnectorTest {
 
     @Test
     public void testDoGetTables() {
-        Param param = new Param();
-        param.setUser("tpcds");
-        param.setPassword("tpcds1234@56");
-        param.setConfig(new HashMap<>());
-        param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
-        param.getConfig().put("url", "jdbc:oracle:thin:@//localhost:1521/XEPDB1");
-        try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
+        try (PostgresJdbcConnector connector = new PostgresJdbcConnector()) {
             connector.initialize(param);
-            List<String> tables = connector.getTables("tpcds");
+            List<String> tables = connector.doGetTables("tpcds_tst");
             System.out.println(tables);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testDoGetTableFields() {
+        try (PostgresJdbcConnector connector = new PostgresJdbcConnector()) {
+            connector.initialize(param);
+            List<TableField> fields = connector.doGetTableFields("tpcds_tst", "catalog_sales");
+            System.out.println(fields);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

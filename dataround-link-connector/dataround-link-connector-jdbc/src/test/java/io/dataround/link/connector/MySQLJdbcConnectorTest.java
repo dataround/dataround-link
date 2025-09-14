@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import io.dataround.link.common.connector.Param;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -29,14 +30,22 @@ import org.junit.Test;
  * @since 2025-08-26
  */
 public class MySQLJdbcConnectorTest {
-    @Test
-    public void testDoGetDatabases() {
+
+    private Param param;
+
+    @Before
+    public void setUp() {
         Param param = new Param();
         param.setUser("root");
         param.setPassword("test1234zxcv....");
         param.setConfig(new HashMap<>());
         param.getConfig().put("driver", "com.mysql.cj.jdbc.Driver");
-        param.getConfig().put("url", "jdbc:mysql://10.8.0.1:3306/test");
+        param.getConfig().put("url", "jdbc:mysql://localhost:3306/test");
+        this.param = param;
+    }
+
+    @Test
+    public void testDoGetDatabases() {
         try (MySQLJdbcConnector connector = new MySQLJdbcConnector()) {
             connector.initialize(param);
             List<String> databases = connector.doGetDatabases();
@@ -47,13 +56,18 @@ public class MySQLJdbcConnectorTest {
     }
 
     @Test
+    public void testDoGetTables() {
+        try (MySQLJdbcConnector connector = new MySQLJdbcConnector()) {
+            connector.initialize(param);
+            List<String> tables = connector.doGetTables("test");
+            System.out.println(tables);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void testDoGetTableFields() {
-        Param param = new Param();
-        param.setUser("root");
-        param.setPassword("test1234zxcv....");
-        param.setConfig(new HashMap<>());
-        param.getConfig().put("driver", "com.mysql.cj.jdbc.Driver");
-        param.getConfig().put("url", "jdbc:mysql://10.8.0.1:3306/test");
         try (MySQLJdbcConnector connector = new MySQLJdbcConnector()) {
             connector.initialize(param);
             List<TableField> tableFields = connector.doGetTableFields("test", "gen_table");
@@ -61,10 +75,5 @@ public class MySQLJdbcConnectorTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    public void testDoGetTables() {
-
     }
 }

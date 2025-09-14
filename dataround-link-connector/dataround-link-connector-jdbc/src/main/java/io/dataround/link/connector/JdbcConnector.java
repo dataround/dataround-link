@@ -164,7 +164,15 @@ public class JdbcConnector extends AbstractTableConnector {
             DatabaseMetaData metaData = conn.getMetaData();
             try (ResultSet rs = metaData.getTables(catalog, schema, tableNamePattern, types)) {
                 while (rs.next()) {
-                    tables.add(rs.getString("TABLE_NAME"));
+                    String tableName = rs.getString("TABLE_NAME");
+                    String tableSchema = schema;
+                    if (tableSchema == null) {
+                        tableSchema = rs.getString("TABLE_SCHEM");
+                        if (tableSchema != null) {
+                            tableName = tableSchema + "." + tableName;
+                        }
+                    }
+                    tables.add(tableName);
                 }
             }
         } catch (SQLException e) {

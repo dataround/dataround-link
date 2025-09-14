@@ -56,20 +56,38 @@ public class PostgresJdbcConnector extends JdbcConnector {
     public List<String> doGetDatabases() {
         // call parent method to get all databases, then filter out system databases
         return super.doGetDatabases().stream()
-                .filter(db -> !SYSTEM_DATABASES.contains(db.toLowerCase()))
-                .collect(Collectors.toList());
+            .filter(db -> !SYSTEM_DATABASES.contains(db.toLowerCase()))
+            .collect(Collectors.toList());
+        // If you want to support cross-database references, you can uncomment the following code
+        // List<String> databases = new ArrayList<>();
+        // // Use PostgreSQL system catalog to get all databases
+        // String sql = "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true";
+        // try (Connection conn = dataSource.getConnection();
+        //         PreparedStatement stmt = conn.prepareStatement(sql);
+        //         ResultSet rs = stmt.executeQuery()) {
+        //     while (rs.next()) {
+        //         String dbName = rs.getString("datname");
+        //         // Filter out system databases
+        //         if (!SYSTEM_DATABASES.contains(dbName.toLowerCase())) {
+        //             databases.add(dbName);
+        //         }
+        //     }
+        // } catch (SQLException e) {
+        //     log.warn("Failed to get PostgreSQL databases using system catalog, Falling back to standard JDBC getCatalogs() method", e.getMessage());
+        // }
+        // return databases;
     }
 
     @Override
     public List<String> doGetTables(String database) {
         // For PostgreSQL: catalog = database name, schema = "public" (default schema)
-        return getTablesWithParams(database, null, "%", new String[]{"TABLE", "VIEW"});
+        return getTablesWithParams(database, null, "%", new String[] { "TABLE", "VIEW" });
     }
 
     @Override
     public List<String> doGetTables(String database, String tableNamePattern) {
         // For PostgreSQL: catalog = database name, schema = "public" (default schema)
-        return getTablesWithParams(database, null, tableNamePattern, new String[]{"TABLE", "VIEW"});
+        return getTablesWithParams(database, null, tableNamePattern, new String[] { "TABLE", "VIEW" });
     }
 
     @Override
@@ -81,7 +99,7 @@ public class PostgresJdbcConnector extends JdbcConnector {
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
         // For PostgreSQL: catalog = database name, schema = "public" (default schema)
-            return getTableFieldsWithParams(database, null, table, columnNamePattern);
+        return getTableFieldsWithParams(database, null, table, columnNamePattern);
     }
-
+ 
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2025 yuehan124@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,13 +57,13 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         List<JSONObject> sources = new ArrayList<>();
         
         for (TableMapping table : tableMappings) {
-            JSONObject source = new JSONObject();
+            JSONObject source = new JSONObject(sourceMap);
             source.put("plugin_name", "Jdbc");
             source.put("connection_check_timeout_sec", 30);
             source.put("parallelism", 1);
+            //source.put("database", table.getSourceDbName());
             source.put("result_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            source.put("query", query(table.getSourceTable(), jobVo));
-            source.putAll(sourceMap);
+            source.put("query", query(getFullTableName(table.getSourceDbName(), table.getSourceTable()), jobVo));
             sources.add(source);
         }
         
@@ -85,7 +85,7 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
                     primaryKeys.add(fieldMapping.getTargetFieldName());
                 }
             }
-            JSONObject sink = new JSONObject();
+            JSONObject sink = new JSONObject(targetMap);
             sink.put("plugin_name", "Jdbc");
             sink.put("connection_check_timeout_sec", 30);
             sink.put("batch_size", 1000);
@@ -100,10 +100,9 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
                 sink.put("enable_upsert", false);
             }
             sink.put("source_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            sink.put("database", table.getTargetDbName());
-            sink.put("table", table.getTargetTable());
+            //sink.put("database", table.getTargetDbName());
+            sink.put("table", getFullTableName(table.getTargetDbName(), table.getTargetTable()));
             sink.put("generate_sink_sql", true);
-            sink.putAll(targetMap);
             sinks.add(sink);
         }
         
@@ -149,6 +148,10 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
             }
         }
         return where;
+    }
+
+    private String getFullTableName(String dbName, String tableName) {
+        return dbName + "." + tableName;
     }
 
     private String sqlDialect(String dialect, String field) {

@@ -163,11 +163,9 @@ public class JobStatusChecker {
                 // Add job end time at the end
                 logContent.append("=== Job End Time: " + sdf.format(jobInstance.getEndTime()) + " ===\n\n");
 
-                // if errorMsg key not exists, asText() result will be "null"
-                String errorMsg = jobDetail.get("errorMsg").asText();
+                JsonNode errorMsg = jobDetail.get("errorMsg");
                 String logs = seaTunnelRestClient.getJobLogs(jobInstance.getSeatunnelId());
-                logContent.append("=== Job Detail Logs:\n" + (null == errorMsg ? logs : errorMsg + "\n\n" + logs) + " ===\n");
-                logContent.append("null".equals(errorMsg) ? logs : errorMsg + "\n\n" + logs);
+                logContent.append("=== Job Detail Logs ===\n" + (errorMsg != null ? errorMsg.asText() + "\n\n" + logs : logs));
 
                 jobInstance.setLogContent(logContent.toString());
                 changed = true;
