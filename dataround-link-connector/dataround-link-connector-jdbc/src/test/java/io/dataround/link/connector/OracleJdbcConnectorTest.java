@@ -19,9 +19,11 @@ package io.dataround.link.connector;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import io.dataround.link.common.connector.Param;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Oracle JDBC connector test
@@ -29,39 +31,54 @@ import io.dataround.link.common.connector.Param;
  * @author yuehan124@gmail.com
  * @since 2025-08-03
  */
+@Slf4j
 public class OracleJdbcConnectorTest {
+    
+    private Param param;
 
-    @Test
-    public void testDoGetDatabases() {
+    @Before
+    public void setUp() {
         Param param = new Param();
         param.setUser("tpcds");
         param.setPassword("tpcds1234@56");
         param.setConfig(new HashMap<>());
         param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
         param.getConfig().put("url", "jdbc:oracle:thin:@//localhost:1521/XEPDB1");
+        this.param = param;
+    }
+
+    @Test
+    public void testDoGetDatabases() {
         try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
             connector.initialize(param);
             List<String> databases = connector.getDatabases();
             System.out.println(databases);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to get databases", e);
         }
     }
 
     @Test
     public void testDoGetTables() {
-        Param param = new Param();
-        param.setUser("tpcds");
-        param.setPassword("tpcds1234@56");
-        param.setConfig(new HashMap<>());
-        param.getConfig().put("driver", "oracle.jdbc.OracleDriver");
-        param.getConfig().put("url", "jdbc:oracle:thin:@//localhost:1521/XEPDB1");
         try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
             connector.initialize(param);
             List<String> tables = connector.getTables("tpcds");
             System.out.println(tables);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to get tables", e);
+        }
+    }
+
+    @Test
+    public void testDoGetTableFields() {
+        try (OracleJdbcConnector connector = new OracleJdbcConnector()) {
+            connector.initialize(param);
+            List<TableField> tableFields = connector.getTableFields("tpcds", "CUSTOMER_ADDRESS");
+            tableFields.forEach(field -> {
+                System.out.println(field.getName() + " " + field.getType() + " ");
+            });
+        } catch (Exception e) {
+            log.error("Failed to get table fields", e);
         }
     }
 }

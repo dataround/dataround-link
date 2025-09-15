@@ -19,11 +19,15 @@ package io.dataround.link.connector;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 /**
  * Oracle JDBC connector
@@ -65,10 +69,23 @@ public class OracleJdbcConnector extends JdbcConnector {
 
     @Override
     public List<String> doGetDatabases() {
-        // call parent method to get all databases, then filter out system databases
-        return super.doGetDatabases().stream()
-                .filter(db -> !SYSTEM_DATABASES.contains(db.toLowerCase()))
-                .collect(Collectors.toList());
+        List<String> databases = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            // Oracle doesn't have catalogs, use schemas instead
+            try (ResultSet rs = metaData.getSchemas()) {
+                while (rs.next()) {
+                    String schemaName = rs.getString("TABLE_SCHEM");
+                    if (schemaName != null && !SYSTEM_DATABASES.contains(schemaName.toLowerCase())) {
+                        databases.add(schemaName);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Failed to get databases", e);
+            throw new RuntimeException("Failed to get databases", e);
+        }
+        return databases;
     }
 
     @Override

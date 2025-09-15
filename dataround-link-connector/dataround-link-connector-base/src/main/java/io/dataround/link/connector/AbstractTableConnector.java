@@ -47,7 +47,8 @@ public abstract class AbstractTableConnector implements TableConnector {
                 doInitialize();
                 return null;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("Failed to initialize connector", e);
+                throw new RuntimeException("Failed to initialize connector", e);
             }
         });
     }
