@@ -43,7 +43,7 @@ import io.dataround.link.utils.BeanConvertor;
  */
 @Component
 public class JdbcJobConfigGenerator implements JobConfigGenerator {
-
+    
     @Override
     public boolean supports(Connector connector) {
         return connector.getPluginName().startsWith("JDBC");
@@ -61,9 +61,8 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
             source.put("plugin_name", "Jdbc");
             source.put("connection_check_timeout_sec", 30);
             source.put("parallelism", 1);
-            //source.put("database", table.getSourceDbName());
             source.put("result_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            source.put("query", query(getFullTableName(table.getSourceDbName(), table.getSourceTable()), jobVo));
+            source.put("query", generateSourceQuery(table));
             sources.add(source);
         }
         
@@ -78,13 +77,7 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         List<JSONObject> sinks = new ArrayList<>();
         
         for (TableMapping table : tableMappings) {
-            List<FieldMapping> fieldMappings = table.getFieldMapping();
-            List<String> primaryKeys = new ArrayList<>();
-            for (FieldMapping fieldMapping : fieldMappings) {
-                if (fieldMapping.getTargetPrimaryKey()) {
-                    primaryKeys.add(fieldMapping.getTargetFieldName());
-                }
-            }
+            List<String> primaryKeys = table.getPrimaryKeyFields();
             JSONObject sink = new JSONObject(targetMap);
             sink.put("plugin_name", "Jdbc");
             sink.put("connection_check_timeout_sec", 30);
@@ -92,7 +85,7 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
             sink.put("max_commit_attempts", 3);
             sink.put("max_retries", 1);
             // jdbc connector support upsert by primary key
-            if (TableWriteTypeEnum.UPSERT.getCode() == table.getWriteType()) {
+            if (doUpsert(table)) {
                 sink.put("primary_keys", primaryKeys.toArray());
                 sink.put("enable_upsert", !primaryKeys.isEmpty() ? true : false);
             } else {
@@ -100,7 +93,6 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
                 sink.put("enable_upsert", false);
             }
             sink.put("source_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            //sink.put("database", table.getTargetDbName());
             sink.put("table", getFullTableName(table.getTargetDbName(), table.getTargetTable()));
             sink.put("generate_sink_sql", true);
             sinks.add(sink);
@@ -109,56 +101,57 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         return sinks;
     }
 
-    private String query(String tableName, JobRes jobVo) {
+    private String generateSourceQuery(TableMapping tableMapping) {
         String query = StringUtils.EMPTY;
-        List<String> fields = fields(tableName, jobVo);
+        String tableName = getFullTableName(tableMapping.getSourceDbName(), tableMapping.getSourceTable());
+        List<String> fields = getSourceFields(tableMapping.getSorteFieldMappings());
         if (fields.isEmpty()) {
             query = "SELECT * FROM " + tableName;
         } else {
             query = "SELECT " + String.join(",", fields) + " FROM " + tableName;
         }
-        String where = whereClause(tableName, jobVo);
+        String where = whereClause(tableMapping);
         return StringUtils.isEmpty(where) ? query : query + " " + where;
     }
 
-    private List<String> fields(String tableName, JobRes jobVo) {
+    public boolean doUpsert(TableMapping tableMapping) {
+        return TableWriteTypeEnum.UPSERT.getCode() == tableMapping.getWriteType();
+    }
+
+    public List<String> getSourceFields(List<FieldMapping> sorteFieldMappings) {
         List<String> fields = new ArrayList<>();
-        for (TableMapping tableMapping : jobVo.getTableMapping()) {
-            if (tableMapping.getSourceTable().equals(tableName)) {
-                List<FieldMapping> fieldMappings = tableMapping.getFieldMapping();
-                for (FieldMapping fm : fieldMappings) {
-                    String fieldName = fm.getSourceFieldName();
-                    fields.add(sqlDialect(null, fieldName));
-                }
-                break;
+        for (FieldMapping fm : sorteFieldMappings) {
+            String fieldName = fm.getSourceFieldName();
+            if (!fieldName.equals(fm.getTargetFieldName())) {
+                fieldName = sqlDialect(null, fieldName) + " AS " + sqlDialect(null, fm.getTargetFieldName());
+            } else {
+                fieldName = sqlDialect(null, fieldName);
             }
+            fields.add(fieldName);
         }
         return fields;
     }
 
-    private String whereClause(String tableName, JobRes jobVo) {
-        String where = StringUtils.EMPTY;
-        for (TableMapping tableMapping : jobVo.getTableMapping()) {
-            if (tableMapping.getSourceTable().equals(tableName)) {
-                where = tableMapping.getWhereClause();
-                if (StringUtils.isNotEmpty(where) && !where.toUpperCase().startsWith("WHERE")) {
-                    where = "WHERE " + where;
-                }
-                break;
-            }
+    private String whereClause(TableMapping tableMapping) {
+        if (StringUtils.isBlank(tableMapping.getWhereClause())) {
+            return StringUtils.EMPTY;
+        }
+        String where = tableMapping.getWhereClause().trim();
+        if (!where.toUpperCase().startsWith("WHERE")) {
+            where = "WHERE " + where;
         }
         return where;
     }
 
-    private String getFullTableName(String dbName, String tableName) {
+    public String getFullTableName(String dbName, String tableName) {
         return dbName + "." + tableName;
-    }
-
-    private String sqlDialect(String dialect, String field) {
-        return field;
     }
 
     private String tmpTableName(String tableName, Long jobId) {
         return "Table_" + tableName + "_" + jobId;
+    }
+
+    private String sqlDialect(String dialect, String field) {
+        return field;
     }
 }

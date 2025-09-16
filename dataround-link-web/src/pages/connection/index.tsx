@@ -24,6 +24,7 @@ import {
   Form, Popconfirm,
   Popover,
   Space,
+  Spin,
   Table,
   TableProps,
   Tabs, message
@@ -161,12 +162,12 @@ const S: FC<IProps> = () => {
     return conns;
   };
 
-  const reqList = useRequest(getConnections, {
+  const reqConnectionList = useRequest(getConnections, {
     wrapperFun: formatData,
   });
 
   useEffect(() => {
-    reqList.caller({ "types": activeKey === "Database" ? ["Database"] : ["File", "MQ"] });
+    reqConnectionList.caller({ "types": activeKey === "Database" ? ["Database"] : ["File", "MQ"] });
   }, [activeKey, refresh]);
 
   const onTabChange = (key: string) => {
@@ -210,20 +211,22 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <div className="module">
-      <Tabs activeKey={activeKey} onChange={onTabChange} tabBarExtraContent={
-        <Button type="primary" htmlType="submit" onClick={newConnection}>{t('connection.new')}</Button>
-      }
-      >
-        <TabPane tab={t('connection.tabs.database')} key="Database">
-          <Table size="small" columns={columnJDBC} dataSource={tabData} />
-        </TabPane>
-        <TabPane tab={t('connection.tabs.nonstructural')} key="File">
-          <Table size="small" columns={columnsNonstructural} dataSource={tabData} />
-        </TabPane>
-      </Tabs>
+    <Spin spinning={reqConnectionList.loading}> 
+      <div className="module">
+        <Tabs activeKey={activeKey} onChange={onTabChange} tabBarExtraContent={
+          <Button type="primary" htmlType="submit" onClick={newConnection}>{t('connection.new')}</Button>
+        }
+        >
+          <TabPane tab={t('connection.tabs.database')} key="Database">
+            <Table size="small" columns={columnJDBC} dataSource={tabData} />
+          </TabPane>
+          <TabPane tab={t('connection.tabs.nonstructural')} key="File">
+            <Table size="small" columns={columnsNonstructural} dataSource={tabData} />
+          </TabPane>
+        </Tabs>
 
-    </div>
+      </div>
+    </Spin>
   );
 };
 

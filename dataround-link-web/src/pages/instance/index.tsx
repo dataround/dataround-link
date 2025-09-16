@@ -29,6 +29,7 @@ import {
   Popconfirm, Row,
   Select,
   Space,
+  Spin,
   Table,
   TableProps,
   Tabs,
@@ -234,13 +235,13 @@ const S: FC<IProps> = () => {
     setTabData(instance);
     return instance;
   };
-  const list = useRequest(getInstanceList, {
+  const reqInstanceList = useRequest(getInstanceList, {
     wrapperFun: formatData,
   });
 
   useEffect(() => {
     console.log("jobType:", jobType);
-    list.caller({ size: pageSize, jobType: jobType });
+    reqInstanceList.caller({ size: pageSize, jobType: jobType });
   }, [refresh]);
 
   const items: TabsProps["items"] = [
@@ -259,7 +260,7 @@ const S: FC<IProps> = () => {
 
   const onPageChange = (current: number, size: number) => {
     setPageSize(size);
-    list.caller({ current: current, size: size, jobType: jobType });
+    reqInstanceList.caller({ current: current, size: size, jobType: jobType });
   };
 
   const onFinish = (values: any) => {
@@ -271,7 +272,7 @@ const S: FC<IProps> = () => {
     }, {} as any);
     form.getFieldValue("startTime") && (filterdValues.startTime = dayjs(form.getFieldValue("startTime")).format("YYYY-MM-DD HH:mm:ss"));
     form.getFieldValue("endTime") && (filterdValues.endTime = dayjs(form.getFieldValue("endTime")).format("YYYY-MM-DD HH:mm:ss"));
-    list.caller({ ...filterdValues, size: pageSize, jobType: jobType });
+    reqInstanceList.caller({ ...filterdValues, size: pageSize, jobType: jobType });
   };
 
   const highlightLogs = (logs: string) => {
@@ -280,7 +281,7 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <>
+    <Spin spinning={reqInstanceList.loading}>
       <div className="module">
         <Form
           form={form}
@@ -352,7 +353,7 @@ const S: FC<IProps> = () => {
           </Card>
         </Modal>
       </div>
-    </>
+    </Spin>
   );
 };
 

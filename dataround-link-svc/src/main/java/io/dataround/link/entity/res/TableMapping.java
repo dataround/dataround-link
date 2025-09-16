@@ -20,6 +20,8 @@ package io.dataround.link.entity.res;
 import lombok.Data;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Comparator;
 
 /**
  * Value object representing table mapping and field correspondence.
@@ -41,4 +43,35 @@ public class TableMapping {
     private Integer matchMethod;
     // field mapping
     private List<FieldMapping> fieldMapping;
+
+    /**
+     * Get field mappings sorted with primary key fields first
+     * 
+     * @return sorted field mappings with primary key fields at the beginning
+     */
+    public List<FieldMapping> getSorteFieldMappings() {
+        if (fieldMapping == null) {
+            return null;
+        }
+        return fieldMapping.stream()
+                .sorted(Comparator.comparing(
+                    (FieldMapping fm) -> Boolean.FALSE.equals(fm.getTargetPrimaryKey())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get primary key fields
+     * 
+     * @return primary key fields
+     */
+    public List<String> getPrimaryKeyFields() {
+        if (fieldMapping == null) {
+            return null;
+        }
+        return fieldMapping.stream()
+                .filter(fm -> Boolean.TRUE.equals(fm.getTargetPrimaryKey()))
+                .map(fm -> fm.getTargetFieldName())
+                .collect(Collectors.toList());
+    }
 }

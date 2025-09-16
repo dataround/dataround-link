@@ -25,6 +25,7 @@ import {
   Popconfirm,
   Popover,
   Space,
+  Spin,
   Table,
   TableProps,
   Tabs,
@@ -76,12 +77,12 @@ const S: FC<IProps> = () => {
     setTabData(vtable);
     return vtable;
   };
-  const list = useRequest(getVirtualTableList, {
+  const reqVirtualTableList = useRequest(getVirtualTableList, {
     wrapperFun: formatData,
   });
 
   useEffect(() => {
-    list.caller();
+    reqVirtualTableList.caller();
   }, [refresh]);
 
   const columns: TableProps<DataType>["columns"] = [
@@ -188,13 +189,15 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <div className="module">
-      <Tabs defaultActiveKey="tabList" items={items} tabBarExtraContent={
-        <Button type="primary" htmlType="submit" onClick={newConnection}>{t('virtualTable.new')}</Button>
-      }
-      />
-      <Table size="small" columns={columns} dataSource={tabData} />
-    </div>
+    <Spin spinning={reqVirtualTableList.loading}>
+      <div className="module">
+        <Tabs defaultActiveKey="tabList" items={items} tabBarExtraContent={
+          <Button type="primary" htmlType="submit" onClick={newConnection}>{t('virtualTable.new')}</Button>
+        }
+        />
+        <Table size="small" columns={columns} dataSource={tabData} />
+      </div>
+    </Spin>
   );
 };
 

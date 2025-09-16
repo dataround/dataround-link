@@ -22,6 +22,7 @@
 import { DeleteOutlined, EditOutlined, InfoCircleOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import {
   Button, Card, Checkbox, Col, Form, Input, Popconfirm, Popover, Row, Select, Space,
+  Spin,
   TableProps,
   Tabs,
   TabsProps,
@@ -172,7 +173,7 @@ const S: FC<IProps> = () => {
     setTabData(jobs);
     return jobs;
   };
-  const listRequest = useRequest(getJobList, {
+  const reqJobList = useRequest(getJobList, {
     wrapperFun: formatData,
   });
 
@@ -182,7 +183,7 @@ const S: FC<IProps> = () => {
   }, []);
 
   useEffect(() => {
-    listRequest.caller({ size: pageSize, jobType: jobType });
+    reqJobList.caller({ size: pageSize, jobType: jobType });
   }, [refresh]);
 
   const execRequest = useRequest(executeJob, {
@@ -253,7 +254,7 @@ const S: FC<IProps> = () => {
 
   const onPageChange = (current: number, size: number) => {
     setPageSize(size);
-    listRequest.caller({ current: current, size: size, jobType: jobType });
+    reqJobList.caller({ current: current, size: size, jobType: jobType });
   };
 
   const onFinish = (values: any) => {
@@ -263,11 +264,11 @@ const S: FC<IProps> = () => {
       }
       return acc;
     }, {} as any);
-    listRequest.caller({ ...filterdValues, size: pageSize, jobType: jobType });
+    reqJobList.caller({ ...filterdValues, size: pageSize, jobType: jobType });
   };
 
   return (
-    <>
+    <Spin spinning={reqJobList.loading}>
       <div className="module">
         <Form
           form={form}
@@ -356,7 +357,7 @@ const S: FC<IProps> = () => {
           onPageChange={onPageChange}
         />
       </div>
-    </>
+    </Spin>
   );
 };
 
