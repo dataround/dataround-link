@@ -76,16 +76,24 @@ public class SQLServerJdbcConnector extends JdbcConnector {
 
     @Override
     public List<TableField> doGetTableFields(String database, String table) {
-        // For SQL Server: catalog = database name, schema = null (search in all schemas)
-        // This will find the table regardless of which schema it's in
-        return getTableFieldsWithParams(database, null, table, "%");
+        int idx = table.indexOf(".");
+        if (idx == -1) {
+            return getTableFieldsWithParams(database, null, table, "%");
+        }
+        String schema = table.substring(0, idx);
+        String tableName = table.substring(idx + 1);
+        return getTableFieldsWithParams(database, schema, tableName, "%");
     }
 
     @Override
     public List<TableField> doGetTableFields(String database, String table, String columnNamePattern) {
-        // For SQL Server: catalog = database name, schema = null (search in all schemas)
-        // This will find the table regardless of which schema it's in
-        return getTableFieldsWithParams(database, null, table, columnNamePattern);
+        int idx = table.indexOf(".");
+        if (idx == -1) {
+            return getTableFieldsWithParams(database, null, table, columnNamePattern);
+        }
+        String schema = table.substring(0, idx);
+        String tableName = table.substring(idx + 1);
+        return getTableFieldsWithParams(database, schema, tableName, columnNamePattern);
     }
 
 }
