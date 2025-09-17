@@ -19,7 +19,7 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-06-05
  */
-import { Checkbox, Col, Form, Input, List, Popconfirm, Row, Select, Table, Tabs } from "antd";
+import { Checkbox, Col, Form, Input, List, message, Popconfirm, Row, Select, Table, Tabs } from "antd";
 import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import useRequest from "../../../hooks/useRequest";
 import { useNavigate } from "react-router-dom";
@@ -268,6 +268,12 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   });
 
   const onCheckedChange = (target: CheckboxChangeEventTarget, item: ListType) => {
+    if (target.checked) {
+      if (!validateTargetConnectionAndDatabase()) {
+        target.checked = false;
+        return;
+      }
+    }
     item.checked = target.checked;
     updateCheckAllBySourceTables();
     const row: RecordType = listItem2Row(item);
@@ -297,6 +303,12 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
 
   const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
     const isChecked: boolean = e.target.checked;
+    if (isChecked) {
+      if (!validateTargetConnectionAndDatabase()) {
+        e.target.checked = false;
+        return;
+      }
+    }
     sourceTables.forEach((item, index) => { item.checked = isChecked; });
     if (!isChecked) {
       setTableMapping([]);
@@ -307,6 +319,18 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
     }
     setCheckedAll(isChecked);
   };
+
+  const validateTargetConnectionAndDatabase = () => {
+    if (targetConnId.length === 0) {
+      message.error(t('job.edit.source.placeholder.selectConnection'));
+      return false;
+    }
+    if (targetDbName.length === 0) {
+      message.error(t('job.edit.source.placeholder.selectDatabase'));
+      return false;
+    }
+    return true;
+  }
 
   const listItem2Row = (item: ListType) => {
     const row: RecordType = { sourceDbName: sourceDbName, sourceTable: item.value, targetDbName: targetDbName, targetTable: "", whereClause: "", writeType: 1, matchMethod: 1, fieldMapping: []}
