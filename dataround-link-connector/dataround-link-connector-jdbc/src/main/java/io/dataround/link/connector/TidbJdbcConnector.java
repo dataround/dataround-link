@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  * Tidb JDBC connector
  * 
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TidbJdbcConnector extends JdbcConnector {
 
-    private final String name = "Tidb";
+    private final String name = ConnectorNameConstants.TIDB;
 
     // TiDB system databases (based on MySQL protocol)
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

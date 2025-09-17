@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  * KingbaseES JDBC connector
  * 
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class KingbaseJdbcConnector extends JdbcConnector {
 
-    private final String name = "KingbaseES";
+    private final String name = ConnectorNameConstants.KINGBASE;
     
     // KingbaseES system databases (based on PostgreSQL)
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

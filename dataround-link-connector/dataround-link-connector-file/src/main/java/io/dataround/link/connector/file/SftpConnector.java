@@ -19,6 +19,7 @@ package io.dataround.link.connector.file;
 
 import com.jcraft.jsch.*;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.connector.AbstractFileConnector;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,7 +60,7 @@ public class SftpConnector extends AbstractFileConnector {
 
     @Override
     public String getName() {
-        return "SFTP";
+        return ConnectorNameConstants.SFTP;
     }
 
     @Override

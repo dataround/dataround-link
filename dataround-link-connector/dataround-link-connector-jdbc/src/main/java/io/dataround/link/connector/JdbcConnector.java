@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JdbcConnector extends AbstractTableConnector {
 
-    private final String name = "JDBC";
+    private final String name = ConnectorNameConstants.JDBC;
     // JDBC connection pool
     protected DataSource dataSource;
     // JDBC connection properties
@@ -166,6 +167,7 @@ public class JdbcConnector extends AbstractTableConnector {
                 while (rs.next()) {
                     String tableName = rs.getString("TABLE_NAME");
                     String tableSchema = schema;
+                    // for Oracle, the table schema is the database name, if has schema parameter, it should not be added to the table name
                     if (tableSchema == null) {
                         tableSchema = rs.getString("TABLE_SCHEM");
                         if (tableSchema != null) {

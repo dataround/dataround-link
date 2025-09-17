@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  * DM JDBC connector
  * 
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DMJdbcConnector extends JdbcConnector {
 
-    private final String name = "DM";
+    private final String name = ConnectorNameConstants.DM;
     
     // DM system databases (schemas/users)
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

@@ -16,6 +16,8 @@
 
 package io.dataround.link.connector;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  * SQLServer CDC connector
  * 
@@ -24,7 +26,7 @@ package io.dataround.link.connector;
  */
 public class SQLServerCDCJdbcConnector extends SQLServerJdbcConnector {
 
-    private final String name = "SQLServer-CDC";
+    private final String name = ConnectorNameConstants.SQLSERVER_CDC;
 
     @Override
     public String getName() {

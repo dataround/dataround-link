@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 import java.util.HashSet;
 
 /**
@@ -38,7 +41,7 @@ import java.util.HashSet;
 @Slf4j
 public class OracleJdbcConnector extends JdbcConnector {
 
-    private final String name = "Oracle";
+    private final String name = ConnectorNameConstants.ORACLE;
 
     // Oracle system databases
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

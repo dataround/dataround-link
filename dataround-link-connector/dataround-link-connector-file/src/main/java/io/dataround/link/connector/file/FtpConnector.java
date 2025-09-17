@@ -31,6 +31,7 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.connector.AbstractFileConnector;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,7 +60,7 @@ public class FtpConnector extends AbstractFileConnector {
 
     @Override
     public String getName() {
-        return "FTP";
+        return ConnectorNameConstants.FTP;
     }
 
     @Override

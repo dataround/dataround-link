@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  * SQLServer JDBC connector
  * 
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SQLServerJdbcConnector extends JdbcConnector {
 
-    private final String name = "SQLServer";
+    private final String name = ConnectorNameConstants.SQLSERVER;
 
     // SQL Server system databases
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

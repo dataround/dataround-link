@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  *  MySQL JDBC connector
  * @author yuehan124@gmail.com
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MySQLJdbcConnector extends JdbcConnector {
 
-    private final String name = "MySQL";
+    private final String name = ConnectorNameConstants.MYSQL;
     
     // MySQL system databases
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

@@ -16,6 +16,8 @@
 
 package io.dataround.link.connector;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
+
 /**
  * MySQL CDC connector
  * 
@@ -24,7 +26,7 @@ package io.dataround.link.connector;
  */
 public class MySQLCDCJdbcConnector extends MySQLJdbcConnector {
 
-    private final String name = "MySQL-CDC";
+    private final String name = ConnectorNameConstants.MYSQL_CDC;
 
     @Override
     public String getName() {

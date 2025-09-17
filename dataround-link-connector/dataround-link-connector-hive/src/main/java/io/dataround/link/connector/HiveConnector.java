@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HiveConnector extends JdbcConnector {
 
-    private final String name = "Hive";
+    private final String name = ConnectorNameConstants.HIVE;
     
     // Hive system databases that should be filtered out
     private static final Set<String> SYSTEM_DATABASES = new HashSet<>(Arrays.asList(

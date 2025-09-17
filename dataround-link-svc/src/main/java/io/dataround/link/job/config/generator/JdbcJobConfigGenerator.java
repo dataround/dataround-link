@@ -28,6 +28,7 @@ import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.enums.TableWriteTypeEnum;
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.res.FieldMapping;
 import io.dataround.link.entity.res.JobRes;
@@ -36,14 +37,15 @@ import io.dataround.link.utils.BeanConvertor;
 
 /**
  * JDBC connector job configuration generator.
- * Handles configuration generation for JDBC-based connectors (MySQL, Oracle, PostgreSQL, etc.).
+ * Handles configuration generation for JDBC-based connectors (MySQL, Oracle,
+ * PostgreSQL, etc.).
  *
  * @author yuehan124@gmail.com
  * @since 2025-09-07
  */
 @Component
 public class JdbcJobConfigGenerator implements JobConfigGenerator {
-    
+
     @Override
     public boolean supports(Connector connector) {
         return connector.getPluginName().startsWith("JDBC");
@@ -55,17 +57,17 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         Map<String, String> sourceMap = BeanConvertor.connection2Map(connection, connector);
 
         List<JSONObject> sources = new ArrayList<>();
-        
+
         for (TableMapping table : tableMappings) {
             JSONObject source = new JSONObject(sourceMap);
             source.put("plugin_name", "Jdbc");
             source.put("connection_check_timeout_sec", 30);
             source.put("parallelism", 1);
             source.put("result_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            source.put("query", generateSourceQuery(table));
+            source.put("query", generateSourceQuery(table, connector.getName()));
             sources.add(source);
         }
-        
+
         return sources;
     }
 
@@ -75,7 +77,7 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         Map<String, String> targetMap = BeanConvertor.connection2Map(connection, connector);
 
         List<JSONObject> sinks = new ArrayList<>();
-        
+
         for (TableMapping table : tableMappings) {
             List<String> primaryKeys = table.getPrimaryKeyFields();
             JSONObject sink = new JSONObject(targetMap);
@@ -92,19 +94,21 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
                 // can speed up the job by disabling upsert
                 sink.put("enable_upsert", false);
             }
+            // the options('database') are required because ['generate_sink_sql' == true] is true
+            sink.put("database", table.getTargetDbName());
             sink.put("source_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            sink.put("table", getFullTableName(table.getTargetDbName(), table.getTargetTable()));
+            sink.put("table", table.getTargetTable());
             sink.put("generate_sink_sql", true);
             sinks.add(sink);
         }
-        
+
         return sinks;
     }
 
-    private String generateSourceQuery(TableMapping tableMapping) {
+    private String generateSourceQuery(TableMapping tableMapping, String dialect) {
         String query = StringUtils.EMPTY;
         String tableName = getFullTableName(tableMapping.getSourceDbName(), tableMapping.getSourceTable());
-        List<String> fields = getSourceFields(tableMapping.getSorteFieldMappings());
+        List<String> fields = getSourceFields(tableMapping.getSorteFieldMappings(), dialect);
         if (fields.isEmpty()) {
             query = "SELECT * FROM " + tableName;
         } else {
@@ -118,14 +122,14 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
         return TableWriteTypeEnum.UPSERT.getCode() == tableMapping.getWriteType();
     }
 
-    public List<String> getSourceFields(List<FieldMapping> sorteFieldMappings) {
+    public List<String> getSourceFields(List<FieldMapping> sorteFieldMappings, String dialect) {
         List<String> fields = new ArrayList<>();
         for (FieldMapping fm : sorteFieldMappings) {
             String fieldName = fm.getSourceFieldName();
             if (!fieldName.equals(fm.getTargetFieldName())) {
-                fieldName = sqlDialect(null, fieldName) + " AS " + sqlDialect(null, fm.getTargetFieldName());
+                fieldName = sqlDialect(dialect, fieldName) + " AS " + sqlDialect(dialect, fm.getTargetFieldName());
             } else {
-                fieldName = sqlDialect(null, fieldName);
+                fieldName = sqlDialect(dialect, fieldName);
             }
             fields.add(fieldName);
         }
@@ -152,6 +156,20 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
     }
 
     private String sqlDialect(String dialect, String field) {
-        return field;
+        switch (dialect) {
+            case ConnectorNameConstants.MYSQL:
+            case ConnectorNameConstants.MYSQL_CDC:
+                return "`" + field + "`";
+            case ConnectorNameConstants.ORACLE:
+                return "\"" + field + "\"";
+            case ConnectorNameConstants.POSTGRESQL:
+                return "\"" + field + "\"";
+            case ConnectorNameConstants.SQLSERVER:
+                return "[" + field + "]";
+            case ConnectorNameConstants.TIDB:
+                return "`" + field + "`";
+            default:
+                return field;
+        }
     }
 }

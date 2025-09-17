@@ -33,6 +33,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.connector.AbstractFileConnector;
 
 /**
@@ -46,7 +47,7 @@ public class LocalFileConnector extends AbstractFileConnector {
 
     @Override
     public String getName() {
-        return "LocalFile";
+        return ConnectorNameConstants.LOCAL_FILE;
     }
 
     @Override

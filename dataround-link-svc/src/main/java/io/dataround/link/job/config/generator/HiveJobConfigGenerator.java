@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
+import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
@@ -44,7 +45,7 @@ public class HiveJobConfigGenerator implements JobConfigGenerator {
 
     @Override
     public boolean supports(Connector connector) {
-        return connector.getPluginName().equalsIgnoreCase("HIVE");
+        return connector.getPluginName().equalsIgnoreCase(ConnectorNameConstants.HIVE);
     }
 
     @Override
