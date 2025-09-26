@@ -35,6 +35,5 @@ dataround:
 
 logging:
   level:
-    org.springframework: debug
-    io.dataround.link: debug
+    io.dataround.link: info
     io.dataround.link.mapper: info

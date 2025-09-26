@@ -51,10 +51,13 @@ public class VirtualFieldServiceImpl extends ServiceImpl<VirtualFieldMapper, Vir
 
     @Override
     public Map<Long, List<VirtualField>> listByTableIds(List<Long> tableIds) {
+        Map<Long, List<VirtualField>> result = new HashMap<>();
+        if (tableIds== null || tableIds.isEmpty()) {
+            return result;
+        }
         LambdaQueryWrapper<VirtualField> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(VirtualField::getTableId, tableIds);
         List<VirtualField> virtualFields = virtualFieldMapper.selectList(queryWrapper);
-        Map<Long, List<VirtualField>> result = new HashMap<>();
         for (VirtualField virtualField : virtualFields) {
             result.computeIfAbsent(virtualField.getTableId(), k -> new ArrayList<>()).add(virtualField);
         }
