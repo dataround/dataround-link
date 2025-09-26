@@ -4,7 +4,7 @@ server:
     context-path: /datalink
 spring:
   application:
-    name: datalink
+    name: dataround-link
   
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -15,9 +15,11 @@ spring:
     url: "jdbc:postgresql://localhost:5432/dataround_link?currentSchema=public"
     username: postgres
     password: "dataround.io"
-    sql:
-      init:
-        schema-locations: classpath:init_pg_schema.sql
+  sql:
+    init:
+      schema-locations: classpath:postgresql-schema.sql
+      # mode: always - execute script on every startup
+      mode: always
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
@@ -33,5 +35,6 @@ dataround:
 
 logging:
   level:
-    io.dataround.link: info
+    org.springframework: debug
+    io.dataround.link: debug
     io.dataround.link.mapper: info

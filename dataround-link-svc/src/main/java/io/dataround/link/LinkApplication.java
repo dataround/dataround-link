@@ -28,7 +28,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * Main entry point for the dataround-link Spring Boot application.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Slf4j
 @SpringBootApplication

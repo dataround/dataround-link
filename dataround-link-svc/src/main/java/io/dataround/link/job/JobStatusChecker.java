@@ -64,8 +64,7 @@ public class JobStatusChecker {
         this.checkingJobs = new ConcurrentHashMap<>();
     }
 
-    @PostConstruct
-    public void init() {
+    public void start() {
         // Load all unfinished jobs from database on startup
         List<JobInstance> unfinishedJobs = jobInstanceService.selectUnfinishedJobs();
         for (JobInstance job : unfinishedJobs) {

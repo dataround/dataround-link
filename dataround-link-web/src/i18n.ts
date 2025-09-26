@@ -23,11 +23,11 @@ import enTranslation from './locales/en/translation.json';
 import zhTranslation from './locales/zh/translation.json';
 
 i18n
-  // 检测用户语言
+  // dectect language from browser
   .use(LanguageDetector)
-  // 将i18n实例传递给react-i18next
+  // pass i18n instance to react-i18next
   .use(initReactI18next)
-  // 初始化i18next
+  // init i18next
   .init({
     resources: {
       en: {
@@ -37,11 +37,11 @@ i18n
         translation: zhTranslation
       }
     },
-    fallbackLng: 'en', // 默认语言
+    fallbackLng: 'en', // default language
     debug: process.env.NODE_ENV === 'development',
     
     interpolation: {
-      escapeValue: false // 不转义HTML
+      escapeValue: false // escape HTML false
     },
 
     detection: {

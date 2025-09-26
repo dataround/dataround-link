@@ -20,16 +20,13 @@
  * @auth: tiandengji
  * @date: 2025/5/15
  **/
-import { CheckOutlined, EditOutlined, FolderOutlined, PoweroffOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Col, Dropdown, Layout, Menu, MenuProps, Row } from 'antd';
-import { FC, memo, useEffect, useState } from 'react';
+import { Col, Layout, Menu, MenuProps, Row } from 'antd';
+import { FC, memo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import useRequest from '../../hooks/useRequest';
 import './index.less';
 import logoImage from '../../assets/logo.v20250728.png';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-//import { ItemType, MenuItemGroupType, MenuItemType, SubMenuType } from 'antd/es/menu/interface';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IProps { }

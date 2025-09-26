@@ -38,12 +38,11 @@ import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.JobStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.enums.JobScheduleTypeEnum;
 import io.dataround.link.service.JobService;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -54,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2025-05-06
  */
 @Slf4j
-@Service
+@Component
 public class SchedulerService {
 
     @Value("${dataround.link.scheduler.threadPoolSize:10}")
@@ -66,7 +65,6 @@ public class SchedulerService {
     private JobService jobService;
     private DirectSchedulerFactory sf = DirectSchedulerFactory.getInstance();
 
-    @PostConstruct
     public void start() {
         try {
             // check if scheduler exists, if exists, shutdown and remove it, only for hot deployment during development

@@ -22,7 +22,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
- * Controller for managing connections and related operations.
+ * Message utils
  *
  * @author yuehan124@gmail.com
  * @date 2025-05-06

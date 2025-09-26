@@ -19,9 +19,7 @@
  * @auth: tiandengji
  * @date: 2025/5/15
  **/
-import { proxy, useSnapshot } from "valtio"
-import dayjs, { Dayjs } from "dayjs";
-import { RecordType } from "../pages/job/create/step-source"
+import { proxy } from "valtio"
 
 export const JOB_TYPE_BATCH = 1;
 export const JOB_TYPE_STREAM = 2;
