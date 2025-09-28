@@ -15,30 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link.entity;
-
-import java.util.Date;
-
-import lombok.Data;
-
 /**
- * Entity class representing a user in the system.
- * Contains user information including name, contact details and account status.
- *
- * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @author: yuehan124@gmail.com
+ * @date: 2026-09-26
  */
-@Data
-public class User {
+import { Form, Input } from "antd";
+import { FC } from "react";
+import { useTranslation } from 'react-i18next';
 
-    private Long id;
-    private String name;
-    private String email;
-    private String cellphone;
-    private String passwd;
-    private Boolean disabled;
-    private Long createBy;
-    private Long updateBy;
-    private Date createTime;
-    private Date updateTime;
+interface IProps {
 }
+
+const KafkaConnectionForm: FC<IProps> = () => {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <Form.Item name="broker" label={t('connection.create.form.broker')} rules={[{ required: true }]}>
+        <Input placeholder={t('connection.create.placeholder.broker')} />
+      </Form.Item>
+    </>
+  );
+};
+
+export default KafkaConnectionForm;

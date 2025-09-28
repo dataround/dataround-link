@@ -34,7 +34,6 @@ import io.dataround.link.entity.JobInstance;
 import io.dataround.link.entity.enums.JobInstanceStatusEnum;
 import io.dataround.link.service.JobInstanceService;
 import io.dataround.link.utils.SeaTunnelRestClient;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -36,7 +36,7 @@ import lombok.Data;
 @Data
 @TableName("virtual_table")
 public class VirtualTable {
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private Long connectionId;
     private Long projectId;

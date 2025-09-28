@@ -39,7 +39,7 @@ import java.util.Map;
 @TableName("connection")
 public class Connection {
 
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private Long projectId;
     private String name;

@@ -36,9 +36,9 @@ public class BaseController {
     private UserResponse mockUser = new UserResponse();
 
     public BaseController() {
-        mockUser.setUserId(1000L);
+        mockUser.setUserId(10000L);
         mockUser.setUserName("admin");
-        mockUser.setProjectId(1000L);
+        mockUser.setProjectId(10000L);
     }
 
     public UserResponse getCurrentUser() {

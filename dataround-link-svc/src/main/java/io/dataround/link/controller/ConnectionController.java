@@ -18,7 +18,6 @@
 package io.dataround.link.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +44,11 @@ import io.dataround.link.common.Result;
 import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.config.MessageUtils;
+import io.dataround.link.connection.ConnectionFactory;
 import io.dataround.link.connector.TableField;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.VirtualTable;
-import io.dataround.link.entity.res.ConnectionRes;
+import io.dataround.link.entity.vo.ConnectionVo;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
 import io.dataround.link.service.UserService;
@@ -78,13 +78,15 @@ public class ConnectionController extends BaseController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public Result<Connection> getById(@PathVariable Long id) {
+    public Result<ConnectionVo> getById(@PathVariable Long id) {
         Connection connection = connectionService.getById(id);
-        return Result.success(connection);
+        ConnectionVo connectionVo = ConnectionFactory.create(connection.getConnector());
+        connectionVo.buildConnectionVo(connection);
+        return Result.success(connectionVo);
     }
 
     @GetMapping("/list")
-    public PageResult<List<ConnectionRes>> list(@Parameter(hidden = true) Page<Connection> page, @RequestParam(required = false) String connector, @RequestParam(required = false) ArrayList<String> types) {
+    public PageResult<List<ConnectionVo>> list(@Parameter(hidden = true) Page<Connection> page, @RequestParam(required = false) String connector, @RequestParam(required = false) ArrayList<String> types) {
         LambdaQueryWrapper<Connection> wrapper = new LambdaQueryWrapper<>();
         if (types != null && !types.isEmpty()) {
             LambdaQueryWrapper<Connector> subQueryWrapper = new LambdaQueryWrapper<>();
@@ -105,35 +107,24 @@ public class ConnectionController extends BaseController {
         wrapper.orderByDesc(Connection::getId);
         wrapper.eq(Connection::getProjectId, getCurrentProjectId());
         Page<Connection> connections = connectionService.page(page, wrapper);
-        List<ConnectionRes> connectionResList = convert2ConnectionRes(connections.getRecords());
+        List<ConnectionVo> connectionResList = convert2ConnectionVo(connections.getRecords());
         return PageResult.success(connections.getTotal(), connectionResList);
     }
 
     @PostMapping("/saveOrUpdate")
-    public Result<Boolean> saveOrUpdate(@RequestBody Connection connection, HttpServletRequest request) {
-        boolean bool = connectionService.saveOrUpdate(buildConnection(connection, request));
+    public Result<Boolean> saveOrUpdate(@RequestBody ConnectionVo connectionVo) {
+        Connector connector = connectorService.getConnector(connectionVo.getConnector());
+        Connection connection = connectionVo.buildConnection(connector, getCurrentUserId(), getCurrentProjectId());
+        boolean bool = connectionService.saveOrUpdate(connection);
         return Result.success(bool);
     }
 
     @PostMapping("/test")
-    public Result<Boolean> testConnection(@RequestBody Connection connection) {
-        addDriverToConfig(connection);
+    public Result<Boolean> testConnection(@RequestBody ConnectionVo connectionVo) {
+        Connector connector = connectorService.getConnector(connectionVo.getConnector());
+        Connection connection = connectionVo.buildConnection(connector, getCurrentUserId(), getCurrentProjectId());
         boolean bool = connectionService.testConnection(connection);
         return bool ? Result.success(MessageUtils.getMessage("connection.test.success")) : Result.error(MessageUtils.getMessage("connection.test.failed"));
-    }
-
-    private Connection buildConnection(Connection connection, HttpServletRequest request) {
-        addDriverToConfig(connection);
-        Long userId = getCurrentUserId();
-        connection.setProjectId(getCurrentProjectId());
-        Date now = new Date();
-        connection.setUpdateBy(userId);
-        connection.setUpdateTime(now);
-        if (connection.getId() == null) {
-            connection.setCreateBy(userId);
-            connection.setCreateTime(now);
-        }
-        return connection;
     }
 
     @DeleteMapping("/{id}")
@@ -181,39 +172,20 @@ public class ConnectionController extends BaseController {
     }
 
     /**
-     * Convert Connection to ConnectionRes
+     * Convert Connection to ConnectionVo
      * @param connections Connection list
-     * @return ConnectionRes list
+     * @return ConnectionVo list
      */
-    private List<ConnectionRes> convert2ConnectionRes(List<Connection> connections) {
-        List<ConnectionRes> connectionResList = new ArrayList<>();
+    private List<ConnectionVo> convert2ConnectionVo(List<Connection> connections) {
+        List<ConnectionVo> connectionVos = new ArrayList<>();
+        Map<Long, String> userMap = new HashMap<>();
         for (Connection connection : connections) {
-            ConnectionRes connectionRes = new ConnectionRes();
-            BeanUtils.copyProperties(connection, connectionRes);
-            connectionRes.setCreateUser(userService.getById(connection.getCreateBy()).getName());
-            connectionRes.setUpdateUser(userService.getById(connection.getUpdateBy()).getName());
-            connectionResList.add(connectionRes);
+            ConnectionVo connectionVo = ConnectionFactory.create(connection.getConnector());
+            BeanUtils.copyProperties(connection, connectionVo);
+            connectionVo.setCreateUser(userMap.computeIfAbsent(connection.getCreateBy(), k -> userService.getById(k).getName()));
+            connectionVo.setUpdateUser(userMap.computeIfAbsent(connection.getUpdateBy(), k -> userService.getById(k).getName()));
+            connectionVos.add(connectionVo);
         }
-        return connectionResList;
-    }
-
-    /**
-     * Add driver property to connection config from connector properties
-     * @param connection the connection object to modify
-     */
-    private void addDriverToConfig(Connection connection) {
-        if (connection.getConnector() != null) {
-            Connector connector = connectorService.getConnector(connection.getConnector());
-            if (connector != null && connector.getProperties() != null) {
-                String driver = connector.getProperties().get("driver");
-                if (driver != null) {
-                    // Ensure config is initialized as Map
-                    if (connection.getConfig() == null) {
-                        connection.setConfig(new HashMap<>());
-                    }
-                    connection.getConfig().put("driver", driver);
-                }
-            }
-        }
+        return connectionVos;
     }
 }

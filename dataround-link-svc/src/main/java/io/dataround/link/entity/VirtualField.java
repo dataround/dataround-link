@@ -35,7 +35,7 @@ import lombok.Data;
 @Data
 @TableName("virtual_field")
 public class VirtualField {
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private Long tableId;
     private String name;

@@ -39,4 +39,6 @@ public class ConnectorNameConstants {
     public static final String LOCAL_FILE = "LocalFile";
     public static final String FTP = "FTP";
     public static final String SFTP = "SFTP";
+    public static final String KAFKA = "Kafka";
+    public static final String S3 = "S3";
 }

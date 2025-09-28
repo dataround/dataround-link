@@ -418,7 +418,7 @@
         "svcType": "服务名或SID",
         "svcName": "服务名",
         "sid": "SID",
-        "extraParams": "其他参数",
+        "configArray": "其他参数",
         "timeout": "超时时间",
         "endpoint": "端点地址",
         "accessKey": "访问密钥",

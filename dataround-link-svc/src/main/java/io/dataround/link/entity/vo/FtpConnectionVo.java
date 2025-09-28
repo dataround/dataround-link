@@ -14,23 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.dataround.link.entity.res;
+package io.dataround.link.entity.vo;
 
 import io.dataround.link.entity.Connection;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 /**
- * connection response
+ * FTP connection value object
  * 
  * @author yuehan124@gmail.com
- * @date 2025-06-25
+ * @date 2025-09-26
  */
 @Getter
 @Setter
-public class ConnectionRes extends Connection {
+public class FtpConnectionVo extends ConnectionVo {
 
-    private String createUser;
-    private String updateUser;
+    private String timeout;
 
+    @Override
+    public void extractProperties(Connection connection) {
+        Map<String, String> config = connection.getConfig();
+        config.put("timeout", timeout);
+    }
+
+    @Override
+    public void fillProperties(Map<String, String> config) {
+        setTimeout(config.get("timeout"));
+
+        // remove config items, other items was used to show extra param for web page
+        config.remove("timeout");
+    }
 }

@@ -38,7 +38,7 @@ import java.util.Map;
 @Data
 @TableName("connector")
 public class Connector {
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
     private String type;

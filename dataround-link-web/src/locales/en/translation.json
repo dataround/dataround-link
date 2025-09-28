@@ -418,7 +418,7 @@
         "svcType": "Service Name or SID",
         "svcName": "Service Name",
         "sid": "SID",
-        "extraParams": "Extra Parameters",
+        "configArray": "Extra Parameters",
         "timeout": "Timeout",
         "endpoint": "Endpoint",
         "accessKey": "Access Key",

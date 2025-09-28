@@ -23,6 +23,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import io.dataround.link.SpringContextUtil;
@@ -44,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JobRunner extends QuartzJobBean {
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
         Long jobId = Long.parseLong(context.getJobDetail().getKey().getName());
         log.info("Start execute job: {}, ScheduledFireTime: {}", jobId, context.getScheduledFireTime());
         JobService jobService = SpringContextUtil.getBean(JobService.class);

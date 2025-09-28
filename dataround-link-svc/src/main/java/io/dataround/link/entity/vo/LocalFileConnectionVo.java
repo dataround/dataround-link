@@ -14,31 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package io.dataround.link.entity.vo;
 
-package io.dataround.link.entity;
+import io.dataround.link.entity.Connection;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
-
-import lombok.Data;
+import java.util.Map;
 
 /**
- * Entity class representing a user in the system.
- * Contains user information including name, contact details and account status.
- *
+ * Local file connection value object
+ * 
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @date 2025-09-26
  */
-@Data
-public class User {
+@Getter
+@Setter
+public class LocalFileConnectionVo extends ConnectionVo {
 
-    private Long id;
-    private String name;
-    private String email;
-    private String cellphone;
-    private String passwd;
-    private Boolean disabled;
-    private Long createBy;
-    private Long updateBy;
-    private Date createTime;
-    private Date updateTime;
+    @Override
+    public void extractProperties(Connection connection) {
+    }
+
+    @Override
+    public void fillProperties(Map<String, String> config) {
+    }
 }

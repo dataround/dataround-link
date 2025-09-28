@@ -35,7 +35,7 @@ import lombok.Data;
 @Data
 @TableName("job_instance")
 public class JobInstance {
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
     private Long jobId;
     private Long projectId;

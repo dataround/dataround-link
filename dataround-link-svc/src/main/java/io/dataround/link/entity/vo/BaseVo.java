@@ -15,30 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link.entity;
+package io.dataround.link.entity.vo;
 
-import java.util.Date;
-
-import lombok.Data;
+import io.dataround.link.entity.res.Response;
 
 /**
- * Entity class representing a user in the system.
- * Contains user information including name, contact details and account status.
+ * BaseVo is the base class for all value objects.
+ * It provides request and response fields for all value objects.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @date 2025-09-28
  */
-@Data
-public class User {
+public class BaseVo extends Response {
 
-    private Long id;
-    private String name;
-    private String email;
-    private String cellphone;
-    private String passwd;
-    private Boolean disabled;
-    private Long createBy;
-    private Long updateBy;
-    private Date createTime;
-    private Date updateTime;
 }

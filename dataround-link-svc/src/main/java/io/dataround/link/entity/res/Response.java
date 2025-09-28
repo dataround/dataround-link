@@ -15,30 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link.entity;
+package io.dataround.link.entity.res;
 
-import java.util.Date;
-
-import lombok.Data;
+import io.dataround.link.entity.req.Request;
 
 /**
- * Entity class representing a user in the system.
- * Contains user information including name, contact details and account status.
+ * Response base class.
  *
  * @author yuehan124@gmail.com
  * @date 2025-05-06
  */
-@Data
-public class User {
+public class Response extends Request {
 
-    private Long id;
-    private String name;
-    private String email;
-    private String cellphone;
-    private String passwd;
-    private Boolean disabled;
-    private Long createBy;
-    private Long updateBy;
-    private Date createTime;
-    private Date updateTime;
 }

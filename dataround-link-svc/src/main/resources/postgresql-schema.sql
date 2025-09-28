@@ -1,8 +1,9 @@
 -- Postgresql schema for dataround_link --
 -- Before starting Spring Boot, please create the database dataround_link first. --
 
+CREATE SEQUENCE IF NOT EXISTS connection_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.connection (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT nextval('connection_id_seq'),
     project_id int8 NOT NULL,
     "name" varchar NOT NULL,
     connector varchar NOT NULL,
@@ -17,9 +18,11 @@ CREATE TABLE IF NOT EXISTS public.connection (
     create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
+ALTER SEQUENCE connection_id_seq OWNED BY connection.id;
 
+CREATE SEQUENCE IF NOT EXISTS virtual_table_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.virtual_table (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT nextval('virtual_table_id_seq'),
     connection_id int8 NOT NULL,
     project_id int8 NOT NULL,
     "database" varchar NOT NULL,
@@ -32,9 +35,11 @@ CREATE TABLE IF NOT EXISTS public.virtual_table (
     create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
+ALTER SEQUENCE virtual_table_id_seq OWNED BY virtual_table.id;
 
+CREATE SEQUENCE IF NOT EXISTS virtual_field_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.virtual_field (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT nextval('virtual_field_id_seq'),
     table_id int8 NOT NULL,
     "name" varchar NOT NULL,
     type varchar NOT NULL,
@@ -47,9 +52,11 @@ CREATE TABLE IF NOT EXISTS public.virtual_field (
     create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
+ALTER SEQUENCE virtual_field_id_seq OWNED BY virtual_field.id;
 
+CREATE SEQUENCE IF NOT EXISTS job_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.job (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT nextval('job_id_seq'),
     project_id int8 NOT NULL,
     "name" varchar NOT NULL,
     description varchar NULL,
@@ -64,11 +71,13 @@ CREATE TABLE IF NOT EXISTS public.job (
     create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
+ALTER SEQUENCE job_id_seq OWNED BY job.id;
 COMMENT ON COLUMN public.job.job_type IS '1:batch 2:stream';
 COMMENT ON COLUMN public.job.schedule_type IS '1:run_now 2:schedule 3:not_run';
 
+CREATE SEQUENCE IF NOT EXISTS job_instance_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.job_instance (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT nextval('job_instance_id_seq'),
     job_id int8 NOT NULL,
     project_id int8 NOT NULL,
     status int2 NOT NULL,
@@ -85,10 +94,12 @@ CREATE TABLE IF NOT EXISTS public.job_instance (
     update_by int8 NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
+ALTER SEQUENCE job_instance_id_seq OWNED BY job_instance.id;
 COMMENT ON COLUMN public.job_instance.status IS '0:waiting, 1:submitted, 2:running, 3:success, 4:failure, 5:canceled';
 
+CREATE SEQUENCE IF NOT EXISTS connector_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.connector (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT nextval('connector_id_seq'),
     name VARCHAR(50) NOT NULL UNIQUE,
     type VARCHAR(50) NOT NULL,
     plugin_name VARCHAR(100) NOT NULL,
@@ -102,6 +113,7 @@ CREATE TABLE IF NOT EXISTS public.connector (
     create_time timestamp with time zone NOT NULL,
     update_time timestamp with time zone NOT NULL
 );
+ALTER SEQUENCE connector_id_seq OWNED BY connector.id;
 
 -- Insert database connectors
 INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by, create_time, update_time) VALUES
@@ -127,10 +139,3 @@ INSERT INTO public.connector (name, type, plugin_name, support_source, support_s
 ('LocalFile', 'File', 'Local', 't', 't', 'f', 'f', '{}', 10000, 10000, '2025-07-22 10:59:37', '2025-07-22 10:59:40'),
 ('SFTP', 'File', 'SFTP', 't', 't', 'f', 'f', '{}', 10000, 10000, '2025-07-27 08:40:38', '2025-07-27 08:40:41')
 ON CONFLICT (name) DO NOTHING;
-
-ALTER SEQUENCE connection_id_seq RESTART WITH 10000;
-ALTER SEQUENCE virtual_table_id_seq RESTART WITH 10000;
-ALTER SEQUENCE virtual_field_id_seq RESTART WITH 10000;
-ALTER SEQUENCE job_id_seq RESTART WITH 10000;
-ALTER SEQUENCE job_instance_id_seq RESTART WITH 10000;
-ALTER SEQUENCE connector_id_seq RESTART WITH 10000;

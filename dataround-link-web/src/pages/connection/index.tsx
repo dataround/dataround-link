@@ -177,7 +177,7 @@ const S: FC<IProps> = () => {
   const reqConnection = useRequest(getConnectionById, {
     wrapperFun: (res: any) => {
       // edit connection
-      connectionStore.setValues({ ...res, type: res.type });
+      connectionStore.setValues({ ...res });
       navigate("/connection/create");
       return res;
     }
