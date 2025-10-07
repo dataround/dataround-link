@@ -22,7 +22,7 @@
     "@codemirror/view": "^6.0.0",
     "@uiw/react-codemirror": "^4.23.5",
     "ahooks": "^3.7.7",
-    "antd": "^5.27.2",
+    "antd": "^5.21.1",
     "axios": "^1.4.0",
     "classnames": "^2.3.2",
     "codemirror": "^6.0.0",
