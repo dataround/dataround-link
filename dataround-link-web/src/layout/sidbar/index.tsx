@@ -43,6 +43,12 @@ const S: FC<IProps> = () => {
     return ['/', '/file'];
   });
 
+  // Listen to pathname changes and update selectedKey accordingly
+  useEffect(() => {
+    const currentKey = pathname !== '/' ? pathname : '/batch/job';
+    setSelectedKey(currentKey);
+  }, [pathname]);
+
   useEffect(() => {
     navigate(selectedKey);
   }, [selectedKey, navigate]);
