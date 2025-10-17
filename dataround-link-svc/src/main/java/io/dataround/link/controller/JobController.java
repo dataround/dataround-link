@@ -114,8 +114,8 @@ public class JobController extends BaseController {
         Set<Long> connectionIds = new HashSet<>();
         for (Job job : page.getRecords()) {
             Map<String, Object> configMap = job.getConfig();
-            Long sourceConnId = configMap != null ? (Long) configMap.get("sourceConnId") : null;
-            Long targetConnId = configMap != null ? (Long) configMap.get("targetConnId") : null;
+            Long sourceConnId = configMap != null ? Long.parseLong(configMap.get("sourceConnId").toString()) : null;
+            Long targetConnId = configMap != null ? Long.parseLong(configMap.get("targetConnId").toString()) : null;
             connectionIds.add(sourceConnId);
             connectionIds.add(targetConnId);
             userSet.add(job.getCreateBy());

@@ -21,142 +21,112 @@
     </properties>
 
     <dependencies>
-        <!-- mysql connector -->
-        <dependency>
+      <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>42.5.1</version>
       </dependency>
-
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>8.0.32</version>
       </dependency>
-
       <dependency>
         <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc8</artifactId>
         <version>23.2.0.0</version>
       </dependency>
-
       <dependency>
         <groupId>com.microsoft.sqlserver</groupId>
         <artifactId>mssql-jdbc</artifactId>
         <version>12.6.1.jre11</version>
       </dependency>
 
-        <!-- seatunnel default lib -->
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>seatunnel-hadoop3-3.1.4-uber</artifactId>
-            <version>${seatunnel.version}</version>
-            <classifier>optional</classifier>
-        </dependency>
-        <!-- seatunnel default lib -->
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>seatunnel-hadoop-aws</artifactId>
-            <version>${seatunnel.version}</version>
-            <classifier>optional</classifier>
-        </dependency>
-        
-        <!-- CDC Connectors (Real-time data capture) -->
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-cdc-mysql</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-cdc-postgres</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-cdc-oracle</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-cdc-sqlserver</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        
-        <!-- Database Connectors -->
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-jdbc</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-hive</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        
-        <!-- Big Data Connectors 
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-kafka</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-pulsar</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-hudi</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-iceberg</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>-->
-        
-        <!-- NoSQL Connectors 
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-mongodb</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-redis</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-elasticsearch</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>-->
-        
-        <!-- IoT and Time Series 
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-iotdb</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-influxdb</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>-->
-        
-        <!-- Utility Connectors 
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-socket</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.seatunnel</groupId>
-            <artifactId>connector-http-base</artifactId>
-            <version>${seatunnel.version}</version>
-        </dependency>-->
+      <!-- seatunnel default lib -->
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>seatunnel-hadoop3-3.1.4-uber</artifactId>
+        <version>${seatunnel.version}</version>
+        <classifier>optional</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>seatunnel-hadoop-aws</artifactId>
+        <version>${seatunnel.version}</version>
+        <classifier>optional</classifier>
+      </dependency>
+
+      <!-- CDC Connectors (Real-time data capture) -->
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-cdc-mysql</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-cdc-postgres</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-cdc-oracle</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-cdc-sqlserver</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+
+      <!-- Database Connectors -->
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-jdbc</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-hive</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-kafka</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <!-- Big Data Connectors
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-pulsar</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-hudi</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-iceberg</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>-->
+      <!-- NoSQL Connectors
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-mongodb</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-redis</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.seatunnel</groupId>
+        <artifactId>connector-elasticsearch</artifactId>
+        <version>${seatunnel.version}</version>
+      </dependency>-->
     </dependencies>
 
     <build>
