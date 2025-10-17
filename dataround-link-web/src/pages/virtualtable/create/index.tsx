@@ -92,7 +92,7 @@ const S: FC<IProps> = () => {
     setSelectedConnectionType(newValue);
   };
 
-  const reqSave = useRequest(saveOrUpdateVirtualTable, {
+  const reqVTableSave = useRequest(saveOrUpdateVirtualTable, {
     wrapperFun: (res: any) => {
       message.success(t('virtualTable.create.message.saveSuccess'));
       // Clear virtual table store data after successful save
@@ -103,7 +103,7 @@ const S: FC<IProps> = () => {
 
   const onFinish = (values: any) => {
     const params = { ...vtable, ...values, jsonConfig: { topic: values.topic, delimiter: values.delimiter } };
-    reqSave.caller(params);
+    reqVTableSave.caller(params);
   };
 
   const reqConnection = useRequest(getConnections, {
@@ -117,8 +117,8 @@ const S: FC<IProps> = () => {
   });
 
   useEffect(() => {
-    reqConnection.caller({ connector: "Kafka" });
-  }, []);
+    reqConnection.caller({ connector: selectedConnectionType });
+  }, [selectedConnectionType]);
 
   const onCancel = () => {
     // Clear virtual table store data when canceling

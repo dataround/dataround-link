@@ -26,14 +26,14 @@ import { useTranslation } from 'react-i18next';
 
 interface IProps {
   selectedConnector?: string;
+  form?: any;
 }
 
-const JdbcConnectionForm: FC<IProps> = ({ selectedConnector }) => {
+const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm }) => {
   const { t } = useTranslation();
-  const [form] = Form.useForm();
 
   const generateUrl = (e: any) => {
-    const values = form.getFieldsValue();
+    const values = parentForm.getFieldsValue();
     const host = values.host || "127.0.0.1";
     const port = values.port || 3306;
     const database = values.database;
@@ -66,8 +66,7 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector }) => {
         jdbcUrl = `jdbc:mysql://${host}:${port}/${database}`;
         break;
     }
-    // set form item url's value
-    form.setFieldsValue({ url: jdbcUrl, "driver": driver });
+    parentForm.setFieldsValue({ url: jdbcUrl, "driver": driver });
   };
 
   return (
@@ -99,6 +98,9 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector }) => {
       )}
       <Form.Item name="url" label={t('connection.create.form.jdbcUrl')} rules={[{ required: true }]}>
         <Input placeholder={t('connection.create.placeholder.jdbcUrl')} />
+      </Form.Item>
+      <Form.Item name="driver" style={{ display: 'none' }}>
+        <Input />
       </Form.Item>
       <Form.Item name="user" label={t('connection.create.form.username')} rules={[{ required: true }]}>
         <Input placeholder={t('connection.create.placeholder.username')} autoComplete="off" />

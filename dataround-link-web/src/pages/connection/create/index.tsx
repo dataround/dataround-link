@@ -27,7 +27,6 @@ import {
   message
 } from "antd";
 import { Rule } from "antd/es/form";
-import FormItem from "antd/es/form/FormItem";
 import { FC, memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatConnector, getConnector, saveOrUpdateConnection, testConnection } from "../../../api/connection";
@@ -147,7 +146,7 @@ const S: FC<IProps> = () => {
     } else if (selectedConnector === 'Hive') {
       return <HiveConnectionForm />;
     } else {
-      return <JdbcConnectionForm selectedConnector={selectedConnector} />;
+      return <JdbcConnectionForm selectedConnector={selectedConnector} form={form} />;
     }
   };
 

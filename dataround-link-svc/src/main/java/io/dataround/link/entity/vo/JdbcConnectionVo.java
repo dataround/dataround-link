@@ -42,10 +42,12 @@ public class JdbcConnectionVo extends ConnectionVo {
     @Override
     public void extractProperties(Connection connection) {
         Map<String, String> config = connection.getConfig();
-        config.put("url", getUrl());
-        config.put("driver", getDriver());
-        config.put("database", getDatabase());
-        config.put("svcType", getSvcType());
+        config.put("url", url);
+        config.put("driver", driver);
+        config.put("database", database);
+        if (svcType != null) {
+            config.put("svcType", svcType);
+        }
     }
 
     @Override
