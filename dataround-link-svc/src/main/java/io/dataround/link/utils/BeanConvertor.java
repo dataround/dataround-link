@@ -55,6 +55,8 @@ public class BeanConvertor {
         vo.setStartTime(job.getStartTime());
         vo.setEndTime(job.getEndTime());
         vo.setConfig(job.getConfig());
+        vo.setCreateBy(job.getCreateBy());
+        vo.setUpdateBy(job.getUpdateBy());
         return vo;
     }
     

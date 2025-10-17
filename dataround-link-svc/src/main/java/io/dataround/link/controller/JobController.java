@@ -110,7 +110,7 @@ public class JobController extends BaseController {
         page.getRecords().forEach(job -> jobResMap.put(job.getId(), BeanConvertor.job2JobRes(job)));
 
         // get connection name and user name
-        Set<Long> creatorIds = new HashSet<>();
+        Set<Long> userSet = new HashSet<>();
         Set<Long> connectionIds = new HashSet<>();
         for (Job job : page.getRecords()) {
             Map<String, Object> configMap = job.getConfig();
@@ -118,7 +118,8 @@ public class JobController extends BaseController {
             Long targetConnId = configMap != null ? (Long) configMap.get("targetConnId") : null;
             connectionIds.add(sourceConnId);
             connectionIds.add(targetConnId);
-            creatorIds.add(job.getCreateBy());
+            userSet.add(job.getCreateBy());
+            userSet.add(job.getUpdateBy());
             jobResMap.get(job.getId()).setSourceConnId(sourceConnId);
             jobResMap.get(job.getId()).setTargetConnId(targetConnId);
         }
@@ -132,9 +133,9 @@ public class JobController extends BaseController {
                 jobRes.setTargetConnectionName(connectionMap.get(jobRes.getTargetConnId()));
             }
         }
-        if (!creatorIds.isEmpty()) {
+        if (!userSet.isEmpty()) {
             Map<Long, String> userMap = new HashMap<>();
-            List<User> users = userService.listByIds(creatorIds);
+            List<User> users = userService.listByIds(userSet);
             users.forEach(user -> userMap.put(user.getId(), user.getName()));
             for (JobRes jobRes : jobResMap.values()) {
                 jobRes.setUpdateUserName(userMap.get(jobRes.getUpdateBy()));

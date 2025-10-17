@@ -147,7 +147,6 @@ const S: FC<IProps> = () => {
 
   const reqVTable = useRequest(getVirtualTableById, {
     wrapperFun: (res: any) => {
-      console.log(res);
       vtableStore.setValues(res);
       navigate("/vtable/create");
       return res;

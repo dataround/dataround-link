@@ -24,7 +24,7 @@ import { Col, Layout, Menu, MenuProps, Row } from 'antd';
 import { FC, memo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './index.less';
-import logoImage from '../../assets/logo.v20250728.png';
+import logoImage from '../../assets/logo.v20251009.png';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 

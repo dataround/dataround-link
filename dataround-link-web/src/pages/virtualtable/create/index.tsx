@@ -191,17 +191,17 @@ const S: FC<IProps> = () => {
 
         {renderDaynamic()}
         <Divider orientation="left" orientationMargin={0}>{t('virtualTable.create.fieldInfo')}</Divider>
-        <Row gutter={20}>          
+        <Row gutter={22}>          
           <Col span={4}>
             <span>{t('virtualTable.create.form.fieldName')}</span>
           </Col>
           <Col span={4}>
             <span>{t('virtualTable.create.form.fieldType')}</span>
           </Col>
-          <Col span={1}>
+          <Col span={2}>
             <span>{t('virtualTable.create.form.nullable')}</span>
           </Col>
-          <Col span={1}>
+          <Col span={2}>
             <span>{t('virtualTable.create.form.primaryKey')}</span>
           </Col>
           <Col span={4}>
@@ -218,7 +218,7 @@ const S: FC<IProps> = () => {
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }, index) => (
-                <Row gutter={20}>
+                <Row gutter={22}>
                   <Col span={1} style={{ display: 'none' }}>
                     <Form.Item {...restField} name={[name, 'id']}>
                       <Input readOnly />
@@ -234,12 +234,12 @@ const S: FC<IProps> = () => {
                       <Select placeholder={t('virtualTable.create.placeholder.selectFieldType')} options={fieldTypeOptions} style={{ maxWidth: '128px' }} />
                     </Form.Item>
                   </Col>
-                  <Col span={1}>
+                  <Col span={2}>
                     <Form.Item {...restField} name={[name, 'nullable']}>
                       <Checkbox></Checkbox>
                     </Form.Item>
                   </Col>
-                  <Col span={1}>
+                  <Col span={2}>
                     <Form.Item {...restField} name={[name, 'primaryKey']}>
                       <Checkbox></Checkbox>
                     </Form.Item>
