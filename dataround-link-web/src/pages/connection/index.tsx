@@ -207,6 +207,8 @@ const S: FC<IProps> = () => {
   });
 
   const newConnection = () => {
+    // Clear connection store data to ensure clean form for new connection
+    connectionStore.setValues({});
     navigate(`/connection/create`);
   };
 

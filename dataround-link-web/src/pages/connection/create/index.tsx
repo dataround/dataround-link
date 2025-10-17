@@ -99,6 +99,8 @@ const S: FC<IProps> = () => {
     wrapperFun: (res: any) => {
       if (res === true) {
         message.success(t('connection.create.message.saveSuccess'));
+        // Clear connection store data after successful save
+        connectionStore.setValues({});
         navigate("/connection");
       } else {
         message.error(t('connection.create.message.saveFailed'));
@@ -122,6 +124,8 @@ const S: FC<IProps> = () => {
   }
 
   const onCancel = () => {
+    // Clear connection store data when canceling
+    connectionStore.setValues({});
     navigate("/connection");
   };
 

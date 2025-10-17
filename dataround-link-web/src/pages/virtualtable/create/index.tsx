@@ -95,6 +95,8 @@ const S: FC<IProps> = () => {
   const reqSave = useRequest(saveOrUpdateVirtualTable, {
     wrapperFun: (res: any) => {
       message.success(t('virtualTable.create.message.saveSuccess'));
+      // Clear virtual table store data after successful save
+      vtableStore.setValues({});
       navigate("/vtable");
     }
   });
@@ -119,6 +121,8 @@ const S: FC<IProps> = () => {
   }, []);
 
   const onCancel = () => {
+    // Clear virtual table store data when canceling
+    vtableStore.setValues({});
     navigate("/vtable");
   };
 
