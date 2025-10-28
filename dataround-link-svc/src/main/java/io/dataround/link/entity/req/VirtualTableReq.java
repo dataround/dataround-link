@@ -37,7 +37,5 @@ import lombok.Setter;
 @Setter
 public class VirtualTableReq extends VirtualTable {
     
-    private JSONObject jsonConfig;
-    
     private List<VirtualField> fields;
 }

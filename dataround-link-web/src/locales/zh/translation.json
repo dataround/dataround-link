@@ -339,7 +339,9 @@
         "primaryKey": "主键",
         "fieldDescription": "字段描述",
         "defaultValue": "默认值",
-        "operation": "操作"
+        "operation": "操作",
+        "pathJson": "Json Path",
+        "pathIndex": "字段索引"
       },
       "format": {
         "json": "JSON字符串",
@@ -354,14 +356,18 @@
         "enterFieldName": "请输入字段名",
         "selectFieldType": "请选择字段类型",
         "enterFieldDescription": "请输入字段描述",
-        "enterDefaultValue": "请输入默认值"
+        "enterDefaultValue": "请输入默认值",
+        "pathJson": "请输入JSON path",
+        "pathIndex": "请输入字段索引，从0开始"
       },
       "button": {
         "cancel": "取消",
         "save": "保存"
       },
       "message": {
-        "saveSuccess": "保存成功"
+        "saveSuccess": "保存成功",
+        "pathJsonInvalid": "JSON path路径必须以$.开头",
+        "pathIndexInvalid": "字段索引必须是数字"
       }
     }
   },

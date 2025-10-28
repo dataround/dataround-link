@@ -107,8 +107,6 @@ public class VirtualTableController extends BaseController {
     @PostMapping("/saveOrUpdate")
     public Result<Boolean> saveOrUpdate(@RequestBody VirtualTableReq virtualTable) {
         UserResponse currentUser = getCurrentUser();
-        // Convert received json object to tableConfig string
-        virtualTable.setTableConfig(virtualTable.getJsonConfig().toString());
         Date now = new Date();
         if (virtualTable.getId() == null) {
             virtualTable.setProjectId(getCurrentProjectId());

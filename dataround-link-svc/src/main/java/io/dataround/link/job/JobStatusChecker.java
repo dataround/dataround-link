@@ -176,7 +176,7 @@ public class JobStatusChecker {
                 jobInstanceService.updateById(jobInstance);
             }
         } catch (Exception e) {
-            log.error("Failed to update status for job {}", jobInstance.getSeatunnelId(), e);
+            log.error("Failed to update status for job {}", jobInstance.getId(), e);
         }
     }
 

@@ -79,7 +79,7 @@ const S: FC<IProps> = () => {
   const { t } = useTranslation();
   const values = vtableStore.getValues();
   const tableConfig = values.tableConfig ? JSON.parse(values.tableConfig) : {};
-  const vtable = { ...values, ...tableConfig, "connectionType": "Kafka", "fields": values.fields || [{}], "format": values.format || "json" };
+  const vtable = { ...values, ...tableConfig, "connectionType": "Kafka", "fields": values.fields || [{}] };
   if (!vtable.hasOwnProperty("delimiter")) {
     vtable.delimiter = ",";
   }
@@ -102,7 +102,12 @@ const S: FC<IProps> = () => {
   });
 
   const onFinish = (values: any) => {
-    const params = { ...vtable, ...values, jsonConfig: { topic: values.topic, delimiter: values.delimiter } };
+    const jsonConfig = { topic: values.topic, delimiter: values.delimiter, format: values.format }
+    const params = { ...values, "tableConfig": JSON.stringify(jsonConfig) };
+    // delete params's topic, delimiter, format
+    delete params.topic;
+    delete params.delimiter;
+    delete params.format;
     reqVTableSave.caller(params);
   };
 
@@ -135,9 +140,9 @@ const S: FC<IProps> = () => {
           </Form.Item>
           <Form.Item name="format" label={t('virtualTable.create.form.sourceFormat')} rules={[{ required: true }]}>
             <div style={{ textAlign: "left" }}>
-              <Radio.Group onChange={(e) => { setFormat(e.target.value) }} defaultValue={format}>
-                <Radio value={"json"}>{t('virtualTable.create.format.json')}</Radio>
-                <Radio value={"text"}>{t('virtualTable.create.format.text')}</Radio>
+              <Radio.Group onChange={(e) => { setFormat(e.target.value) }} value={format}>
+                <Radio value="json">{t('virtualTable.create.format.json')}</Radio>
+                <Radio value="text">{t('virtualTable.create.format.text')}</Radio>
               </Radio.Group>
               {format === "text" && (
                 <Form.Item name="delimiter" noStyle>
@@ -161,13 +166,16 @@ const S: FC<IProps> = () => {
 
   return (
     <div className="module">
+      <Divider orientation="left" orientationMargin={0}>{t('virtualTable.create.basicInfo')}</Divider>
       <Form
         form={form}
         labelCol={{ span: 3 }}
         onFinish={onFinish}
         initialValues={vtable}
       >
-        <Divider orientation="left" orientationMargin={0}>{t('virtualTable.create.basicInfo')}</Divider>
+        <Form.Item name="id" style={{display: 'none'}}>
+          <Input readOnly />
+        </Form.Item>
         <Form.Item name="connectionType" label={t('virtualTable.create.form.connectionType')} rules={[{ required: true }]}>
           <TreeSelect
             showSearch
@@ -195,7 +203,10 @@ const S: FC<IProps> = () => {
 
         {renderDaynamic()}
         <Divider orientation="left" orientationMargin={0}>{t('virtualTable.create.fieldInfo')}</Divider>
-        <Row gutter={22}>          
+        <Row gutter={24}>      
+          <Col span={4}> 
+            <span>{ format === 'json' ? t('virtualTable.create.form.pathJson') : t('virtualTable.create.form.pathIndex')}</span>
+          </Col>   
           <Col span={4}>
             <span>{t('virtualTable.create.form.fieldName')}</span>
           </Col>
@@ -205,15 +216,15 @@ const S: FC<IProps> = () => {
           <Col span={2}>
             <span>{t('virtualTable.create.form.nullable')}</span>
           </Col>
-          <Col span={2}>
+          <Col span={3}>
             <span>{t('virtualTable.create.form.primaryKey')}</span>
           </Col>
-          <Col span={4}>
+          <Col span={3}>
             <span>{t('virtualTable.create.form.fieldDescription')}</span>
           </Col>
-          <Col span={4}>
+          {/* <Col span={3}>
             <span>{t('virtualTable.create.form.defaultValue')}</span>
-          </Col>
+          </Col> */}
           <Col span={2}>
             <span>{t('virtualTable.create.form.operation')}</span>
           </Col>
@@ -222,10 +233,30 @@ const S: FC<IProps> = () => {
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }, index) => (
-                <Row gutter={22}>
+                <Row gutter={24}>
                   <Col span={1} style={{ display: 'none' }}>
                     <Form.Item {...restField} name={[name, 'id']}>
                       <Input readOnly />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}> 
+                    <Form.Item {...restField} name={[name, 'path']} rules={[
+                      {
+                        validator: (_, value) => {
+                          if (format === "json") {
+                            if (!value || !value.startsWith('$.')) {
+                              return Promise.reject(new Error(t('virtualTable.create.message.pathJsonInvalid')));
+                            }
+                          } else {
+                            if (!/^\d+$/.test(value)) {
+                              return Promise.reject(new Error(t('virtualTable.create.message.pathIndexInvalid')));
+                            }
+                          }
+                          return Promise.resolve();
+                        }
+                      }
+                    ]}>
+                      <Input placeholder={format === "json" ? t('virtualTable.create.placeholder.pathJson') : t('virtualTable.create.placeholder.pathIndex')} />
                     </Form.Item>
                   </Col>
                   <Col span={4}>
@@ -243,21 +274,21 @@ const S: FC<IProps> = () => {
                       <Checkbox></Checkbox>
                     </Form.Item>
                   </Col>
-                  <Col span={2}>
+                  <Col span={3}>
                     <Form.Item {...restField} name={[name, 'primaryKey']}>
                       <Checkbox></Checkbox>
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
+                  <Col span={3}>
                     <Form.Item {...restField} name={[name, 'comment']}>
                       <Input placeholder={t('virtualTable.create.placeholder.enterFieldDescription')} />
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
+                  {/* <Col span={3}>
                     <Form.Item {...restField} name={[name, 'defaultValue']}>
                       <Input placeholder={t('virtualTable.create.placeholder.enterDefaultValue')} />
                     </Form.Item>
-                  </Col>
+                  </Col> */}
                   <Col span={2}>
                     <Form.Item {...restField} name={[name, 'op']} >
                       <span>

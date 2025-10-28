@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS public.virtual_field (
     id BIGINT PRIMARY KEY DEFAULT nextval('virtual_field_id_seq'),
     table_id int8 NOT NULL,
     "name" varchar NOT NULL,
+    "path" varchar(255) NOT NULL,
     type varchar NOT NULL,
     comment varchar NULL,
     nullable bool NULL,

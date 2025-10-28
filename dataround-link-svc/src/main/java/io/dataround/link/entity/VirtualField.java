@@ -39,6 +39,8 @@ public class VirtualField {
     private Long id;
     private Long tableId;
     private String name;
+    // array index or json path
+    private String path;
     private String type;
     private String comment;
     private Boolean nullable;

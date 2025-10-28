@@ -30,6 +30,7 @@ import com.alibaba.fastjson2.JSONObject;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.VirtualTable;
+import io.dataround.link.entity.res.FieldMapping;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
 import io.dataround.link.service.VirtualTableService;
@@ -74,6 +75,14 @@ public class KafkaJobConfigGenerator implements JobConfigGenerator {
             for (String key : tableConfig.keySet()) {
                 source.put(key, tableConfig.get(key));
             }
+            // add field properties
+            JSONObject fields = new JSONObject();
+            for (FieldMapping field : table.getFieldMapping()) {
+                fields.put(field.getSourceFieldName(), field.getSourceFieldType());
+            }
+            JSONObject schema = new JSONObject();
+            schema.put("fields", fields);
+            source.put("schema", schema);
             sources.add(source);
         }
         

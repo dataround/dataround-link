@@ -339,7 +339,9 @@
         "primaryKey": "Primary Key",
         "fieldDescription": "Field Description",
         "defaultValue": "Default Value",
-        "operation": "Operation"
+        "operation": "Operation",
+        "pathJson": "Json Path",
+        "pathIndex": "Field Index"
       },
       "format": {
         "json": "JSON String",
@@ -354,14 +356,18 @@
         "enterFieldName": "Please enter field name",
         "selectFieldType": "Please select field type",
         "enterFieldDescription": "Please enter field description",
-        "enterDefaultValue": "Please enter default value"
+        "enterDefaultValue": "Please enter default value",
+        "pathJson": "Please enter json path",
+        "pathIndex": "Please enter field index, starting from 0"
       },
       "button": {
         "cancel": "Cancel",
         "save": "Save"
       },
       "message": {
-        "saveSuccess": "Saved successfully"
+        "saveSuccess": "Saved successfully",
+        "pathJsonInvalid": "JSON path must start with $.",
+        "pathIndexInvalid": "Field index must be a number"
       }
     }
   },
