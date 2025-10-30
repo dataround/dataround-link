@@ -294,7 +294,8 @@
     },
     "message": {
       "stopSuccess": "任务停止成功",
-      "deleteSuccess": "任务删除成功"
+      "deleteSuccess": "任务删除成功",
+      "fetchLogFailed": "获取日志内容失败"
     }
   },
   "virtualTable": {

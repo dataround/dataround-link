@@ -17,19 +17,13 @@
 
 package io.dataround.link.job;
 
-import io.dataround.link.job.config.generator.JobConfigGenerator;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSONObject;
-
 import io.dataround.link.entity.Connector;
-import io.dataround.link.entity.Connection;
-import io.dataround.link.entity.res.JobRes;
+import io.dataround.link.job.config.generator.JobConfigGenerator;
 
 /**
  * Factory class for managing job configuration generators.
@@ -49,7 +43,7 @@ public class JobConfigGeneratorFactory {
      * @param connector the connector to get generator for
      * @return the configuration generator, or null if none found
      */
-    public JobConfigGenerator getGenerator(Connector connector) {
+    public JobConfigGenerator createGenerator(Connector connector) {
         for (JobConfigGenerator generator : generators) {
             if (generator.supports(connector)) {
                 return generator;
@@ -57,34 +51,5 @@ public class JobConfigGeneratorFactory {
         }
         return null;
     }
-
-    /**
-     * Generate source configurations using the appropriate generator
-     * @param jobVo the job configuration
-     * @param connection the source connection
-     * @param connector the source connector
-     * @return list of source configurations
-     */
-    public List<JSONObject> generateSourceConfig(JobRes jobVo, Connection connection, Connector connector) {
-        JobConfigGenerator generator = getGenerator(connector);
-        if (generator != null) {
-            return generator.generateSourceConfig(jobVo, connection, connector);
-        }
-        return new ArrayList<>();
-    }
-
-    /**
-     * Generate sink configurations using the appropriate generator
-     * @param jobVo the job configuration
-     * @param connection the target connection
-     * @param connector the target connector
-     * @return list of sink configurations
-     */
-    public List<JSONObject> generateSinkConfig(JobRes jobVo, Connection connection, Connector connector) {
-        JobConfigGenerator generator = getGenerator(connector);
-        if (generator != null) {
-            return generator.generateSinkConfig(jobVo, connection, connector);
-        }
-        return new ArrayList<>();
-    }
+ 
 }

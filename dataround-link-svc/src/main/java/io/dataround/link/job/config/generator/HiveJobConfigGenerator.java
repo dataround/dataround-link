@@ -28,7 +28,6 @@ import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
 import io.dataround.link.common.utils.ConnectorNameConstants;
-import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
 import io.dataround.link.utils.BeanConvertor;
@@ -41,7 +40,7 @@ import io.dataround.link.utils.BeanConvertor;
  * @since 2025-09-07
  */
 @Component
-public class HiveJobConfigGenerator implements JobConfigGenerator {
+public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
 
     @Override
     public boolean supports(Connector connector) {
@@ -49,22 +48,23 @@ public class HiveJobConfigGenerator implements JobConfigGenerator {
     }
 
     @Override
-    public List<JSONObject> generateSourceConfig(JobRes jobVo, Connection connection, Connector connector) {
+    public List<JSONObject> generateSourceConfig(GeneratorContext context) {
         // Hive connectors typically don't have source configurations
         return new ArrayList<>();
     }
 
     @Override
-    public List<JSONObject> generateSinkConfig(JobRes jobVo, Connection connection, Connector connector) {
+    public List<JSONObject> generateSinkConfig(GeneratorContext context) {
+        JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(connection, connector);
+        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection(), context.getTargetConnector());
 
         List<JSONObject> sinks = new ArrayList<>();
         
         for (TableMapping table : tableMappings) {
             JSONObject sink = new JSONObject();
             sink.put("plugin_name", "Hive");
-            sink.put("source_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
+            sink.put("source_table_name", prevStepResultTableName(context));
             sink.put("table_name", table.getTargetDbName() + "." + table.getTargetTable());
             
             Map<String, String> hadoopConfig = new HashMap<>();
@@ -79,9 +79,5 @@ public class HiveJobConfigGenerator implements JobConfigGenerator {
         }
         
         return sinks;
-    }
-
-    private String tmpTableName(String tableName, Long jobId) {
-        return "Table_" + tableName + "_" + jobId;
     }
 }

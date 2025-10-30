@@ -17,6 +17,7 @@
 
 package io.dataround.link.job;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -129,10 +130,12 @@ public class JobStatusChecker {
                     runningJobs.remove(jobInstance.getSeatunnelId());
                     break;
                 case "CANCELED":
-                case "CANCELLING":
                     changed = jobInstance.getStatus() != JobInstanceStatusEnum.CANCELLED.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.CANCELLED.getCode());
+                    runningJobs.remove(jobInstance.getSeatunnelId());
                     break;
+                case "CANCELLING":
+                    // go default case
                 default:
                     changed = jobInstance.getStatus() != JobInstanceStatusEnum.RUNNING.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.RUNNING.getCode());
@@ -147,6 +150,13 @@ public class JobStatusChecker {
             if (jobInstance.getStartTime() != null) {
                 logContent.append("=== Job Start Time: " + sdf.format(jobInstance.getStartTime()) + " ===\n");
             }
+            logContent.append("Total Read Count: " + jobInstance.getReadCount() + "\n");
+            logContent.append("Total Write Count: " + jobInstance.getWriteCount() + "\n");
+            logContent.append("Total Read Bytes: " + jobInstance.getReadBytes() + "\n");
+            logContent.append("Total Write Bytes: " + jobInstance.getWriteBytes() + "\n");
+            DecimalFormat df = new DecimalFormat("#.###");
+            logContent.append("Read QPS: " + df.format(jobInstance.getReadQps()) + "\n");
+            logContent.append("Write QPS: " + df.format(jobInstance.getWriteQps()) + "\n");
             // Add table-level metrics information
             if (metrics != null) {
                 String tableMetricsInfo = buildTableMetricsInfo(metrics);

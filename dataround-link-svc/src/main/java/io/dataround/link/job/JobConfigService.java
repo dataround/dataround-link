@@ -17,7 +17,6 @@
 
 package io.dataround.link.job;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,8 @@ import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.enums.JobTypeEnum;
 import io.dataround.link.entity.res.JobRes;
+import io.dataround.link.job.config.generator.GeneratorContext;
+import io.dataround.link.job.config.generator.JobConfigGenerator;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
 import lombok.extern.slf4j.Slf4j;
@@ -67,18 +68,22 @@ public class JobConfigService {
         Connection sourceConn = connectionService.getById(sourceConnId);
         Connector sourceConnector = connectorService.getConnector(sourceConn.getConnector());
 
-        List<JSONObject> sources = configGeneratorFactory.generateSourceConfig(jobVo, sourceConn, sourceConnector);
-        jsonConfig.put("source", sources);
-
-        // Add empty transform section
-        jsonConfig.put("transform", new ArrayList<>());
-
         // Add sink section
         Long targetConnId = jobVo.getTargetConnId();
         Connection targetConn = connectionService.getById(targetConnId);
         Connector targetConnector = connectorService.getConnector(targetConn.getConnector());
+    
+        GeneratorContext context = new GeneratorContext(jobVo, sourceConn, sourceConnector, targetConn, targetConnector);
 
-        List<JSONObject> sinks = configGeneratorFactory.generateSinkConfig(jobVo, targetConn, targetConnector);
+        JobConfigGenerator sourceGenerator = configGeneratorFactory.createGenerator(sourceConnector);
+        List<JSONObject> sources = sourceGenerator.generateSourceConfig(context);
+        jsonConfig.put("source", sources);
+        // Kafka source should generate transform, others should not need
+        List<JSONObject> transforms = sourceGenerator.generateTransformConfig(context);
+        jsonConfig.put("transform", transforms);
+
+        JobConfigGenerator sinkGenerator = configGeneratorFactory.createGenerator(targetConnector);
+        List<JSONObject> sinks = sinkGenerator.generateSinkConfig(context);
         jsonConfig.put("sink", sinks);
 
         return jsonConfig.toJSONString();

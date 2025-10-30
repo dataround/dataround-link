@@ -19,8 +19,6 @@ package io.dataround.link.entity.req;
 
 import java.util.List;
 
-import com.alibaba.fastjson2.JSONObject;
-
 import io.dataround.link.entity.VirtualField;
 import io.dataround.link.entity.VirtualTable;
 import lombok.Getter;

@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
-import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
 import io.dataround.link.utils.BeanConvertor;
@@ -40,7 +39,7 @@ import io.dataround.link.utils.BeanConvertor;
  * @since 2025-09-07
  */
 @Component
-public class CdcJobConfigGenerator implements JobConfigGenerator {
+public class CdcJobConfigGenerator extends AbstractJobConfigGenerator {
 
     @Override
     public boolean supports(Connector connector) {
@@ -48,18 +47,19 @@ public class CdcJobConfigGenerator implements JobConfigGenerator {
     }
 
     @Override
-    public List<JSONObject> generateSourceConfig(JobRes jobVo, Connection connection, Connector connector) {
+    public List<JSONObject> generateSourceConfig(GeneratorContext context) {
+        JobRes jobVo = context.getJobVo();
         List<JSONObject> sources = new ArrayList<>();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(connection, connector);
+        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection(), context.getSourceConnector());
 
         for (TableMapping table : tableMappings) {
             JSONObject source = new JSONObject();
-            source.put("plugin_name", connector.getPluginName());
+            source.put("plugin_name", context.getSourceConnector().getPluginName());
             source.put("base-url", 30);
             source.put("username", 1);
             source.put("table-names", Collections.singletonList(table.getSourceDbName() + "." + table.getSourceTable()));
-            source.put("result_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
+            source.put("result_table_name", sourceResultTableName(table.getSourceTable(), jobVo.getId(), context));
             
             // Add connection properties
             for (Map.Entry<String, String> entry : sourceMap.entrySet()) {
@@ -72,12 +72,8 @@ public class CdcJobConfigGenerator implements JobConfigGenerator {
     }
 
     @Override
-    public List<JSONObject> generateSinkConfig(JobRes jobVo, Connection connection, Connector connector) {
+    public List<JSONObject> generateSinkConfig(GeneratorContext context) {
         // CDC connectors typically don't have sink configurations
         return new ArrayList<>();
-    }
-
-    private String tmpTableName(String tableName, Long jobId) {
-        return "Table_" + tableName + "_" + jobId;
     }
 }

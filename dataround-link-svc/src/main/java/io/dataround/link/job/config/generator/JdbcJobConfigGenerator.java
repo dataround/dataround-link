@@ -29,7 +29,6 @@ import com.alibaba.fastjson2.JSONObject;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.enums.TableWriteTypeEnum;
 import io.dataround.link.common.utils.ConnectorNameConstants;
-import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.res.FieldMapping;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
@@ -44,7 +43,7 @@ import io.dataround.link.utils.BeanConvertor;
  * @since 2025-09-07
  */
 @Component
-public class JdbcJobConfigGenerator implements JobConfigGenerator {
+public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
 
     @Override
     public boolean supports(Connector connector) {
@@ -52,9 +51,10 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
     }
 
     @Override
-    public List<JSONObject> generateSourceConfig(JobRes jobVo, Connection connection, Connector connector) {
+    public List<JSONObject> generateSourceConfig(GeneratorContext context) {
+        JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(connection, connector);
+        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection(), context.getSourceConnector());
 
         List<JSONObject> sources = new ArrayList<>();
 
@@ -63,8 +63,8 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
             source.put("plugin_name", "Jdbc");
             source.put("connection_check_timeout_sec", 30);
             source.put("parallelism", 1);
-            source.put("result_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
-            source.put("query", generateSourceQuery(table, connector.getName()));
+            source.put("result_table_name", sourceResultTableName(table.getSourceTable(), jobVo.getId(), context));
+            source.put("query", generateSourceQuery(table, context.getSourceConnector().getName()));
             sources.add(source);
         }
 
@@ -72,9 +72,10 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
     }
 
     @Override
-    public List<JSONObject> generateSinkConfig(JobRes jobVo, Connection connection, Connector connector) {
+    public List<JSONObject> generateSinkConfig(GeneratorContext context) {
+        JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(connection, connector);
+        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection(), context.getTargetConnector());
 
         List<JSONObject> sinks = new ArrayList<>();
 
@@ -96,7 +97,7 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
             }
             // the options('database') are required because ['generate_sink_sql' == true] is true
             sink.put("database", table.getTargetDbName());
-            sink.put("source_table_name", tmpTableName(table.getSourceTable(), jobVo.getId()));
+            sink.put("source_table_name", prevStepResultTableName(context));
             sink.put("table", table.getTargetTable());
             sink.put("generate_sink_sql", true);
             sinks.add(sink);
@@ -149,10 +150,6 @@ public class JdbcJobConfigGenerator implements JobConfigGenerator {
 
     public String getFullTableName(String dbName, String tableName) {
         return dbName + "." + tableName;
-    }
-
-    private String tmpTableName(String tableName, Long jobId) {
-        return "Table_" + tableName + "_" + jobId;
     }
 
     private String sqlDialect(String dialect, String field) {

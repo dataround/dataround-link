@@ -22,8 +22,6 @@ import java.util.List;
 import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
-import io.dataround.link.entity.Connection;
-import io.dataround.link.entity.res.JobRes;
 
 /**
  * Abstract interface for generating job configurations for different connector types.
@@ -43,19 +41,22 @@ public interface JobConfigGenerator {
 
     /**
      * Generate source configurations for the given job
-     * @param jobVo the job configuration
-     * @param connection the source connection
-     * @param connector the source connector
+     * @param context generator context
      * @return list of source configurations
      */
-    List<JSONObject> generateSourceConfig(JobRes jobVo, Connection connection, Connector connector);
+    List<JSONObject> generateSourceConfig(GeneratorContext context);
+
+    /**
+     * Generate transform configurations for the given job
+      * @param context generator context
+     * @return list of transform configurations
+     */
+    List<JSONObject> generateTransformConfig(GeneratorContext context);
 
     /**
      * Generate sink configurations for the given job
-     * @param jobVo the job configuration
-     * @param connection the target connection
-     * @param connector the target connector
+      * @param context generator context
      * @return list of sink configurations
      */
-    List<JSONObject> generateSinkConfig(JobRes jobVo, Connection connection, Connector connector);
+    List<JSONObject> generateSinkConfig(GeneratorContext context);
 }

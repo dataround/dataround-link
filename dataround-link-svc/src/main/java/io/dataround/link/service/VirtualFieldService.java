@@ -34,5 +34,7 @@ public interface VirtualFieldService extends IService<VirtualField> {
 
     void removeByTableId(Long tableId);
 
+    List<VirtualField> listByTableId(Long tableId);
+
     Map<Long, List<VirtualField>> listByTableIds(List<Long> tableIds);
 }

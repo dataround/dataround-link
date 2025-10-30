@@ -36,7 +36,7 @@ import {
   TabsProps, message
 } from "antd";
 import { FC, memo, useEffect, useState } from "react";
-import { deleteInstance, getInstanceList, stopInstance } from "../../api/instance";
+import { deleteInstance, getInstanceList, stopInstance, getInstanceById } from "../../api/instance";
 import useRequest from "../../hooks/useRequest";
 import dayjs from "dayjs";
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined, PauseCircleOutlined, StopOutlined } from "@ant-design/icons";
@@ -77,6 +77,7 @@ const S: FC<IProps> = () => {
   const [refresh, setRefresh] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logContent, setLogContent] = useState("");
+  const [logLoading, setLogLoading] = useState(false);
   // retrive jobType from path
   const jobType = window.location.pathname.includes("/batch") ? JOB_TYPE_BATCH : window.location.pathname.includes("/stream") ? JOB_TYPE_STREAM : JOB_TYPE_FILESYNC;
 
@@ -131,7 +132,7 @@ const S: FC<IProps> = () => {
             record.status == 2 ? <><span style={{ color: "#1890ff" }}><PauseCircleOutlined spin /> {t('instance.status.running')}</span></> :
               record.status == 3 ? <><span style={{ color: "#00a854" }}><CheckCircleOutlined /> {t('instance.status.success')}</span></> :
                 record.status == 4 ? <><span style={{ color: "#f50" }}><CloseCircleOutlined /> {t('instance.status.failure')}</span></> :
-                  record.status == 5 ? <><span style={{ color: "#f50" }}><CloseCircleOutlined /> {t('instance.status.canceled')}</span></> :
+                  record.status == 5 ? <><span style={{ color: "#00a854" }}><CheckCircleOutlined /> {t('instance.status.canceled')}</span></> :
                     <span>{record.status}</span>
       ),
     },
@@ -174,8 +175,18 @@ const S: FC<IProps> = () => {
   ];
 
   const viewLogContent = (record: DataType) => {
+    // previous log content
+    setLogContent(record.logContent || "");
     setIsModalOpen(true);
-    setLogContent(record.logContent);
+    // then request the latest log content
+    setLogLoading(true);
+    getInstanceById(record.key).then((res: any) => {
+      setLogContent(res.data.logContent || "");
+    }).catch((error: any) => {
+      message.error(t('instance.message.fetchLogFailed'));
+    }).finally(() => {
+      setLogLoading(false);
+    });
   };
 
   const deleteRequest = useRequest(deleteInstance, {
@@ -343,14 +354,16 @@ const S: FC<IProps> = () => {
           style={{ top: 100, height: '80vh' }}
           bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
-          <Card style={{ width: 'fit-content' }}>
-            <pre>
-              <code
-                className="language-java code"
-                dangerouslySetInnerHTML={{ __html: highlightLogs(logContent) }}
-              />
-            </pre>
-          </Card>
+          <Spin spinning={logLoading}>
+            <Card>
+              <pre>
+                <code
+                  className="language-java code"
+                  dangerouslySetInnerHTML={{ __html: highlightLogs(logContent) }}
+                />
+              </pre>
+            </Card>
+          </Spin>
         </Modal>
       </div>
     </Spin>

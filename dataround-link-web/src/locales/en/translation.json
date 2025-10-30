@@ -294,7 +294,8 @@
     },
     "message": {
       "stopSuccess": "Job stopped successfully",
-      "deleteSuccess": "Job deleted successfully"
+      "deleteSuccess": "Job deleted successfully",
+      "fetchLogFailed": "Failed to fetch log content"
     }
   },
   "virtualTable": {
