@@ -21,7 +21,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.dataround.link.common.Result;
 import io.dataround.link.common.entity.res.UserResponse;
@@ -159,7 +158,6 @@ public class JobController extends BaseController {
         Job job = jobVo;
         Long id = jobVo.getId();
         if (id == null) {
-            job.setId(IdWorker.getId());
             job.setProjectId(getCurrentProjectId());
             job.setCreateBy(currentUser.getUserId());
             job.setCreateTime(now);

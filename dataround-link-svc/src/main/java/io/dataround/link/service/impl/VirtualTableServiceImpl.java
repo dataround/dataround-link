@@ -18,7 +18,6 @@
 package io.dataround.link.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.dataround.link.entity.VirtualField;
 import io.dataround.link.entity.VirtualTable;
@@ -71,15 +70,12 @@ public class VirtualTableServiceImpl extends ServiceImpl<VirtualTableMapper, Vir
 
     @Override
     public boolean saveOrUpdate(VirtualTableReq virtualTable) {
-        // do save
-        if (virtualTable.getId() == null) {
-            Long id = IdWorker.getId();
-            virtualTable.setId(id);
-            virtualTable.getFields().forEach(field -> field.setTableId(id));
-        }
+        // do save or update
+        super.saveOrUpdate(virtualTable);
+        Long id = virtualTable.getId();
+        virtualTable.getFields().forEach(field -> field.setTableId(id));
         // save or update, mybatis-plus will check id exist in db or not
-        virtualFieldService.saveOrUpdateBatch(virtualTable.getFields());
-        return super.saveOrUpdate(virtualTable);
+        return virtualFieldService.saveOrUpdateBatch(virtualTable.getFields());
     }
 
     @Override

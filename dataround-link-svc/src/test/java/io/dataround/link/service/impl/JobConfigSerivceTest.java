@@ -19,7 +19,6 @@ package io.dataround.link.service.impl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.dataround.link.entity.enums.JobTypeEnum;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.job.JobConfigService;
@@ -47,7 +46,7 @@ public class JobConfigSerivceTest {
     @Test
     public void getJobConfig() {
         JobRes request = new JobRes();
-        request.setId(IdWorker.getId());
+        request.setId(123L);
         request.setName("job123");
         request.setJobType(JobTypeEnum.BATCH.getCode());
         request.setSourceConnId(1837273009577148418L);
