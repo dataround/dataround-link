@@ -51,13 +51,14 @@ public class CdcJobConfigGenerator extends AbstractJobConfigGenerator {
         JobRes jobVo = context.getJobVo();
         List<JSONObject> sources = new ArrayList<>();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection(), context.getSourceConnector());
+        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection());
 
         for (TableMapping table : tableMappings) {
             JSONObject source = new JSONObject();
             source.put("plugin_name", context.getSourceConnector().getPluginName());
-            source.put("base-url", 30);
-            source.put("username", 1);
+            // rename url to base-url, user to username
+            source.put("base-url", sourceMap.get("url"));
+            source.put("username", sourceMap.get("user"));
             source.put("table-names", Collections.singletonList(table.getSourceDbName() + "." + table.getSourceTable()));
             source.put("result_table_name", sourceResultTableName(table.getSourceTable(), jobVo.getId(), context));
             

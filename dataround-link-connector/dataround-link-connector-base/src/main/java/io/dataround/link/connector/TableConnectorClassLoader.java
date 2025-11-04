@@ -47,9 +47,7 @@ public class TableConnectorClassLoader extends URLClassLoader {
                 "scala.",
                 "javax.annotation.",
                 "org.slf4j",
-                "org.apache.log4j",
                 "org.apache.logging",
-                "org.apache.commons",
                 "com.fasterxml.jackson"
             };
 

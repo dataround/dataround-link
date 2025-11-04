@@ -22,7 +22,6 @@ import java.util.Map;
 import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connection;
-import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.res.JobRes;
 
@@ -63,32 +62,21 @@ public class BeanConvertor {
     /**
      * Convert a connection to a map.
      * @param connection the connection to convert
-     * @param connector the connector to use
      * @return the map
      */
-    public static Map<String, String> connection2Map(Connection connection, Connector connector) {
+    public static Map<String, String> connection2Map(Connection connection) {
         Map<String, String> map = connection.getConfig();
-        Map<String, String> properties = connector.getProperties();
-        if (properties != null) {
-            map.put("driver", properties.get("driver"));
+        if (connection.getHost() != null) {
+            map.put("host", connection.getHost());
         }
-        map.put("type", connector.getType());
-        map.put("host", connection.getHost());
         if (connection.getPort() != null) {
             map.put("port", connection.getPort().toString());
         }
-        map.put("user", connection.getUser());
-        map.put("password", connection.getPasswd());
-        // rename broker to bootstrap.servers
-        if (map.containsKey("broker")) {
-            map.put("\"bootstrap.servers\"", map.get("broker"));
-            map.remove("broker");
+        if (connection.getUser() != null) {
+            map.put("user", connection.getUser());
         }
-        // MYSQL-CDC use base-url and username, different property key
-        String pluginName = connector.getPluginName();
-        if (Constants.PlUGIN_NAME_MYSQL_CDC.equals(pluginName)) {
-            map.put("base-url", map.get("url"));
-            map.put("username", map.get("user"));
+        if (connection.getPasswd() != null) {
+            map.put("password", connection.getPasswd());
         }
         return map;
     }

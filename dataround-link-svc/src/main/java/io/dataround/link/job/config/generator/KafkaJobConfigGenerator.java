@@ -68,7 +68,7 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSourceConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection(), context.getSourceConnector());
+        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection());
 
         List<JSONObject> sources = new ArrayList<>();
         for (TableMapping table : tableMappings) {
@@ -197,7 +197,7 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSinkConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection(), context.getTargetConnector());
+        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection());
 
         List<JSONObject> sinks = new ArrayList<>();
         for (TableMapping table : tableMappings) {

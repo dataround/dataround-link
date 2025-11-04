@@ -23,23 +23,23 @@ import { MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import {
   Button,
   Col, Form,
-  Input, Radio, Row, Select, TreeSelect, Typography,
+  Input, Row, Select, TreeSelect, Typography,
   message
 } from "antd";
 import { Rule } from "antd/es/form";
 import { FC, memo, useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 import { formatConnector, getConnector, saveOrUpdateConnection, testConnection } from "../../../api/connection";
 import useRequest from "../../../hooks/useRequest";
 import { connectionStore } from "../../../store";
-import { useTranslation } from 'react-i18next';
-import FtpConnectionForm from "./ftp";
-import S3ConnectionForm from "./s3";
-import "./index.less";
-import KafkaConnectionForm from "./kafka";
 import CDCConnectionForm from "./cdc";
+import FtpConnectionForm from "./ftp";
 import HiveConnectionForm from "./hive";
 import JdbcConnectionForm from "./jdbc";
+import KafkaConnectionForm from "./kafka";
+import S3ConnectionForm from "./s3";
+import "./index.less";
 const { Option } = Select;
 
 
@@ -84,12 +84,12 @@ const S: FC<IProps> = () => {
       delete values.configArray;
     }
     // hive property
-    const metastore_uri = values.metastore_uri;
+    const metastore_uri = values.metastoreUri;
     if (metastore_uri) {
       // retrieve metastore's host and port: thrift://hive-metastore:9083
       values.host = metastore_uri.split('://')[1].split(':')[0];
       values.port = Number.parseInt(metastore_uri.split('://')[1].split(':')[1]);
-    }    
+    }
     const conn = { ...values };
     return conn;
   }
@@ -144,7 +144,7 @@ const S: FC<IProps> = () => {
     } else if (selectedConnector === 'LocalFile') {
       return <></>
     } else if (selectedConnector === 'Hive') {
-      return <HiveConnectionForm />;
+      return <HiveConnectionForm form={form} />;
     } else {
       return <JdbcConnectionForm selectedConnector={selectedConnector} form={form} />;
     }

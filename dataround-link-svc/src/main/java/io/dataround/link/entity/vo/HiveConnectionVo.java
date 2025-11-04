@@ -19,7 +19,9 @@ package io.dataround.link.entity.vo;
 
 import java.util.Map;
 
+import io.dataround.link.SpringContextUtil;
 import io.dataround.link.entity.Connection;
+import io.dataround.link.service.HazelcastCacheService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,39 +36,61 @@ import lombok.Setter;
 public class HiveConnectionVo extends ConnectionVo {
 
     private String metastoreUri;
-    private String hdfsSite;
+    private String hdfsSite; 
     private String hiveSite;
     private String kerberosPrincipal;
-    private String kerberosKeytab;
-    private String kerberosKrb5Conf;
+    private String kerberosKeytab;  
+    private String kerberosKrb5Conf;  
+
+    private final String KEY_METASTORE_URI = "metastore_uri";
+    private final String KEY_HDFS_SITE_PATH = "hdfs_site_path";
+    private final String KEY_HIVE_SITE_PATH = "hive_site_path";
+    private final String KEY_KERBEROS_PRINCIPAL = "kerberos_principal";
+    private final String KEY_KERBEROS_KEYTAB_PATH = "krb5_path";
+    private final String KEY_KERBEROS_KRB5_CONF_PATH = "kerberos_keytab_path";
 
     @Override
     public void extractProperties(Connection connection) {
         Map<String, String> config = connection.getConfig();
-        config.put("metastore.uri", metastoreUri);
-        config.put("hdfs.site", hdfsSite);
-        config.put("hive.site", hiveSite);
-        config.put("kerberos.principal", kerberosPrincipal);
-        config.put("kerberos.keytab", kerberosKeytab);
-        config.put("kerberos.krb5.conf", kerberosKrb5Conf);
+        config.put(KEY_METASTORE_URI, metastoreUri);
+        if (hdfsSite != null) {
+            config.put(KEY_HDFS_SITE_PATH, getCachedValue(hdfsSite));
+        }
+        if (hiveSite != null) {
+            config.put(KEY_HIVE_SITE_PATH, getCachedValue(hiveSite));
+        }
+        if (kerberosPrincipal != null) {
+            config.put(KEY_KERBEROS_PRINCIPAL, kerberosPrincipal);
+        }
+        if (kerberosKeytab != null) {
+            config.put(KEY_KERBEROS_KEYTAB_PATH, getCachedValue(kerberosKeytab));
+        }
+        if (kerberosKrb5Conf != null) {
+            config.put(KEY_KERBEROS_KRB5_CONF_PATH, getCachedValue(kerberosKrb5Conf));
+        }
         connection.setConfig(config);
     }
 
     @Override
     public void fillProperties(Map<String, String> config) {
-        setMetastoreUri(config.get("metastore.uri"));
-        setHdfsSite(config.get("hdfs.site"));
-        setHiveSite(config.get("hive.site"));
-        setKerberosPrincipal(config.get("kerberos.principal"));
-        setKerberosKeytab(config.get("kerberos.keytab"));
-        setKerberosKrb5Conf(config.get("kerberos.krb5.conf"));
+        setMetastoreUri(config.get(KEY_METASTORE_URI));
+        setHdfsSite(config.get(KEY_HDFS_SITE_PATH));
+        setHiveSite(config.get(KEY_HIVE_SITE_PATH));
+        setKerberosPrincipal(config.get(KEY_KERBEROS_PRINCIPAL));
+        setKerberosKeytab(config.get(KEY_KERBEROS_KEYTAB_PATH));
+        setKerberosKrb5Conf(config.get(KEY_KERBEROS_KRB5_CONF_PATH));
 
         // remove config items, other items was used to show extra param for web page
-        config.remove("metastore.uri");
-        config.remove("hdfs.site");
-        config.remove("hive.site");
-        config.remove("kerberos.principal");
-        config.remove("kerberos.keytab");
-        config.remove("kerberos.krb5.conf");
+        config.remove(KEY_METASTORE_URI);
+        config.remove(KEY_HDFS_SITE_PATH);
+        config.remove(KEY_HIVE_SITE_PATH);
+        config.remove(KEY_KERBEROS_PRINCIPAL);
+        config.remove(KEY_KERBEROS_KEYTAB_PATH);
+        config.remove(KEY_KERBEROS_KRB5_CONF_PATH);
+    }
+
+    private String getCachedValue(String key) {
+        HazelcastCacheService cacheService = SpringContextUtil.getBean(HazelcastCacheService.class);
+        return cacheService.get(key);
     }
 }

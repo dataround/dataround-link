@@ -17,12 +17,14 @@
 
 package io.dataround.link.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -53,6 +56,7 @@ import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
 import io.dataround.link.service.UserService;
 import io.dataround.link.service.VirtualTableService;
+import io.dataround.link.service.HazelcastCacheService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +80,8 @@ public class ConnectionController extends BaseController {
     private ConnectorService connectorService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private HazelcastCacheService cacheService;
 
     @GetMapping("/{id}")
     public Result<ConnectionVo> getById(@PathVariable Long id) {
@@ -117,6 +123,28 @@ public class ConnectionController extends BaseController {
         Connection connection = connectionVo.buildConnection(connector, getCurrentUserId(), getCurrentProjectId());
         boolean bool = connectionService.saveOrUpdate(connection);
         return Result.success(bool);
+    }
+
+    @PostMapping("/upload")
+    public Result<Object> upload(@RequestParam("file") MultipartFile file) {
+        try {
+            // Generate a unique key for the file
+            String fileKey = "file_" + System.currentTimeMillis() + "_" + RandomStringUtils.randomAlphanumeric(5);
+            
+            // Cache the uploaded configuration file content in Hazelcast
+            String content = new String(file.getBytes(), StandardCharsets.UTF_8);
+            boolean cached = cacheService.put(fileKey, content);
+            if (cached) {
+                log.info("Uploaded configuration file cached in Hazelcast with key: {}", fileKey);
+                return Result.success((Object)fileKey); // Return the generated key
+            } else {
+                log.error("Failed to cache uploaded configuration file with key: {}", fileKey);
+                return Result.error("Failed to cache uploaded file");
+            }
+        } catch (Exception e) {
+            log.error("Failed to process uploaded file", e);
+            return Result.error("Failed to process uploaded file");
+        }
     }
 
     @PostMapping("/test")

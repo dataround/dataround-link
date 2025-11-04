@@ -18,7 +18,6 @@
 package io.dataround.link.job.config.generator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,17 +29,19 @@ import io.dataround.link.entity.Connector;
 import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
+import io.dataround.link.service.HazelcastCacheService;
 import io.dataround.link.utils.BeanConvertor;
 
 /**
  * Hive connector job configuration generator.
- * Handles configuration generation for Hive connectors.
  *
  * @author yuehan124@gmail.com
  * @since 2025-09-07
  */
 @Component
 public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
+
+    private HazelcastCacheService cacheService;
 
     @Override
     public boolean supports(Connector connector) {
@@ -57,7 +58,7 @@ public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSinkConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection(), context.getTargetConnector());
+        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection());
 
         List<JSONObject> sinks = new ArrayList<>();
         
@@ -66,11 +67,7 @@ public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
             sink.put("plugin_name", "Hive");
             sink.put("source_table_name", prevStepResultTableName(context));
             sink.put("table_name", table.getTargetDbName() + "." + table.getTargetTable());
-            
-            Map<String, String> hadoopConfig = new HashMap<>();
-            hadoopConfig.put("fs.defaultFS", "hdfs://vm2.test.com:30802");
-            sink.put("hive.hadoop.conf", hadoopConfig);
-            
+            sink.put("hdfs_site_path", "abc"); // genTempFileFromHazelcast("hdfs_site_path", "hdfs-site"));
             // Add connection properties
             for (Map.Entry<String, String> entry : targetMap.entrySet()) {
                 sink.put(entry.getKey(), entry.getValue());
@@ -79,5 +76,5 @@ public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
         }
         
         return sinks;
-    }
+    } 
 }

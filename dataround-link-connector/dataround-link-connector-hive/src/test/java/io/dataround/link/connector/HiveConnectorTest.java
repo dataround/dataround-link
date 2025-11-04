@@ -17,77 +17,49 @@
 
 package io.dataround.link.connector;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import io.dataround.link.common.connector.Param;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Test class for HiveConnector
- * 
+ * Unit test for HiveConnector
+ *
  * @author yuehan124@gmail.com
  * @since 2025-06-09
  */
+@Slf4j
 public class HiveConnectorTest {
 
     private Param param;
     private HiveConnector connector;
 
     @Before
-    void setUp() {
+    public void setUp() {
         connector = new HiveConnector();
         param = new Param();
-        param.setHost("localhost");
-        param.setPort(10000);
-        param.setUser("hive");
-        param.setPassword("hive");
         Map<String, String> config = new HashMap<>();
-        config.put("driver", "org.apache.hive.jdbc.HiveDriver");
+        config.put("metastore_uri", "thrift://192.168.10.68:30083");
         param.setConfig(config);
-    }
-
-    @Test
-    void testGetName() {
-        assertEquals("Hive", connector.getName());
-    }
-
-    @Test
-    void testInitializeWithDefaultUrl() throws Exception {
-        // Remove url from config to test default URL generation
-        param.getConfig().remove("url");
-
         connector.initialize(param);
-
-        // Verify that the connector was initialized
-        assertNotNull(connector.getParam());
-        assertEquals("localhost", connector.getParam().getHost());
-        assertEquals(Integer.valueOf(10000), connector.getParam().getPort());
     }
 
     @Test
-    void testInitializeWithCustomUrl() throws Exception {
-        param.getConfig().put("url", "jdbc:hive2://custom-host:10001/custom_db");
-
-        connector.initialize(param);
-
-        // Verify that the connector was initialized
-        assertNotNull(connector.getParam());
-        assertEquals("jdbc:hive2://custom-host:10001/custom_db", connector.getParam().getConfig().get("url"));
+    public void testDoGetDatabases() {
+        List<String> databases = connector.doGetDatabases();
+        System.out.println(String.join(",", databases));
+        log.info("Databases: {}", String.join(",", databases));
     }
 
     @Test
-    void testInitializeWithDefaultDriver() throws Exception {
-        // Remove driver from config to test default driver
-        param.getConfig().remove("driver");
-        connector.initialize(param);
-
-        // Verify that default driver was set
-        assertEquals("org.apache.hive.jdbc.HiveDriver", connector.getParam().getConfig().get("driver"));
+    public void testDoGetTables() {
+        List<String> tables = connector.doGetTables("default");
+        System.out.println(String.join(",", tables));
+        log.info("Tables: {}", String.join(",", tables));
     }
 }

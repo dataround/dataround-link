@@ -66,6 +66,20 @@ export const getConnector = (params: any) => {
   return http.get(baseAPI + "/connector/" + reqParams);
 }
 
+/**
+ * Upload a file to Hazelcast cache
+ * @param file The file to upload
+ * @returns Promise with the response containing the generated key
+ */
+export const uploadFile = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return http.post(baseAPI + "/connection/upload", formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
 
 export const formatConnector = (res: any) => {
   interface TreeNode {
