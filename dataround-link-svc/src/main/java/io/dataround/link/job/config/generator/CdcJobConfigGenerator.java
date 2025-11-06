@@ -29,7 +29,6 @@ import com.alibaba.fastjson2.JSONObject;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
-import io.dataround.link.utils.BeanConvertor;
 
 /**
  * CDC connector job configuration generator.
@@ -51,7 +50,7 @@ public class CdcJobConfigGenerator extends AbstractJobConfigGenerator {
         JobRes jobVo = context.getJobVo();
         List<JSONObject> sources = new ArrayList<>();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection());
+        Map<String, String> sourceMap = context.getSourceConnectionMap();
 
         for (TableMapping table : tableMappings) {
             JSONObject source = new JSONObject();
@@ -60,7 +59,7 @@ public class CdcJobConfigGenerator extends AbstractJobConfigGenerator {
             source.put("base-url", sourceMap.get("url"));
             source.put("username", sourceMap.get("user"));
             source.put("table-names", Collections.singletonList(table.getSourceDbName() + "." + table.getSourceTable()));
-            source.put("result_table_name", sourceResultTableName(table.getSourceTable(), jobVo.getId(), context));
+            source.put("result_table_name", context.sourceResultTableName(table.getSourceTable()));
             
             // Add connection properties
             for (Map.Entry<String, String> entry : sourceMap.entrySet()) {

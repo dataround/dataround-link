@@ -15,25 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link.job.config.generator;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.alibaba.fastjson2.JSONObject;
+package io.dataround.link.utils;
 
 /**
- * AbstractJobConfigGenerator
- *
+ * Job configuration parameter constants.
+ * 
  * @author yuehan124@gmail.com
- * @since 2025/10/29
+ * @date 2025-11-05
  */
-public abstract class AbstractJobConfigGenerator implements JobConfigGenerator {
-    
+public class JobConfigParamConstants {
 
-    @Override
-    public List<JSONObject> generateTransformConfig(GeneratorContext context) {
-        // Return an empty list by default
-        return new ArrayList<>();
-    }
+    public static final String HIVE_JOB_HDFS_SITE_PATH = "hdfs_site_path";
+    public static final String HIVE_JOB_HIVE_SITE_PATH = "hive_site_path";
+    public static final String HIVE_JOB_KERBEROS_KRB5_PATH = "krb5_path";
+    public static final String HIVE_JOB_KERBEROS_KEYTAB_PATH = "kerberos_keytab_path";
+    public static final String HIVE_JOB_KERBEROS_PRINCIPAL = "kerberos_principal";
+    public static final String HIVE_JOB_METASTORE_URI = "metastore_uri";
+    
 }

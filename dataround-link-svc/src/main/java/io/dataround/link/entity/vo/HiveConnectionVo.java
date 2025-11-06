@@ -22,6 +22,7 @@ import java.util.Map;
 import io.dataround.link.SpringContextUtil;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.service.HazelcastCacheService;
+import io.dataround.link.utils.JobConfigParamConstants;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 public class HiveConnectionVo extends ConnectionVo {
 
+    // form name 
     private String metastoreUri;
     private String hdfsSite; 
     private String hiveSite;
@@ -42,51 +44,44 @@ public class HiveConnectionVo extends ConnectionVo {
     private String kerberosKeytab;  
     private String kerberosKrb5Conf;  
 
-    private final String KEY_METASTORE_URI = "metastore_uri";
-    private final String KEY_HDFS_SITE_PATH = "hdfs_site_path";
-    private final String KEY_HIVE_SITE_PATH = "hive_site_path";
-    private final String KEY_KERBEROS_PRINCIPAL = "kerberos_principal";
-    private final String KEY_KERBEROS_KEYTAB_PATH = "krb5_path";
-    private final String KEY_KERBEROS_KRB5_CONF_PATH = "kerberos_keytab_path";
-
     @Override
     public void extractProperties(Connection connection) {
         Map<String, String> config = connection.getConfig();
-        config.put(KEY_METASTORE_URI, metastoreUri);
+        config.put(JobConfigParamConstants.HIVE_JOB_METASTORE_URI, metastoreUri);
         if (hdfsSite != null) {
-            config.put(KEY_HDFS_SITE_PATH, getCachedValue(hdfsSite));
+            config.put(JobConfigParamConstants.HIVE_JOB_HDFS_SITE_PATH, getCachedValue(hdfsSite));
         }
         if (hiveSite != null) {
-            config.put(KEY_HIVE_SITE_PATH, getCachedValue(hiveSite));
+            config.put(JobConfigParamConstants.HIVE_JOB_HIVE_SITE_PATH, getCachedValue(hiveSite));
         }
         if (kerberosPrincipal != null) {
-            config.put(KEY_KERBEROS_PRINCIPAL, kerberosPrincipal);
+            config.put(JobConfigParamConstants.HIVE_JOB_KERBEROS_PRINCIPAL, kerberosPrincipal);
         }
         if (kerberosKeytab != null) {
-            config.put(KEY_KERBEROS_KEYTAB_PATH, getCachedValue(kerberosKeytab));
+            config.put(JobConfigParamConstants.HIVE_JOB_KERBEROS_KEYTAB_PATH, getCachedValue(kerberosKeytab));
         }
         if (kerberosKrb5Conf != null) {
-            config.put(KEY_KERBEROS_KRB5_CONF_PATH, getCachedValue(kerberosKrb5Conf));
+            config.put(JobConfigParamConstants.HIVE_JOB_KERBEROS_KRB5_PATH, getCachedValue(kerberosKrb5Conf));
         }
         connection.setConfig(config);
     }
 
     @Override
     public void fillProperties(Map<String, String> config) {
-        setMetastoreUri(config.get(KEY_METASTORE_URI));
-        setHdfsSite(config.get(KEY_HDFS_SITE_PATH));
-        setHiveSite(config.get(KEY_HIVE_SITE_PATH));
-        setKerberosPrincipal(config.get(KEY_KERBEROS_PRINCIPAL));
-        setKerberosKeytab(config.get(KEY_KERBEROS_KEYTAB_PATH));
-        setKerberosKrb5Conf(config.get(KEY_KERBEROS_KRB5_CONF_PATH));
+        setMetastoreUri(config.get(JobConfigParamConstants.HIVE_JOB_METASTORE_URI));
+        setHdfsSite(config.get(JobConfigParamConstants.HIVE_JOB_HDFS_SITE_PATH));
+        setHiveSite(config.get(JobConfigParamConstants.HIVE_JOB_HIVE_SITE_PATH));
+        setKerberosPrincipal(config.get(JobConfigParamConstants.HIVE_JOB_KERBEROS_PRINCIPAL));
+        setKerberosKeytab(config.get(JobConfigParamConstants.HIVE_JOB_KERBEROS_KEYTAB_PATH));
+        setKerberosKrb5Conf(config.get(JobConfigParamConstants.HIVE_JOB_KERBEROS_KRB5_PATH));
 
         // remove config items, other items was used to show extra param for web page
-        config.remove(KEY_METASTORE_URI);
-        config.remove(KEY_HDFS_SITE_PATH);
-        config.remove(KEY_HIVE_SITE_PATH);
-        config.remove(KEY_KERBEROS_PRINCIPAL);
-        config.remove(KEY_KERBEROS_KEYTAB_PATH);
-        config.remove(KEY_KERBEROS_KRB5_CONF_PATH);
+        config.remove(JobConfigParamConstants.HIVE_JOB_METASTORE_URI);
+        config.remove(JobConfigParamConstants.HIVE_JOB_HDFS_SITE_PATH);
+        config.remove(JobConfigParamConstants.HIVE_JOB_HIVE_SITE_PATH);
+        config.remove(JobConfigParamConstants.HIVE_JOB_KERBEROS_PRINCIPAL);
+        config.remove(JobConfigParamConstants.HIVE_JOB_KERBEROS_KEYTAB_PATH);
+        config.remove(JobConfigParamConstants.HIVE_JOB_KERBEROS_KRB5_PATH);
     }
 
     private String getCachedValue(String key) {

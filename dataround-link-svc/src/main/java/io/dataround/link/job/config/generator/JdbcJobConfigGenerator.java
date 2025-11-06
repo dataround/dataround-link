@@ -32,7 +32,6 @@ import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.entity.res.FieldMapping;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
-import io.dataround.link.utils.BeanConvertor;
 
 /**
  * JDBC connector job configuration generator.
@@ -54,7 +53,7 @@ public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSourceConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection());
+        Map<String, String> sourceMap = context.getSourceConnectionMap();
 
         List<JSONObject> sources = new ArrayList<>();
 
@@ -63,7 +62,7 @@ public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
             source.put("plugin_name", "Jdbc");
             source.put("connection_check_timeout_sec", 30);
             source.put("parallelism", 1);
-            source.put("result_table_name", sourceResultTableName(table.getSourceTable(), jobVo.getId(), context));
+            source.put("result_table_name", context.sourceResultTableName(table.getSourceTable()));
             source.put("query", generateSourceQuery(table, context.getSourceConnector().getName()));
             sources.add(source);
         }
@@ -75,7 +74,7 @@ public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSinkConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection());
+        Map<String, String> targetMap = context.getTargetConnectionMap();
 
         List<JSONObject> sinks = new ArrayList<>();
 
@@ -97,7 +96,7 @@ public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
             }
             // the options('database') are required because ['generate_sink_sql' == true] is true
             sink.put("database", table.getTargetDbName());
-            sink.put("source_table_name", prevStepResultTableName(context));
+            sink.put("source_table_name", context.sinkSourceTableName(table.getSourceTable()));
             sink.put("table", table.getTargetTable());
             sink.put("generate_sink_sql", true);
             sinks.add(sink);

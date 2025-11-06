@@ -18,9 +18,7 @@
 package io.dataround.link.connector;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
@@ -36,6 +33,7 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.thrift.TException;
 
 import io.dataround.link.common.utils.ConnectorNameConstants;
+import io.dataround.link.common.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -70,6 +68,7 @@ public class HiveConnector extends AbstractTableConnector {
         return this.name;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void doInitialize() throws Exception {
         Map<String, String> props = getParam().getConfig();
@@ -113,7 +112,7 @@ public class HiveConnector extends AbstractTableConnector {
         // Handle hdfs-site.xml
         String hdfsSiteContent = props.get(KEY_HDFS_SITE_PATH);
         if (hdfsSiteContent != null && !hdfsSiteContent.isEmpty()) {
-            Path hdfsSitePath = createTempFile("hdfs-site", ".xml", hdfsSiteContent);
+            Path hdfsSitePath = FileUtils.createTempFile("hdfs-site", ".xml", hdfsSiteContent);
             hiveConf.addResource(hdfsSitePath.toString());
             log.info("Added hdfs-site.xml from temporary file: {}", hdfsSitePath);
         }
@@ -121,7 +120,7 @@ public class HiveConnector extends AbstractTableConnector {
         // Handle hive-site.xml
         String hiveSiteContent = props.get(KEY_HIVE_SITE_PATH);
         if (hiveSiteContent != null && !hiveSiteContent.isEmpty()) {
-            Path hiveSitePath = createTempFile("hive-site", ".xml", hiveSiteContent);
+            Path hiveSitePath = FileUtils.createTempFile("hive-site", ".xml", hiveSiteContent);
             hiveConf.addResource(hiveSitePath.toString());
             log.info("Added hive-site.xml from temporary file: {}", hiveSitePath);
         }
@@ -140,45 +139,19 @@ public class HiveConnector extends AbstractTableConnector {
             // Handle keytab file
             String keytabContent = props.get(KEY_KERBEROS_KEYTAB_PATH);
             if (keytabContent != null && !keytabContent.isEmpty()) {
-                try {
-                    Path keytabPath = createTempFile("hive-keytab", ".keytab", keytabContent);
-                    hiveConf.set("hive.metastore.kerberos.keytab.file", keytabPath.toString());
-                    log.info("Added Kerberos keytab from temporary file: {}", keytabPath);
-                } catch (IOException e) {
-                    log.error("Failed to create temporary keytab file", e);
-                }
+                Path keytabPath = FileUtils.createTempFile("hive-keytab", ".keytab", keytabContent);
+                hiveConf.set("hive.metastore.kerberos.keytab.file", keytabPath.toString());
+                log.info("Added Kerberos keytab from temporary file: {}", keytabPath);
             }
 
             // Handle krb5.conf file
             String krb5ConfContent = props.get(KEY_KERBEROS_KRB5_CONF_PATH);
             if (krb5ConfContent != null && !krb5ConfContent.isEmpty()) {
-                try {
-                    Path krb5ConfPath = createTempFile("krb5", ".conf", krb5ConfContent);
-                    System.setProperty("java.security.krb5.conf", krb5ConfPath.toString());
-                    log.info("Set Kerberos configuration file: {}", krb5ConfPath);
-                } catch (IOException e) {
-                    log.error("Failed to create temporary krb5.conf file", e);
-                }
+                Path krb5ConfPath = FileUtils.createTempFile("krb5", ".conf", krb5ConfContent);
+                System.setProperty("java.security.krb5.conf", krb5ConfPath.toString());
+                log.info("Set Kerberos configuration file: {}", krb5ConfPath);
             }
         }
-    }
-
-    /**
-     * Create a temporary file with the given content
-     */
-    private Path createTempFile(String prefix, String suffix, String content) throws IOException {
-        // Create temporary directory if it doesn't exist
-        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"), "dataround-hive");
-        if (!Files.exists(tempDir)) {
-            Files.createDirectories(tempDir);
-        }
-        // Create temporary file
-        Path tempFile = Files.createTempFile(tempDir, prefix + "-", suffix);
-        // Write content to file
-        FileUtils.writeStringToFile(tempFile.toFile(), content, "UTF-8");
-        // Delete file on JVM exit
-        tempFile.toFile().deleteOnExit();
-        return tempFile;
     }
 
     @Override

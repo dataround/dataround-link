@@ -18,6 +18,7 @@
 package io.dataround.link.job.config.generator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +28,10 @@ import com.alibaba.fastjson2.JSONObject;
 
 import io.dataround.link.entity.Connector;
 import io.dataround.link.common.utils.ConnectorNameConstants;
+import io.dataround.link.common.utils.FileUtils;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
-import io.dataround.link.service.HazelcastCacheService;
-import io.dataround.link.utils.BeanConvertor;
+import io.dataround.link.utils.JobConfigParamConstants;
 
 /**
  * Hive connector job configuration generator.
@@ -40,8 +41,6 @@ import io.dataround.link.utils.BeanConvertor;
  */
 @Component
 public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
-
-    private HazelcastCacheService cacheService;
 
     @Override
     public boolean supports(Connector connector) {
@@ -58,23 +57,47 @@ public class HiveJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSinkConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection());
+        Map<String, String> targetMap = context.getTargetConnectionMap();
 
         List<JSONObject> sinks = new ArrayList<>();
-        
+        String hdfsSiteKey = JobConfigParamConstants.HIVE_JOB_HDFS_SITE_PATH;
+        String hiveSiteKey = JobConfigParamConstants.HIVE_JOB_HIVE_SITE_PATH;
+        String kerberosKeytabKey = JobConfigParamConstants.HIVE_JOB_KERBEROS_KEYTAB_PATH;
+        String kerberosKrb5Key = JobConfigParamConstants.HIVE_JOB_KERBEROS_KRB5_PATH;
         for (TableMapping table : tableMappings) {
             JSONObject sink = new JSONObject();
             sink.put("plugin_name", "Hive");
-            sink.put("source_table_name", prevStepResultTableName(context));
+            sink.put("source_table_name", context.sinkSourceTableName(table.getSourceTable()));
             sink.put("table_name", table.getTargetDbName() + "." + table.getTargetTable());
-            sink.put("hdfs_site_path", "abc"); // genTempFileFromHazelcast("hdfs_site_path", "hdfs-site"));
+            sink.put(JobConfigParamConstants.HIVE_JOB_METASTORE_URI, targetMap.get(JobConfigParamConstants.HIVE_JOB_METASTORE_URI));
+            if (targetMap.get(hdfsSiteKey) != null) {
+                sink.put(hdfsSiteKey, FileUtils.createTempFile("hdfs-site", ".xml", targetMap.get(hdfsSiteKey)));
+            }
+            if (targetMap.get(hiveSiteKey) != null) {
+                sink.put(hiveSiteKey, FileUtils.createTempFile("hive-site", ".xml", targetMap.get(hiveSiteKey)));
+            }
+            if (targetMap.get(kerberosKeytabKey) != null) {
+                sink.put(kerberosKeytabKey, FileUtils.createTempFile("hive-keytab", ".keytab", targetMap.get(kerberosKeytabKey)));
+            }
+            if (targetMap.get(kerberosKrb5Key) != null) {
+                sink.put(kerberosKrb5Key, FileUtils.createTempFile("krb5", ".conf", targetMap.get(kerberosKrb5Key)));
+            }
             // Add connection properties
+            Map<String, String> hadoopConfMap = new HashMap<>();
             for (Map.Entry<String, String> entry : targetMap.entrySet()) {
-                sink.put(entry.getKey(), entry.getValue());
+                if (entry.getKey().equals(hdfsSiteKey) || entry.getKey().equals(hiveSiteKey) || entry.getKey().equals(kerberosKeytabKey) 
+                    || entry.getKey().equals(kerberosKrb5Key) || entry.getKey().equals(JobConfigParamConstants.HIVE_JOB_METASTORE_URI)
+                    || entry.getKey().equals("host") || entry.getKey().equals("port")) {
+                    continue;
+                }
+                hadoopConfMap.put(entry.getKey(), entry.getValue());                
+            }
+            if (!hadoopConfMap.isEmpty()) {
+                sink.put("hive.hadoop.conf", hadoopConfMap);
             }
             sinks.add(sink);
         }
-        
+
         return sinks;
-    } 
+    }
 }

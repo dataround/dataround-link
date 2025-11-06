@@ -109,6 +109,8 @@
                 <include>postgresql-*.jar</include>
                 <include>ojdbc8*.jar</include>
                 <include>mssql-jdbc*.jar</include>
+                <include>hive-exec*.jar</include>
+                <include>libfb303*.jar</include>
             </includes>
             <fileMode>0644</fileMode>
         </fileSet>

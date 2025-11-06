@@ -89,6 +89,14 @@
         <artifactId>connector-hive</artifactId>
         <version>${seatunnel.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.hive</groupId>
+        <artifactId>hive-exec</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.thrift</groupId>
+        <artifactId>libfb303</artifactId>
+      </dependency>
 
       <dependency>
         <groupId>org.apache.seatunnel</groupId>

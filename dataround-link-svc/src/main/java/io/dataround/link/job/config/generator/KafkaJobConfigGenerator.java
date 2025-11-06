@@ -38,7 +38,6 @@ import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.entity.res.TableMapping;
 import io.dataround.link.service.VirtualFieldService;
 import io.dataround.link.service.VirtualTableService;
-import io.dataround.link.utils.BeanConvertor;
 
 /**
  * Kafka connector job configuration generator.
@@ -68,13 +67,13 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSourceConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> sourceMap = BeanConvertor.connection2Map(context.getSourceConnection());
+        Map<String, String> sourceMap = context.getSourceConnectionMap();
 
         List<JSONObject> sources = new ArrayList<>();
         for (TableMapping table : tableMappings) {
             JSONObject source = new JSONObject();
             source.put("plugin_name", "Kafka");
-            source.put("result_table_name", sourceResultTableName(table.getSourceTable(), jobVo.getId(), context));
+            source.put("result_table_name", context.sourceResultTableName(table.getSourceTable()));
             VirtualTable vtable = virtualTableService.getBy(context.getSourceConnection().getId(), table.getSourceDbName(), table.getSourceTable());
             List<VirtualField> vFields = virtualFieldService.listByTableId(vtable.getId());
             JSONObject tableConfig = JSON.parseObject(vtable.getTableConfig());
@@ -139,12 +138,12 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
             List<VirtualField> vFields = virtualFieldService.listByTableId(vtable.getId());
             JSONObject tableConfig = JSON.parseObject(vtable.getTableConfig());
 
-            String sourceTableName = sourceResultTableName(table.getSourceTable(), jobVo.getId(), context);
+            String sourceTableName = context.sourceResultTableName(table.getSourceTable());
             if (FORMAT_TEXT.equals(tableConfig.get(FORMAT_KEY))) {
                 JSONObject transform = new JSONObject();
                 transform.put("plugin_name", "sql");
                 transform.put("source_table_name", sourceTableName);
-                transform.put("result_table_name", transformResultTableName(table.getTargetTable(), jobVo.getId(), context));
+                transform.put("result_table_name", context.transformResultTableName(table.getSourceTable()));
                 String sql = "SELECT ";
                 for (int i = 0; i < table.getFieldMapping().size(); i++) {
                     FieldMapping field = table.getFieldMapping().get(i);
@@ -160,7 +159,7 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
                 JSONObject jsonPathTransform = new JSONObject();
                 jsonPathTransform.put("plugin_name", "jsonpath");
                 jsonPathTransform.put("source_table_name", sourceTableName);
-                jsonPathTransform.put("result_table_name", transformResultTableName(table.getTargetTable(), jobVo.getId(), context));
+                jsonPathTransform.put("result_table_name", context.transformResultTableName(table.getSourceTable() + "_jsonpath"));
                 JSONArray fieldArray = new JSONArray();
                 JSONObject fieldMapper = new JSONObject();
                 for (FieldMapping fieldMapping : table.getFieldMapping()) {
@@ -182,8 +181,8 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
                 // remove original fields: content
                 JSONObject fieldMapperTransform = new JSONObject();
                 fieldMapperTransform.put("plugin_name", "FieldMapper");
-                fieldMapperTransform.put("source_table_name", transformResultTableName(table.getTargetTable(), jobVo.getId(), context));
-                fieldMapperTransform.put("result_table_name", transformResultTableName("fieldmapper_" + table.getTargetTable(), jobVo.getId(), context));
+                fieldMapperTransform.put("source_table_name", context.transformResultTableName(table.getSourceTable() + "_jsonpath"));
+                fieldMapperTransform.put("result_table_name", context.transformResultTableName(table.getSourceTable()));
                 fieldMapperTransform.put("field_mapper", fieldMapper);
                 // add to transforms
                 transforms.add(jsonPathTransform);
@@ -197,13 +196,13 @@ public class KafkaJobConfigGenerator extends AbstractJobConfigGenerator {
     public List<JSONObject> generateSinkConfig(GeneratorContext context) {
         JobRes jobVo = context.getJobVo();
         List<TableMapping> tableMappings = jobVo.getTableMapping();
-        Map<String, String> targetMap = BeanConvertor.connection2Map(context.getTargetConnection());
+        Map<String, String> targetMap = context.getTargetConnectionMap();
 
         List<JSONObject> sinks = new ArrayList<>();
         for (TableMapping table : tableMappings) {
             JSONObject sink = new JSONObject();
             sink.put("plugin_name", "Kafka");
-            sink.put("source_table_name", prevStepResultTableName(context));
+            sink.put("source_table_name", context.sinkSourceTableName(table.getSourceTable()));
             VirtualTable vtable = virtualTableService.getBy(context.getTargetConnection().getId(), table.getTargetDbName(), table.getTargetTable());
             JSONObject tableConfig = JSON.parseObject(vtable.getTableConfig());
 

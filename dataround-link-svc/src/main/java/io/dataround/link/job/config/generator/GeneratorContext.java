@@ -17,11 +17,14 @@
 
 package io.dataround.link.job.config.generator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.res.JobRes;
+import io.dataround.link.utils.BeanConvertor;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Generator context
@@ -41,9 +44,7 @@ public class GeneratorContext {
     @Getter
     private Connector targetConnector;
 
-    @Getter
-    @Setter
-    private String prevStepResultTableName;
+    private Map<String, String> tableNameMap = new HashMap<>();
 
     public GeneratorContext(JobRes jobVo, Connection sourceConnection, Connector sourceConnector,
             Connection targetConnection, Connector targetConnector) {
@@ -53,4 +54,43 @@ public class GeneratorContext {
         this.targetConnection = targetConnection;
         this.targetConnector = targetConnector;
     }
-}
+
+    public Map<String, String> getSourceConnectionMap() {
+        return BeanConvertor.connection2Map(sourceConnection);
+    }
+
+    public Map<String, String> getTargetConnectionMap() {
+        return BeanConvertor.connection2Map(targetConnection);
+    }
+
+    public String sourceResultTableName(String tableName) {
+        String result = sourceTableName(tableName);
+        return tableNameMap.computeIfAbsent(result, k -> result);
+    }
+
+    public String transformResultTableName(String tableName) {
+        String result = transformTableName(tableName);
+        return tableNameMap.computeIfAbsent(result, k -> result);
+    }
+
+    /**
+     * Get the sink source table name, If transform table exists, return transform table name
+     * @param tableName
+     * @return
+     */
+    public String sinkSourceTableName(String tableName) {
+        if (tableNameMap.containsKey(transformTableName(tableName))) {
+            return tableNameMap.get(transformTableName(tableName));
+        } else {
+            return tableNameMap.get(sourceTableName(tableName));
+        }
+    }
+
+    private String sourceTableName(String tableName) {
+        return "TableSource_" + tableName;
+    }
+
+    private String transformTableName(String tableName) {
+        return "TableTransform_" + tableName;
+    }
+ }
