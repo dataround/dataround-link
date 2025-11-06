@@ -57,7 +57,7 @@ const H: FC<IProps> = () => {
     setCurrent(e.key);
     console.log(e.key);
     if (e.key === 'doc')
-      window.open('https://dataround.io/doc', '_blank');
+      window.open('https://dataround.io/', '_blank');
   };
 
   return (

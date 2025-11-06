@@ -69,9 +69,8 @@ The application will be available at `http://localhost:5600/datalink`
 ## Documentation
 
 For detailed documentation, please refer to the following:
-- [User Guide](docs/user-guide.md)
-- [Developer Guide](docs/developer-guide.md)
-- [API Documentation](docs/api-documentation.md)
+- [Quickstart Guide](https://dataround.io/quickstart/)
+- [API Documentation](https://dataround.io/)
 
 ## Contributing
 

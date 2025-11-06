@@ -65,9 +65,8 @@ psql -d dataround_link -f $DATAROUND_HOME/conf/init_pg_schema.sql
 ## 文档
 
 详细文档请参考以下内容：
-- [用户指南](docs/user-guide.md)
-- [开发者指南](docs/developer-guide.md)
-- [API文档](docs/api-documentation.md)
+- [快速指南](https://dataround.io/quickstart/)
+- [API文档](https://dataround.io/)
 
 ## 贡献
 
