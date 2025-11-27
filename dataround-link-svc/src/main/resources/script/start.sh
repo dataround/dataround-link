@@ -2,6 +2,12 @@
 BIN_PATH=$(dirname $0)
 BASE_PATH=$(cd $(dirname $BIN_PATH); pwd)
 
+# Check for foreground mode parameter
+FOREGROUND_MODE=false
+if [[ "$1" == "--foreground" || "$1" == "-f" ]]; then
+    FOREGROUND_MODE=true
+fi
+
 echo "Prepare to start dataround link services..."
 
 # Create logs directory
@@ -48,12 +54,20 @@ done
 echo "Starting dataround link service on port $DATALINK_PORT..."
 cd $BASE_PATH
 JAVA_OPTS="" #"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
-nohup $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-1.0.jar \
-      --spring.config.location=$BASE_PATH/conf/application.yaml \
-      --server.port=$DATALINK_PORT > $LOG_PATH/datalink.log 2>&1 &
-DATALINK_PID=$!
-echo $DATALINK_PID > $LOG_PATH/datalink.pid
-echo "Dataround link service started with PID: $DATALINK_PID"
 
-echo "All services started successfully!"
-echo "Dataround link: http://localhost:$DATALINK_PORT/datalink"
+if [ "$FOREGROUND_MODE" = true ]; then
+    # Run in foreground for Docker
+    $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-1.0.jar \
+      --spring.config.location=$BASE_PATH/conf/application.yaml \
+      --server.port=$DATALINK_PORT
+else
+    # Run in background (default behavior)
+    nohup $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-1.0.jar \
+      --spring.config.location=$BASE_PATH/conf/application.yaml \
+      --server.port=$DATALINK_PORT > $LOG_PATH/datalink.out 2>&1 &
+    DATALINK_PID=$!
+    echo $DATALINK_PID > $LOG_PATH/datalink.pid
+    echo "Dataround link service started with PID: $DATALINK_PID"
+    echo "All services started successfully!"
+    echo "Dataround link: http://localhost:$DATALINK_PORT/datalink"
+fi
