@@ -90,7 +90,7 @@ public class ConnectorFactory {
             // get or create ClassLoader
             URLClassLoader classLoader = classLoaderCache.computeIfAbsent(name, k -> {
                 try {
-                    String connectorPath = getConnectorPath(name);
+                    String connectorPath = getConnectorPath(param.getLibDir());
                     // Create custom classloader for this connector
                     File connectorDir = new File(connectorPath);
                     URL[] parentUrls = getJarUrls(connectorDir.getParentFile());
