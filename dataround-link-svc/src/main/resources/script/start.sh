@@ -53,7 +53,7 @@ done
 
 echo "Starting dataround link service on port $DATALINK_PORT..."
 cd $BASE_PATH
-JAVA_OPTS="" #"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+JAVA_OPTS="-Ddataround.link.homeDir=$BASE_PATH" 
 
 if [ "$FOREGROUND_MODE" = true ]; then
     # Run in foreground for Docker
