@@ -1,4 +1,16 @@
-FROM eclipse-temurin:17-jdk-jammy
+# Multi-stage build to reduce image size
+# Stage 1: Preparer stage - extract application files
+FROM eclipse-temurin:17-jdk-jammy AS preparer
+
+ENV DATAROUND_HOME=/opt/dataround-link
+
+# Copy and extract the built tar.gz package
+COPY dataround-link-svc/target/dataround-link-*.tar.gz $DATAROUND_HOME/
+RUN tar -xzf $DATAROUND_HOME/dataround-link-*.tar.gz -C $DATAROUND_HOME --strip-components=1 \
+    && rm $DATAROUND_HOME/dataround-link-*.tar.gz
+
+# Stage 2: Runtime stage (this becomes the final image)
+FROM eclipse-temurin:17-jre-jammy
 
 ENV DATAROUND_HOME=/opt/dataround-link \
     TZ=Asia/Shanghai \
@@ -17,10 +29,8 @@ RUN apt-get update && apt-get install -y \
     && chown -R postgres:postgres /var/lib/postgresql \
     && mkdir -p $DATAROUND_HOME
 
-# Extract the built tar.gz package to target location
-COPY dataround-link-svc/target/dataround-link-*.tar.gz $DATAROUND_HOME/
-RUN tar -xzf $DATAROUND_HOME/dataround-link-*.tar.gz -C $DATAROUND_HOME --strip-components=1 \
-    && rm $DATAROUND_HOME/dataround-link-*.tar.gz
+# Copy only the extracted application files from preparer stage (excluding the tar.gz)
+COPY --from=preparer $DATAROUND_HOME $DATAROUND_HOME
 
 # Set working directory
 WORKDIR $DATAROUND_HOME
