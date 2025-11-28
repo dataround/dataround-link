@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/dataround_link?currentSchema=public}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:dataround.io}
+  sql:
+    init:
+      schema-locations: classpath:postgresql-schema.sql
+      mode: always

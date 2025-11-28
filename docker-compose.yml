@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13.10
+    container_name: dataround-postgres
+    environment:
+      POSTGRES_DB: dataround_link
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dataround.io
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dataround-network
+
+  dataround-link:
+    build: .
+    container_name: dataround-link
+    depends_on:
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATASOURCE_URL: jdbc:postgresql://postgres:5432/dataround_link?currentSchema=public
+      DATASOURCE_USERNAME: postgres
+      DATASOURCE_PASSWORD: dataround.io
+    ports:
+      - "5600:5600"
+    networks:
+      - dataround-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dataround-network:
+    driver: bridge

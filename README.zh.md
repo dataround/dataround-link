@@ -44,20 +44,44 @@ mvn clean package -DskipTests
 最终程序包将生成在 `dataround-link-svc/target/dataround-link-xxx.tar.gz`
 
 3. 初始化数据库：
+
+Dataround link 支持 PostgreSQL 和 H2 数据库：
+
+**选项 1: 使用 PostgreSQL (默认)**
 - 安装PostgreSQL并创建数据库：
 ```sql
 CREATE DATABASE dataround_link;
 ```
 - 运行初始化脚本创建表：
 ```bash
-psql -d dataround_link -f $DATAROUND_HOME/conf/init_pg_schema.sql
+psql -d dataround_link -f $DATAROUND_HOME/conf/postgresql-schema.sql
 ```
+
+**选项 2: 使用 H2 (用于开发/测试)**
+- 无需安装，H2 默认在内存中运行
+- 表会在启动时自动创建
 
 4. 启动 dataround link 服务器：
 
-修改 `$DATAROUND_HOME/conf/application.yaml` 中的数据库IP、名称和密码，启动服务：
+**使用 Docker (默认 H2 数据库):**
+```bash
+docker run [options] dataround-link
+```
+
+**对于 PostgreSQL (生产环境):**
+通过环境变量或修改 `$DATAROUND_HOME/conf/application-prod.yaml` 中的数据库配置，然后启动服务：
 ```bash
 ./bin/start.sh
+```
+
+**对于 H2 数据库 (测试/开发环境):**
+```bash
+./bin/start.sh --spring.profiles.active=test
+```
+
+要在 Docker 中使用 PostgreSQL:
+```bash
+docker run -e SPRING_PROFILES_ACTIVE=prod [其他选项] dataround-link
 ```
 
 应用程序将在 `http://localhost:5600/datalink` 上可用

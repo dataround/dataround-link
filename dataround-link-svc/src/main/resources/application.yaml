@@ -3,23 +3,15 @@ server:
   servlet:
     context-path: /datalink
 spring:
+  profiles:
+    active: prod
+
   application:
     name: dataround-link
   
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:5432/dataround_link?currentSchema=public"
-    username: postgres
-    password: "dataround.io"
-  sql:
-    init:
-      schema-locations: classpath:postgresql-schema.sql
-      # mode: always - execute script on every startup
-      mode: always
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml

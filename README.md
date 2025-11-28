@@ -47,20 +47,43 @@ The final package will be generated at `dataround-link-svc/target/dataround-link
 
 3. Initialize the database:
 
+Dataround link supports both PostgreSQL and H2 databases:
+
+**Option 1: Using PostgreSQL (default)**
 - Install PostgreSQL and create a database:
 ```sql
 CREATE DATABASE dataround_link;
 ```
 - Run the initialization script to create tables:
 ```bash
-psql -d dataround_link -f $DATAROUND_HOME/conf/init_pg_schema.sql
+psql -d dataround_link -f $DATAROUND_HOME/conf/postgresql-schema.sql
 ```
+
+**Option 2: Using H2 (for development/testing)**
+- No installation required, H2 runs in-memory by default
+- Tables are automatically created on startup
 
 4. Start dataround link server:
 
-Modify database IP, name and password conf in `$DATAROUND_HOME/conf/application.yaml`, Start the service:
+**Using Docker (default H2 database):**
+```bash
+docker run [options] dataround-link
+```
+
+**For PostgreSQL (production):**
+Modify database configuration in environment variables or in `$DATAROUND_HOME/conf/application-prod.yaml`, then start the service:
 ```bash
 ./bin/start.sh
+```
+
+**For H2 database (testing/development):**
+```bash
+./bin/start.sh --spring.profiles.active=test
+```
+
+To use PostgreSQL in Docker:
+```bash
+docker run -e SPRING_PROFILES_ACTIVE=prod [other options] dataround-link
 ```
 
 The application will be available at `http://localhost:5600/datalink`
