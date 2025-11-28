@@ -23,17 +23,20 @@
     "structuredData": "结构化数据",
     "unstructuredData": "非结构化数据",
     "connectionManagement": "连接管理",
-    "batchJob": "批处理作业",
-    "batchInstance": "批处理实例",
-    "streamJob": "流处理作业",
-    "streamInstance": "流处理实例",
+    "batchJob": "离线作业",
+    "batchInstance": "离线作业实例",
+    "streamJob": "流式作业",
+    "streamInstance": "流式作业实例",
     "virtualTable": "虚拟表",
     "createVirtualTable": "创建虚拟表",
     "fileSync": "文件同步",
     "fileSyncInstance": "文件同步实例",
     "hdfsSync": "HDFS同步",
     "objectStorageSync": "对象存储同步",
-    "createConnection": "创建连接"
+    "createConnection": "创建连接",
+    "taskManagement": "作业管理",
+    "runningInstances": "运行实例",
+    "tablesAndConnections": "表&连接"
   },
   "job": {
     "list": {

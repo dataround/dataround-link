@@ -64,17 +64,31 @@ const S: FC<IProps> = () => {
 
   const wrapRoute: any = (menuArr: IMenu[] | undefined) => {
     if (Array.isArray(menuArr)) {
-      return menuArr.map((item) => item.hidden ? null : ({
-        key: item.path || item.name,
-        label: item.name,
-        icon: item.icon,
-        children: wrapRoute(item.children),
-      })).filter((menu) => menu);
+      return menuArr.map((item) => {
+        if (item.hidden) return null;
+        
+        // Handle category groups
+        if (item.type === 'group') {
+          return {
+            type: 'group',
+            label: item.name,
+            children: wrapRoute(item.children),
+          };
+        }
+        
+        // Handle regular menu items
+        return {
+          key: item.path || item.name,
+          label: item.name,
+          icon: item.icon,
+          children: wrapRoute(item.children),
+        };
+      }).filter((menu) => menu);
     }
     return null;
   };
 
-  const menuItems = wrapRoute(routeMenu);
+  const menuItems = wrapRoute(routeMenu)?.filter(Boolean);
 
   return (
     <div className="left-menu">

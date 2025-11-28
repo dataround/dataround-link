@@ -33,7 +33,10 @@
     "fileSyncInstance": "File Sync Instance",
     "hdfsSync": "HDFS Sync",
     "objectStorageSync": "Object Storage Sync",
-    "createConnection": "Create Connection"
+    "createConnection": "Create Connection",
+    "taskManagement": "Job Management",
+    "runningInstances": "Job Instances",
+    "tablesAndConnections": "Tables & Connections"
   },
   "job": {
     "list": {

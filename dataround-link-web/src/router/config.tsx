@@ -37,6 +37,7 @@ export interface IMenu {
   icon?: ReactNode;
   element?: ReactNode | null;
   hidden?: boolean;
+  type?: string;
 }
 
 const fallback = <div>loading</div>;
@@ -55,114 +56,135 @@ export const useRoutes = () => {
           path: "/",
           element: lazyReactElement(() => import("../pages/home"), fallback),
           children: [
+            // Task Management Category
             {
-              path: "/batch/job",
-              name: t('menu.batchJob'),
-              icon: <FolderOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/job"),
-                fallback
-              ),
+              name: t('menu.taskManagement'),
+              type: 'group',
+              children: [
+                {
+                  path: "/batch/job",
+                  name: t('menu.batchJob'),
+                  icon: <FolderOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/job"),
+                    fallback
+                  ),
+                },
+                {
+                  path: "/stream/job",
+                  name: t('menu.streamJob'),
+                  icon: <SwapOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/job"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/fileSync/job",
+                  name: t('menu.fileSync'),
+                  icon: <FileOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/job"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/batch/job/create",
+                  name: "newJob",
+                  hidden: true,
+                  element: lazyReactElement(
+                    () => import("../pages/job/create"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/fileSync/create",
+                  name: t('menu.fileSync'),
+                  hidden: true,
+                  icon: <FileOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/fileSync/create"),
+                    fallback
+                  )
+                },
+              ]
             },
+            // Running Instances Category
             {
-              path: "/stream/job",
-              name: t('menu.streamJob'),
-              icon: <SwapOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/job"),
-                fallback
-              )
+              name: t('menu.runningInstances'),
+              type: 'group',
+              children: [
+                {
+                  path: "/batch/instance",
+                  name: t('menu.batchInstance'),
+                  icon: <RedoOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/instance"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/stream/instance",
+                  name: t('menu.streamInstance'),
+                  icon: <SwapRightOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/instance"),
+                    fallback
+                  )
+                },            
+                {
+                  path: "/fileSync/instance",
+                  name: t('menu.fileSyncInstance'),
+                  icon: <FileOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/instance"),
+                    fallback
+                  )
+                },
+              ]
             },
+            // Tables & Connections Category
             {
-              path: "/fileSync/job",
-              name: t('menu.fileSync'),
-              icon: <FileOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/job"),
-                fallback
-              )
-            },
-            {
-              path: "/batch/instance",
-              name: t('menu.batchInstance'),
-              icon: <RedoOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/instance"),
-                fallback
-              )
-            },
-            {
-              path: "/stream/instance",
-              name: t('menu.streamInstance'),
-              icon: <SwapRightOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/instance"),
-                fallback
-              )
-            },            
-            {
-              path: "/fileSync/instance",
-              name: t('menu.fileSyncInstance'),
-              icon: <FileOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/instance"),
-                fallback
-              )
-            },
-            {
-              path: "/batch/job/create",
-              name: "newJob",
-              hidden: true,
-              element: lazyReactElement(
-                () => import("../pages/job/create"),
-                fallback
-              )
-            },
-            {
-              path: "/fileSync/create",
-              name: t('menu.fileSync'),
-              hidden: true,
-              icon: <FileOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/fileSync/create"),
-                fallback
-              )
-            },
-            {
-              path: "/vtable",
-              name: t('menu.virtualTable'),
-              icon: <RadiusBottomrightOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/virtualtable"),
-                fallback
-              )
-            },
-            {
-              path: "/vtable/create",
-              name: t('menu.createVirtualTable'),
-              hidden: true,
-              element: lazyReactElement(
-                () => import("../pages/virtualtable/create"),
-                fallback
-              )
-            },
-            {
-              path: "/connection",
-              name: t('menu.connectionManagement'),
-              icon: <DatabaseOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/connection"),
-                fallback
-              )
-            },
-            {
-              path: "/connection/create",
-              name: t('menu.createConnection'),
-              hidden: true,
-              element: lazyReactElement(
-                () => import("../pages/connection/create"),
-                fallback
-              )
+              name: t('menu.tablesAndConnections'),
+              type: 'group',
+              children: [
+                {
+                  path: "/vtable",
+                  name: t('menu.virtualTable'),
+                  icon: <RadiusBottomrightOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/virtualtable"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/vtable/create",
+                  name: t('menu.createVirtualTable'),
+                  hidden: true,
+                  element: lazyReactElement(
+                    () => import("../pages/virtualtable/create"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/connection",
+                  name: t('menu.connectionManagement'),
+                  icon: <DatabaseOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/connection"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/connection/create",
+                  name: t('menu.createConnection'),
+                  hidden: true,
+                  element: lazyReactElement(
+                    () => import("../pages/connection/create"),
+                    fallback
+                  )
+                },
+              ]
             },
           ]
         },
