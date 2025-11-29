@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import io.dataround.link.typehandler.JsonbTypeHandler;
+import io.dataround.link.typehandler.JsonTypeHandler;
 import lombok.Data;
 
 import java.util.Date;
@@ -50,7 +50,7 @@ public class Job {
     private String cron;
     private Date startTime;
     private Date endTime;
-    @TableField(typeHandler = JsonbTypeHandler.class)
+    @TableField(typeHandler = JsonTypeHandler.class)
     private Map<String, Object> config;
     private Long createBy;
     private Long updateBy;

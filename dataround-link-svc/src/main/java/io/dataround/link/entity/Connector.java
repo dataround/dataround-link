@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import io.dataround.link.typehandler.JsonbTypeHandler;
+import io.dataround.link.typehandler.JsonTypeHandler;
 import lombok.Data;
 
 import java.util.Date;
@@ -47,7 +47,7 @@ public class Connector {
     private Boolean supportSink;
     private Boolean isStream;
     private Boolean virtualTable;
-    @TableField(typeHandler = JsonbTypeHandler.class)
+    @TableField(typeHandler = JsonTypeHandler.class)
     private Map<String, String> properties;
     private Long createBy;
     private Long updateBy;

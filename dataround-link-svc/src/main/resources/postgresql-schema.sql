@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS public.job (
     cron varchar(255) NULL,
     start_time timestamp with time zone NULL,
     end_time timestamp with time zone NULL,
-    config jsonb NOT NULL,
+    config JSONB NOT NULL,
     create_by int8 NOT NULL,
     update_by int8 NOT NULL,
     create_time timestamp with time zone NOT NULL,

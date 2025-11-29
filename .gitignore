@@ -26,3 +26,6 @@ target
 logs
 dataround-link-web/yarn.lock
 dataround-link-svc/src/main/resources/static
+
+### h2 database ###
+data/
