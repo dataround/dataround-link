@@ -21,16 +21,16 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 
 /**
- * Database configuration class to initialize database type used in JsonbTypeHandler
+ * Database configuration class to initialize database type used in JsonTypeHandler
  *
  * @author yuehan124@gmail.com
  * @date 2025-11-29
  */
-@Configuration
+@Component
 public class DatabaseConfig {
 
     @Value("${spring.datasource.url}")

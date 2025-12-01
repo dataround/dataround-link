@@ -132,7 +132,7 @@
             <directory>${project.basedir}/src/main/resources/</directory>
             <outputDirectory>conf</outputDirectory>
             <includes>
-                <include>application.yaml</include>
+                <include>*.yaml</include>
             </includes>
         </fileSet>
         

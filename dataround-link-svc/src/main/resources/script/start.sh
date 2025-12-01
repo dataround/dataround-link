@@ -43,7 +43,6 @@ fi
 export SEATUNNEL_HOME=$BASE_PATH/seatunnel
 export SEATUNNEL_ENGINE=${SEATUNNEL_ENGINE:-"seatunnel"}
 export SEATUNNEL_API_PORT=${SEATUNNEL_API_PORT:-8080}
-export DATALINK_PORT=${DATALINK_PORT:-5600}
 
 echo "Starting seatunnel service on port $SEATUNNEL_API_PORT..."
 # Start SeaTunnel cluster
@@ -72,16 +71,14 @@ JAVA_OPTS="-Ddataround.link.homeDir=$BASE_PATH"
 
 if [ "$FOREGROUND_MODE" = true ]; then
     # Run in foreground for Docker
-    $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-1.0.jar \
-      --spring.config.location=$BASE_PATH/conf/application.yaml \
-      --spring.profiles.active=$SPRING_PROFILE \
-      --server.port=$DATALINK_PORT
+    $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-*.jar \
+      --spring.config.location=$BASE_PATH/conf/ \
+      --spring.profiles.active=$SPRING_PROFILE 
 else
     # Run in background (default behavior)
-    nohup $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-1.0.jar \
-      --spring.config.location=$BASE_PATH/conf/application.yaml \
-      --spring.profiles.active=$SPRING_PROFILE \
-      --server.port=$DATALINK_PORT > $LOG_PATH/datalink.out 2>&1 &
+    nohup $JAVA_HOME/bin/java $JAVA_OPTS -jar $BASE_PATH/lib/dataround-link-*.jar \
+      --spring.config.location=$BASE_PATH/conf/ \
+      --spring.profiles.active=$SPRING_PROFILE > $LOG_PATH/datalink.log 2>&1 &
     DATALINK_PID=$!
     echo $DATALINK_PID > $LOG_PATH/datalink.pid
     echo "Dataround link service started with PID: $DATALINK_PID"

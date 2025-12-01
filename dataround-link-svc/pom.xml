@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.dataround</groupId>
         <artifactId>dataround-link</artifactId>
-        <version>1.0</version>
+        <version>0.9.0</version>
     </parent>
 
     <artifactId>dataround-link-svc</artifactId>
