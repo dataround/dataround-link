@@ -97,6 +97,7 @@ public class FileSyncServiceImpl implements FileSyncService {
         String sourcePath = jobVo.getSourcePath();
         String targetPath = jobVo.getTargetPath();
         String filePattern = jobVo.getFilePattern();
+        boolean includeSubdirectories = jobVo.getIncludeSubdirectories();
 
         // Initialize the connector with properties
         Connection sourceConn = connectionService.getById(sourceConnId);
@@ -106,7 +107,7 @@ public class FileSyncServiceImpl implements FileSyncService {
         // Find the connector with matching name
         Param sourceParam = ParamParser.from(sourceConn, sourceDbConnector);
         Param targetParam = ParamParser.from(targetConn, targetDbConnector);
-        List<String> sourceFiles = getSourceFiles(sourceParam, sourcePath, filePattern);
+        List<String> sourceFiles = getSourceFiles(sourceParam, sourcePath, filePattern, includeSubdirectories);
         AtomicLong readCount = new AtomicLong(0);
         AtomicLong writeCount = new AtomicLong(0);
         AtomicLong readBytes = new AtomicLong(0);
@@ -191,9 +192,9 @@ public class FileSyncServiceImpl implements FileSyncService {
         }
     }
 
-    private List<String> getSourceFiles(Param sourceParam, String sourcePath, String filePattern) {
+    private List<String> getSourceFiles(Param sourceParam, String sourcePath, String filePattern, boolean recursive) {
         try (FileConnector sourceConnector = ConnectorFactory.createFileConnector(sourceParam)) {
-            return sourceConnector.getFiles(sourcePath, filePattern);
+            return sourceConnector.getFiles(sourcePath, filePattern, recursive);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
