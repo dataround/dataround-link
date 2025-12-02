@@ -2,8 +2,8 @@
 BIN_PATH=$(dirname $0)
 BASE_PATH=$(cd $(dirname $BIN_PATH); pwd)
 
-# Check for profile && foreground
-SPRING_PROFILE="prod"
+# Check for profile && foreground, shell can read environment variables setted by docker
+SPRING_PROFILE=${SPRING_PROFILES_ACTIVE:-"prod"}
 FOREGROUND_MODE=false
 
 # Parse command line arguments
