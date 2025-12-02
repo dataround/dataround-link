@@ -72,7 +72,9 @@ public class FtpConnector extends AbstractFileConnector {
         this.password = getParam().getPassword();
         this.passiveMode = Boolean.parseBoolean(config.getOrDefault("passiveMode", "true"));
         this.binaryMode = Boolean.parseBoolean(config.getOrDefault("binaryMode", "true"));
-        this.timeout = Integer.parseInt(config.getOrDefault("timeout", "30000"));
+        // Handle potential null values for timeout, config map contains null values
+        String strTimeout = config.get("timeout");
+        this.timeout = strTimeout == null ? 30000 : Integer.parseInt(strTimeout);
         this.encoding = config.getOrDefault("encoding", "UTF-8");
         // Initialize FTP client
         this.ftpClient = new FTPClient();

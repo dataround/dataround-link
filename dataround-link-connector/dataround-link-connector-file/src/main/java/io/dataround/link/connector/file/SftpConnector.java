@@ -75,7 +75,9 @@ public class SftpConnector extends AbstractFileConnector {
         this.privateKeyPassphrase = config.get("privateKeyPassphrase");
         this.strictHostKeyChecking = Boolean.parseBoolean(config.getOrDefault("strictHostKeyChecking", "false"));
         this.encoding = config.getOrDefault("encoding", "UTF-8");
-        this.timeout = Integer.parseInt(config.getOrDefault("timeout", "30000"));
+        // Handle potential null values for timeout, config map contains null values
+        String strTimeout = config.get("timeout");
+        this.timeout = strTimeout == null ? 30000 : Integer.parseInt(strTimeout);
     }
 
     @Override
