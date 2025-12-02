@@ -42,7 +42,7 @@ public class ParamParser {
         }
         // JDBC connector's libDir is jdbc, otherwise use connector's name as libDir
         if (connector != null) {
-            param.setLibDir(connector.getPluginName().startsWith("JDBC") ? "jdbc" : connector.getName());
+            param.setLibDir(connector.getPluginName().startsWith("JDBC") ? "jdbc" : connector.getName().toLowerCase());
         }
         return param;
     }
