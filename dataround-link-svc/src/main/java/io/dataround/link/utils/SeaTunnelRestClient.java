@@ -19,6 +19,8 @@ package io.dataround.link.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -26,7 +28,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -40,8 +41,8 @@ public class SeaTunnelRestClient {
     private String baseUrls;
     
     private String[] baseUrlArray;
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate = new RestTemplate();   
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // seatunnel log be of no use when return the following string
     private static final String EMPTY_LOG = "<html><head><title>Seatunnel log</title></head>\n" +
@@ -51,9 +52,8 @@ public class SeaTunnelRestClient {
             " </ul>\n" +
             "</body></html>";
 
-    public SeaTunnelRestClient() {
-        this.restTemplate = new RestTemplate();
-        this.objectMapper = new ObjectMapper();
+    @PostConstruct
+    public void init() {
         this.baseUrlArray = baseUrls.split(",");
     }
 

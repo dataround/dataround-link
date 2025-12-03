@@ -299,6 +299,14 @@
       "stopSuccess": "任务停止成功",
       "deleteSuccess": "任务删除成功",
       "fetchLogFailed": "获取日志内容失败"
+    },
+    "refresh": {
+      "3s": "3",
+      "5s": "5",
+      "10s": "10",
+      "30s": "30",
+      "60s": "60",
+      "autoRefresh": "自动刷新(秒)"
     }
   },
   "virtualTable": {

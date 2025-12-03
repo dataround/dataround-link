@@ -299,6 +299,14 @@
       "stopSuccess": "Job stopped successfully",
       "deleteSuccess": "Job deleted successfully",
       "fetchLogFailed": "Failed to fetch log content"
+    },
+    "refresh": {
+      "3s": "3",
+      "5s": "5",
+      "10s": "10",
+      "30s": "30",
+      "60s": "60",
+      "autoRefresh": "Auto Refresh(s)"
     }
   },
   "virtualTable": {

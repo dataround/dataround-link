@@ -35,7 +35,7 @@ import {
   Tabs,
   TabsProps, message
 } from "antd";
-import { FC, memo, useEffect, useState } from "react";
+import { FC, memo, useEffect, useState, useRef } from "react";
 import { deleteInstance, getInstanceList, stopInstance, getInstanceById } from "../../api/instance";
 import useRequest from "../../hooks/useRequest";
 import dayjs from "dayjs";
@@ -78,6 +78,10 @@ const S: FC<IProps> = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logContent, setLogContent] = useState("");
   const [logLoading, setLogLoading] = useState(false);
+  // auto refresh
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(3);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
   // retrive jobType from path
   const jobType = window.location.pathname.includes("/batch") ? JOB_TYPE_BATCH : window.location.pathname.includes("/stream") ? JOB_TYPE_STREAM : JOB_TYPE_FILESYNC;
 
@@ -250,10 +254,71 @@ const S: FC<IProps> = () => {
     wrapperFun: formatData,
   });
 
+  const refreshInstanceList = (otherParams: any = {}) => {
+    const formValues = form.getFieldsValue();
+    // filter out empty values
+    const filteredValues = Object.keys(formValues).reduce((acc, key) => {
+      if (formValues[key] !== undefined && formValues[key] !== '') {
+        acc[key] = formValues[key];
+      }
+      return acc;
+    }, {} as any);
+    // handle date format
+    if (filteredValues.startTime) {
+      filteredValues.startTime = dayjs(filteredValues.startTime).format("YYYY-MM-DD HH:mm:ss");
+    }
+    if (filteredValues.endTime) {
+      filteredValues.endTime = dayjs(filteredValues.endTime).format("YYYY-MM-DD HH:mm:ss");
+    }
+    
+    const params = {
+      ...filteredValues,
+      size: pageSize,
+      jobType: jobType,
+      ...otherParams
+    };
+    
+    reqInstanceList.caller(params);
+  };
+
   useEffect(() => {
-    console.log("jobType:", jobType);
-    reqInstanceList.caller({ size: pageSize, jobType: jobType });
+    refreshInstanceList();
   }, [refresh]);
+
+  // handle auto refresh
+  useEffect(() => {
+    // clear previous timer
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    // if auto refresh is set and interval is greater than 0, then start the timer
+    if (autoRefreshInterval > 0) {
+      intervalRef.current = setInterval(() => {
+        refreshInstanceList();
+      }, autoRefreshInterval * 1000);
+    }
+
+    // component unmount when clear timer
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [autoRefreshInterval]);
+
+  const handleAutoRefreshChange = (value: number) => {
+    setAutoRefreshInterval(value);
+  };
+
+  const autoRefreshOptions = [
+    { label: t('instance.refresh.3s'), value: 3 },
+    { label: t('instance.refresh.5s'), value: 5 },
+    { label: t('instance.refresh.10s'), value: 10 },
+    { label: t('instance.refresh.30s'), value: 30 },
+    { label: t('instance.refresh.60s'), value: 60 }
+  ];
 
   const items: TabsProps["items"] = [
     {
@@ -261,6 +326,25 @@ const S: FC<IProps> = () => {
       label: jobType == JOB_TYPE_BATCH ? t('menu.batchInstance') : jobType == JOB_TYPE_STREAM ? t('menu.streamInstance') : t('menu.fileSyncInstance')
     },
   ];
+
+  // tabBarExtraContent
+  const tabsProps: TabsProps = {
+    defaultActiveKey: "tabInstance",
+    items: items,
+    tabBarExtraContent: (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span>{t('instance.refresh.autoRefresh')}:</span>
+        <Select
+          style={{ width: 120 }}
+          options={autoRefreshOptions}
+          value={autoRefreshInterval}
+          onChange={handleAutoRefreshChange}
+          size="small"
+        />
+      </div>
+    )
+  };
+
   const statusOptions = [
     { label: t('instance.status.submitted'), value: 1 },
     { label: t('instance.status.running'), value: 2 },
@@ -271,19 +355,11 @@ const S: FC<IProps> = () => {
 
   const onPageChange = (current: number, size: number) => {
     setPageSize(size);
-    reqInstanceList.caller({ current: current, size: size, jobType: jobType });
+    refreshInstanceList({ current: current, size: size });
   };
 
   const onFinish = (values: any) => {
-    const filterdValues = Object.keys(values).reduce((acc, key) => {
-      if (values[key] !== undefined && values[key] !== '') {
-        acc[key] = values[key];
-      }
-      return acc;
-    }, {} as any);
-    form.getFieldValue("startTime") && (filterdValues.startTime = dayjs(form.getFieldValue("startTime")).format("YYYY-MM-DD HH:mm:ss"));
-    form.getFieldValue("endTime") && (filterdValues.endTime = dayjs(form.getFieldValue("endTime")).format("YYYY-MM-DD HH:mm:ss"));
-    reqInstanceList.caller({ ...filterdValues, size: pageSize, jobType: jobType });
+    refreshInstanceList();
   };
 
   const highlightLogs = (logs: string) => {
@@ -292,7 +368,7 @@ const S: FC<IProps> = () => {
   };
 
   return (
-    <Spin spinning={reqInstanceList.loading}>
+    <Spin spinning={false}> {/* Remove loading state because of auto refresh */}
       <div className="module">
         <Form
           form={form}
@@ -338,7 +414,7 @@ const S: FC<IProps> = () => {
       </div>
 
       <div className="module">
-        <Tabs defaultActiveKey="tabInstance" items={items} />      
+        <Tabs {...tabsProps} />      
         <CommonTable 
           columns={columns} 
           dataSource={tabData} 

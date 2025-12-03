@@ -44,6 +44,9 @@ export SEATUNNEL_HOME=$BASE_PATH/seatunnel
 export SEATUNNEL_ENGINE=${SEATUNNEL_ENGINE:-"seatunnel"}
 export SEATUNNEL_API_PORT=${SEATUNNEL_API_PORT:-8080}
 
+# Override hazelcast.yaml for seatunnel, modify this file to enable seatunnel cluster mode
+cp -f $BASE_PATH/conf/hazelcast.yaml $SEATUNNEL_HOME/config/hazelcast.yaml
+
 echo "Starting seatunnel service on port $SEATUNNEL_API_PORT..."
 # Start SeaTunnel cluster
 cd $SEATUNNEL_HOME
@@ -55,7 +58,7 @@ echo "seatunnel cluster started with PID: $SEATUNNEL_PID"
 # Wait for seatunnel to start (check API availability)
 echo "Waiting for seatunnel to start..."
 for i in {1..10}; do
-    if curl -s -f http://localhost:$SEATUNNEL_API_PORT/hazelcast/rest/maps/system || [ $? -eq 0 ]; then
+    if curl -s -f http://localhost:$SEATUNNEL_API_PORT/ || [ $? -eq 0 ]; then
         echo "seatunnel is ready!"
         break
     fi
