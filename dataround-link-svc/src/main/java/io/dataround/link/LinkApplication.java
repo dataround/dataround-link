@@ -45,5 +45,6 @@ public class LinkApplication {
     public static void main(String[] args) {
         SpringApplication.run(LinkApplication.class, args);
         log.info("SpringDoc URI: /swagger-ui/index.html");
+        log.info("The application has started. The access URL is http://localhost:5600/datalink");
     }
 }

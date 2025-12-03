@@ -25,6 +25,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -35,8 +37,9 @@ import org.springframework.web.client.RestTemplate;
 public class SeaTunnelRestClient {
 
     @Value("${dataround.seatunnel.api.base-url}")
-    private String baseUrl;
-
+    private String baseUrls;
+    
+    private String[] baseUrlArray;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -51,6 +54,7 @@ public class SeaTunnelRestClient {
     public SeaTunnelRestClient() {
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
+        this.baseUrlArray = baseUrls.split(",");
     }
 
     /**
@@ -72,7 +76,7 @@ public class SeaTunnelRestClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> request = new HttpEntity<>(jobConfig, headers);
-            String response = restTemplate.postForObject(baseUrl + "/submit-job", request, String.class);
+            String response = httpRequest("/submit-job", request, String.class);
             JsonNode responseJson = objectMapper.readTree(response);
             return responseJson.get("jobId").asText();
         } catch (Exception e) {
@@ -90,7 +94,7 @@ public class SeaTunnelRestClient {
     private boolean checkJobExistOrNot(String jobName) {
         try {
             // Get all running jobs
-            String response = restTemplate.getForObject(baseUrl + "/running-jobs", String.class);
+            String response = httpRequest("/running-jobs", String.class);
             JsonNode jobsJson = objectMapper.readTree(response);
             for (JsonNode job : jobsJson) {
                 if (jobName.equals(job.get("jobName").asText())) {
@@ -98,7 +102,7 @@ public class SeaTunnelRestClient {
                 }
             }
             // Get all finished jobs
-            response = restTemplate.getForObject(baseUrl + "/finished-jobs", String.class);
+            response = httpRequest("/finished-jobs", String.class);
             jobsJson = objectMapper.readTree(response);
             for (JsonNode job : jobsJson) {
                 if (jobName.equals(job.get("jobName").asText())) {
@@ -120,7 +124,7 @@ public class SeaTunnelRestClient {
      */
     public JsonNode getJobDetail(String jobId) {
         try {
-            String response = restTemplate.getForObject(baseUrl + "/job-info/" + jobId, String.class);
+            String response = httpRequest("/job-info/" + jobId, String.class);
             JsonNode responseJson = objectMapper.readTree(response);
             return responseJson;
         } catch (Exception e) {
@@ -149,15 +153,14 @@ public class SeaTunnelRestClient {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             // Create request body
-            String requestBody = String.format("{\"jobId\": %s, \"isStopWithSavePoint\": %b}", jobId,
-                    stopWithSavePoint);
+            String requestBody = String.format("{\"jobId\": %s, \"isStopWithSavePoint\": %b}", jobId, stopWithSavePoint);
             HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-            restTemplate.postForObject(baseUrl + "/stop-job", request, String.class);
+            httpRequest("/stop-job", request, String.class);
         } catch (Exception e) {
             log.error("Failed to stop job {}", jobId, e);
             throw new RuntimeException("Failed to stop job", e);
         }
-    }
+    } 
 
     /**
      * Get job logs
@@ -167,12 +170,56 @@ public class SeaTunnelRestClient {
      */
     public String getJobLogs(String jobId) {
         try {
-            String logs = restTemplate.getForObject(baseUrl + "/logs/" + jobId, String.class);
+            String logs = httpRequest("/logs/" + jobId, String.class);
             // EMPTY_LOG be of no use, return empty string
             return EMPTY_LOG.equals(logs) ? "" : logs;
         } catch (Exception e) {
             log.error("Failed to get logs for job {}", jobId, e);
             throw new RuntimeException("Failed to get job logs", e);
         }
+    }
+
+
+    /**
+     * Make a HTTP request to the SeaTunnel API, try multiple base URLs if failed
+     *
+     * @param url         The URL to request
+     * @param responseType The response type
+     * @param <T> The type of the response
+     * @return The response, or null if failed to get response
+     */
+    @SuppressWarnings("null")
+    private <T> T httpRequest(String url, Class<T> responseType) {
+        for (String baseUrl : baseUrlArray) {
+            try {
+                T t = restTemplate.getForObject(baseUrl + url, responseType);
+                return t;
+            } catch (ResourceAccessException e) { // target server is unavailable
+                log.warn("Failed to get response from {}: {}", baseUrl + url, e.getMessage());
+            }            
+        }
+        throw new RuntimeException("Failed to get response from all base URLs");
+    }
+
+    /**
+     * Make a HTTP request to the SeaTunnel API, try multiple base URLs if failed
+     *
+     * @param url         The URL to request
+     * @param request     The request entity
+     * @param responseType The response type
+     * @param <T> The type of the response
+     * @return The response, or null if failed to get response
+     */
+    @SuppressWarnings("null")
+    private <T> T httpRequest(String url, HttpEntity<?> request, Class<T> responseType) {
+        for (String baseUrl : baseUrlArray) {
+            try {
+                T t = restTemplate.postForObject(baseUrl + url, request, responseType);
+                return t;
+            } catch (ResourceAccessException e) { // target server is unavailable
+                log.warn("Failed to get response from {}: {}", baseUrl + url, e.getMessage());
+            }            
+        }
+        throw new RuntimeException("Failed to get response from all base URLs");
     }
 }
