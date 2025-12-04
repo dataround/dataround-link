@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dataround-link-config
+data:
+  SPRING_PROFILES_ACTIVE: prod
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dataround-link-secret
+type: Opaque
+data:
+  # Base64 encoded values
+  POSTGRES_PASSWORD: ZGF0YXJvdW5kLmlv
+  DATASOURCE_PASSWORD: ZGF0YXJvdW5kLmlv
+  DATASOURCE_USERNAME: cG9zdGdyZXM=
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dataround-link-service
+  labels:
+    app: dataround-link
+spec:
+  selector:
+    app: dataround-link
+  ports:
+    - protocol: TCP
+      port: 5600
+      targetPort: 5600
+      nodePort: 30560
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.10
+          env:
+            - name: POSTGRES_DB
+              value: dataround_link
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dataround-link-secret
+                  key: DATASOURCE_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dataround-link-secret
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dataround-link-deployment
+  labels:
+    app: dataround-link
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dataround-link
+  template:
+    metadata:
+      labels:
+        app: dataround-link
+    spec:
+      containers:
+        - name: dataround-link
+          image: dataround/link:0.9.0
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: dataround-link-config
+                  key: SPRING_PROFILES_ACTIVE
+            - name: DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/dataround_link?currentSchema=public
+            - name: DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: dataround-link-secret
+                  key: DATASOURCE_USERNAME
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dataround-link-secret
+                  key: DATASOURCE_PASSWORD
+          ports:
+            - containerPort: 5600
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
