@@ -54,7 +54,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: dataround-postgres
   labels:
     app: postgres
 spec:
@@ -97,7 +97,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dataround-link-deployment
+  name: dataround-link
   labels:
     app: dataround-link
 spec:
