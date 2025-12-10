@@ -101,7 +101,7 @@ metadata:
   labels:
     app: dataround-link
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: dataround-link
