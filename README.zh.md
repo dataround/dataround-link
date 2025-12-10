@@ -43,7 +43,10 @@ mvn clean package -DskipTests
 
 最终程序包将生成在 `dataround-link-svc/target/dataround-link-xxx.tar.gz`
 
-3. 初始化数据库：
+
+## 部署
+
+### 数据库初始化
 
 Dataround link 支持 PostgreSQL 和 H2 数据库：
 
@@ -52,21 +55,56 @@ Dataround link 支持 PostgreSQL 和 H2 数据库：
 ```sql
 CREATE DATABASE dataround_link;
 ```
-- 运行初始化脚本创建表：
-```bash
-psql -d dataround_link -f $DATAROUND_HOME/conf/postgresql-schema.sql
-```
-
-**选项 2: 使用 H2 (用于开发/测试)**
-- 无需安装，H2 默认在内存中运行
 - 表会在启动时自动创建
 
-4. 启动 dataround link 服务器：
+**选项 2: 使用 H2 (用于开发/测试)**
+- 无需安装，H2 已配置为将数据持久化保存至本地文件
+- 表会在启动时自动创建
 
-**使用 Docker (默认 H2 数据库):**
+### 部署选项
+
+#### 1. Docker 部署
+
+**使用默认 H2 数据库:**
 ```bash
-docker run [options] dataround-link
+docker run -p 5600:5600 -d dataround/link:0.9.0
 ```
+
+**使用外部 PostgreSQL 数据库:**
+```bash
+docker run -e SPRING_PROFILES_ACTIVE=prod \
+  -e DATASOURCE_URL=jdbc:postgresql://your-postgres-host:5432/dataround_link \
+  -e DATASOURCE_USERNAME=your_username \
+  -e DATASOURCE_PASSWORD=your_password \
+  -p 5600:5600 -d \
+  dataround/link:0.9.0
+```
+
+#### 2. Docker Compose 部署
+
+创建并启动服务：
+```bash
+docker-compose up -d
+```
+
+这将启动 PostgreSQL 和 Dataround Link 服务并进行适当配置。
+
+#### 3. Kubernetes 部署
+
+部署到 Kubernetes 集群：
+```bash
+kubectl apply -f kubernetes.yml
+```
+
+这将创建：
+- 带持久化存储的 PostgreSQL 部署
+- 具有2个副本的 Dataround Link 部署
+- 两个组件的服务
+- 用于配置的 ConfigMaps 和 Secrets
+
+#### 4. 手动部署
+
+启动 dataroud link 服务器：
 
 **对于 PostgreSQL (生产环境):**
 通过环境变量或修改 `$DATAROUND_HOME/conf/application-prod.yaml` 中的数据库配置，然后启动服务：
@@ -79,12 +117,8 @@ docker run [options] dataround-link
 ./bin/start.sh --spring.profiles.active=test
 ```
 
-要在 Docker 中使用 PostgreSQL:
-```bash
-docker run -e SPRING_PROFILES_ACTIVE=prod [其他选项] dataround-link
-```
-
 应用程序将在 `http://localhost:5600/datalink` 上可用
+
 
 ## 文档
 
@@ -111,4 +145,4 @@ docker run -e SPRING_PROFILES_ACTIVE=prod [其他选项] dataround-link
 
 ## 致谢
 
-感谢所有帮助使 Dataround link 变得更好的贡献者！ 
+感谢所有帮助使 Dataround link 变得更好的贡献者！

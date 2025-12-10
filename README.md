@@ -25,7 +25,7 @@ Dataround link adopts a **zero-code visual** design philosophy, eliminating the 
 ![Table Mapping](docs/imgs/tablemapping.png)
 
 
-## Building dataround link from source
+## Building Dataround Link from source
 
 Prerequisites for building Dataround:
 
@@ -45,7 +45,10 @@ mvn clean package -DskipTests
 
 The final package will be generated at `dataround-link-svc/target/dataround-link-xxx.tar.gz`
 
-3. Initialize the database:
+
+## Deployment
+
+### Database Initialization
 
 Dataround link supports both PostgreSQL and H2 databases:
 
@@ -54,21 +57,56 @@ Dataround link supports both PostgreSQL and H2 databases:
 ```sql
 CREATE DATABASE dataround_link;
 ```
-- Run the initialization script to create tables:
-```bash
-psql -d dataround_link -f $DATAROUND_HOME/conf/postgresql-schema.sql
-```
-
-**Option 2: Using H2 (for development/testing)**
-- No installation required, H2 runs in-memory by default
 - Tables are automatically created on startup
 
-4. Start dataround link server:
+**Option 2: Using H2 (for development/testing)**
+- No installation required, H2 is configured to persist data to local files
+- Tables are automatically created on startup
 
-**Using Docker (default H2 database):**
+### Deployment Options
+
+#### 1. Docker Deployment
+
+**Using default H2 database:**
 ```bash
-docker run [options] dataround-link
+docker run -p 5600:5600 -d dataround/link:0.9.0
 ```
+
+**Using external PostgreSQL database:**
+```bash
+docker run -e SPRING_PROFILES_ACTIVE=prod \
+  -e DATASOURCE_URL=jdbc:postgresql://your-postgres-host:5432/dataround_link \
+  -e DATASOURCE_USERNAME=your_username \
+  -e DATASOURCE_PASSWORD=your_password \
+  -p 5600:5600 -d \
+  dataround/link:0.9.0
+```
+
+#### 2. Docker Compose Deployment
+
+Create and start services:
+```bash
+docker-compose up -d
+```
+
+This will start both PostgreSQL and Dataround Link services with proper configuration.
+
+#### 3. Kubernetes Deployment
+
+Deploy to Kubernetes cluster:
+```bash
+kubectl apply -f kubernetes.yml
+```
+
+This will create:
+- PostgreSQL deployment with persistent storage
+- Dataround Link deployment with 2 replicas
+- Services for both components
+- ConfigMaps and Secrets for configuration
+
+#### 4. Manual Deployment
+
+Start Dataround link server:
 
 **For PostgreSQL (production):**
 Modify database configuration in environment variables or in `$DATAROUND_HOME/conf/application-prod.yaml`, then start the service:
@@ -79,11 +117,6 @@ Modify database configuration in environment variables or in `$DATAROUND_HOME/co
 **For H2 database (testing/development):**
 ```bash
 ./bin/start.sh --spring.profiles.active=test
-```
-
-To use PostgreSQL in Docker:
-```bash
-docker run -e SPRING_PROFILES_ACTIVE=prod [other options] dataround-link
 ```
 
 The application will be available at `http://localhost:5600/datalink`
@@ -114,4 +147,4 @@ If you have any questions or suggestions, we encourage you to:
 
 ## Acknowledgments
 
-Thanks to all contributors who have helped make Dataround link better! 
+Thanks to all contributors who have helped make Dataround link better!
