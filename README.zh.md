@@ -84,6 +84,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod \
 
 创建并启动服务：
 ```bash
+# download docker-compose.yml
+curl -O https://raw.githubusercontent.com/dataround/dataround-link/main/docker-compose.yml
+# start services
 docker-compose up -d
 ```
 
@@ -93,7 +96,7 @@ docker-compose up -d
 
 部署到 Kubernetes 集群：
 ```bash
-kubectl apply -f kubernetes.yml
+kubectl apply -f https://raw.githubusercontent.com/dataround/dataround-link/main/kubernetes.yml
 ```
 
 这将创建：

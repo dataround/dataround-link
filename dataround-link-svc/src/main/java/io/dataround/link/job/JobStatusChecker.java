@@ -124,6 +124,7 @@ public class JobStatusChecker {
                     jobInstance.setStatus(JobInstanceStatusEnum.SUCCESS.getCode());
                     runningJobs.remove(jobInstance.getSeatunnelId());
                     break;
+                case "FAILING": // seatunnel bug may cause job to remain in a failing status
                 case "FAILED":
                     changed = jobInstance.getStatus() != JobInstanceStatusEnum.FAILURE.getCode();
                     jobInstance.setStatus(JobInstanceStatusEnum.FAILURE.getCode());

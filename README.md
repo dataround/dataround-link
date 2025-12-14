@@ -86,6 +86,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod \
 
 Create and start services:
 ```bash
+# download docker-compose.yml
+curl -O https://raw.githubusercontent.com/dataround/dataround-link/main/docker-compose.yml
+# start services
 docker-compose up -d
 ```
 
@@ -95,7 +98,7 @@ This will start both PostgreSQL and Dataround Link services with proper configur
 
 Deploy to Kubernetes cluster:
 ```bash
-kubectl apply -f kubernetes.yml
+kubectl apply -f https://raw.githubusercontent.com/dataround/dataround-link/main/kubernetes.yml
 ```
 
 This will create:

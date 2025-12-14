@@ -27,6 +27,7 @@ services:
       DATASOURCE_PASSWORD: dataround.io
     ports:
       - "5600:5600"
+      - "8080:8080"
     networks:
       - dataround-network
 
