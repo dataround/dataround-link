@@ -107,15 +107,37 @@ public class SchedulerService {
             scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
         } else if (job.getScheduleType() == JobScheduleTypeEnum.SCHEDULED.getCode()) {
             scheduleBuilder = CronScheduleBuilder.cronSchedule(job.getCron());
-        } else {
-            return;
+        } else if (job.getScheduleType() == JobScheduleTypeEnum.NOT_RUN.getCode()) {
+            // If job is scheduled, remove it
+            try {
+                if (getScheduler().checkExists(new JobKey(jobKey))) {
+                    boolean deleted = getScheduler().deleteJob(new JobKey(jobKey));
+                    log.info("Job deleted from scheduler, jobId: {}, deleted: {}", job.getId(), deleted);
+                    if (!deleted) {
+                        log.warn("Failed to delete job from scheduler, jobId: {}", job.getId());
+                        throw new RuntimeException("Failed to delete job from scheduler, jobId: " + job.getId());
+                    }
+                } else {
+                    return;
+                }
+            } catch (SchedulerException e) {
+                throw new RuntimeException(e);
+            }
         }
         TriggerBuilder<? extends Trigger> triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobKey).withSchedule(scheduleBuilder);
         // If startTime less than now, job will be scheduled immediately, that cause repeat schedule
         if (job.getStartTime() != null && job.getStartTime().getTime() > System.currentTimeMillis()) {
             triggerBuilder.startAt(job.getStartTime());
-        } else if (job.getEndTime() != null) {
-            triggerBuilder.endAt(job.getEndTime());
+        }
+        if (job.getEndTime() != null && job.getEndTime().getTime() > System.currentTimeMillis()) {
+            // If endTime less than or equal to startTime, return
+            if (job.getStartTime() != null && job.getEndTime().getTime() <= job.getStartTime().getTime()) {
+                return;
+            } else {
+                triggerBuilder.endAt(job.getEndTime());
+            }
+        } else if (job.getEndTime() != null && job.getEndTime().getTime() < System.currentTimeMillis()) {
+            return;
         }
         Trigger trigger = triggerBuilder.build();
         JobDetail jobDetail = JobBuilder.newJob(JobRunner.class).withIdentity(jobKey).storeDurably(false).build();

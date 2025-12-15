@@ -181,7 +181,9 @@
         },
         "message": {
           "nameRequired": "Job name is required",
-          "scheduleTypeRequired": "Please select execution method"
+          "scheduleTypeRequired": "Please select execution method",
+          "endTimeAfterNow": "End time must be after the current time",
+          "endTimeAfterStartTime": "End time must be after start time"
         }
       },
       "cron": {

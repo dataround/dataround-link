@@ -17,6 +17,7 @@
 
 package io.dataround.link.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -48,7 +49,11 @@ public class Job {
     // 1: run once, 2: run every day, 3: not run
     private Integer scheduleType;
     private String cron;
+    // when startTime was set to null, update db's startTime
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Date startTime;
+    // when endTime was set to null, update db's endTime
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Date endTime;
     @TableField(typeHandler = JsonTypeHandler.class)
     private Map<String, Object> config;

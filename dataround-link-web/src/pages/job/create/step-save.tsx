@@ -37,20 +37,23 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   const [form] = Form.useForm();
   const { data, onDataChange } = props;
   const jobType = data.jobType;
+  // cron is not form item, so we use local state to manage them
+  const [localData, setLocalData] = useState({
+    scheduleType: data.scheduleType,
+    cron: data.cron
+  });
 
   // expose validateFields and getFieldsValue
   useImperativeHandle(ref, () => ({
     validateFields: async () => {
       try {
-        await form.validateFields();
-        const formValues = form.getFieldsValue();
-        console.log("Step-save form values:", formValues);
+        const formValues = await form.validateFields();
         onDataChange({
           name: formValues.name,
           description: formValues.description,
-          scheduleType: formValues.scheduleType,
-          startTime: localData.startTime,
-          endTime: localData.endTime,
+          scheduleType: localData.scheduleType,
+          startTime: formValues.startTime?.format('YYYY-MM-DD HH:mm:ss'),
+          endTime: formValues.endTime?.format('YYYY-MM-DD HH:mm:ss'),
           cron: localData.cron
         });
         return true;
@@ -75,39 +78,24 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
 
     setLocalData({
       scheduleType: data.scheduleType,
-      startTime: data.startTime,
-      endTime: data.endTime,
       cron: data.cron
     });
   }, [data, form]);
 
-  const [localData, setLocalData] = useState({
-    scheduleType: data.scheduleType,
-    startTime: data.startTime,
-    endTime: data.endTime,
-    cron: data.cron
-  });
-
   const onScheduleTypeChange = (e: RadioChangeEvent) => {
     const scheduleType = e.target.value;
     setLocalData(prev => ({ ...prev, scheduleType }));
-    // 确保表单值也同步更新
-    form.setFieldsValue({ scheduleType });
   };
 
   const onStartTimeChange: DatePickerProps['onChange'] = (date, dateString) => {
-    const startTime = dateString ? dateString + ":00" : '';
-    setLocalData(prev => ({ ...prev, startTime }));
   };
 
   const onEndTimeChange: DatePickerProps['onChange'] = (date, dateString) => {
-    const endTime = dateString ? dateString + ":00" : '';
-    setLocalData(prev => ({ ...prev, endTime }));
   };
 
   const disabledEndTime = (current: any) => {
-    if (!localData.startTime) { return false; }
-    return current && current.valueOf() < dayjs(localData.startTime).valueOf();
+    if (!form.getFieldValue('startTime')) { return false; }
+    return current && current.valueOf() < dayjs(form.getFieldValue('startTime')).valueOf();
   };
 
   return (
@@ -132,14 +120,35 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
             <Radio value={3}>{t('job.edit.save.scheduleType.none')}</Radio>
           </Radio.Group>
         </Form.Item>
-        {localData.scheduleType === 2 && (<CronExpression cron={localData.cron || ''}
-          onChange={(cron: string) => setLocalData(prev => ({ ...prev, cron }))} />)}
-        <Form.Item name="expire" label={t('job.edit.save.form.validPeriod')}>
-          <DatePicker name="startTime" 
-            showTime format="YYYY-MM-DD HH:mm" onChange={onStartTimeChange} style={{ marginRight: 8 }} />
-          <DatePicker name="endTime" 
-            showTime format="YYYY-MM-DD HH:mm" onChange={onEndTimeChange} disabledDate={disabledEndTime} />
+        {localData.scheduleType === 2 && (
+        <>
+        <CronExpression cron={localData.cron || ''} onChange={(cron: string) => setLocalData(prev => ({ ...prev, cron }))} />
+        <Form.Item label={t('job.edit.save.form.validPeriod')}>
+          <Form.Item name="startTime" noStyle>
+            <DatePicker name="startTime" 
+              showTime format="YYYY-MM-DD HH:mm" onChange={onStartTimeChange} style={{ marginRight: 8 }} />
+          </Form.Item>
+          <Form.Item name="endTime" noStyle
+            rules={[{ validator: (_, value) => {
+                      if (!value) {
+                        return Promise.resolve();
+                      }                      
+                      const now = dayjs();
+                      if (value.isBefore(now)) {
+                        return Promise.reject(new Error(t('job.edit.save.message.endTimeAfterNow')));
+                      }                      
+                      const startTime = form.getFieldValue('startTime');
+                      if (startTime && value.isBefore(startTime)) {
+                        return Promise.reject(new Error(t('job.edit.save.message.endTimeAfterStartTime')));
+                      }                      
+                      return Promise.resolve();
+                    } }]}>
+            <DatePicker name="endTime" 
+              showTime format="YYYY-MM-DD HH:mm" onChange={onEndTimeChange} disabledDate={disabledEndTime} />
+          </Form.Item>
         </Form.Item>
+        </>
+        )}
       </Form>
     </>
   );

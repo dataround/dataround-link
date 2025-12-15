@@ -181,7 +181,9 @@
         },
         "message": {
           "nameRequired": "任务名不能为空",
-          "scheduleTypeRequired": "请选择执行方式"
+          "scheduleTypeRequired": "请选择执行方式",
+          "endTimeAfterNow": "结束时间必须大于当前时间",
+          "endTimeAfterStartTime": "结束时间必须大于开始时间"
         }
       },
       "cron": {

@@ -179,7 +179,7 @@ const C: FC<IProps> = ({ cron, onChange }) => {
     };
 
     return (
-        <Form.Item name="cron" label={t('job.edit.cron.form.frequency')} rules={[{ required: true, message: t('job.edit.cron.form.frequencyRequired') }]}>
+        <Form.Item name="cron" label={t('job.edit.cron.form.frequency')} rules={[{ required: false, message: t('job.edit.cron.form.frequencyRequired') }]}>
             <Row>
                 <Form.Item initialValue={cronFrequency} style={{ marginBottom: 0 }}>
                     <Select 
