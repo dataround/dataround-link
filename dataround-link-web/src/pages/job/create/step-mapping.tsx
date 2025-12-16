@@ -21,8 +21,8 @@
  */
 import { Checkbox, Col, Form, Popconfirm, Radio, RadioChangeEvent, Row, Select, Space, Spin, TableProps, Tabs, message } from "antd";
 import CommonTable from "../../../components/common-table";
-import { FC, memo, useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { getTableColumns } from "../../../api/connection";
+import { memo, useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
+import { getConnectionById, getTableColumns } from "../../../api/connection";
 import useRequest from "../../../hooks/useRequest";
 import { useTranslation } from 'react-i18next';
 import { JobFormData, StepRef } from './index';
@@ -58,6 +58,24 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
   const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set());
   // cache for table fields to avoid repeated requests
   const fieldsCache = useRef<Map<string, { sourceFields: any[], targetFields: any[] }>>(new Map());
+
+  // check target connection support upsert or not, todo: db's table of connector add field: support_upsert
+  const [supportUpsert, setSupportUpsert] = useState<boolean>(true);
+  const reqTargetConnection = useRequest(getConnectionById, {
+    wrapperFun: (data) => {
+      if (data.connector === "Kafka") {
+        setSupportUpsert(false);
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (data.targetConnId) {
+      reqTargetConnection.caller(data.targetConnId);
+    }
+  }, [data.targetConnId]);
+  // end check
+
 
   // expose validate method
   useImperativeHandle(ref, () => ({
@@ -362,7 +380,7 @@ const S = forwardRef<StepRef, IProps>((props, ref) => {
               <Form.Item label={t('job.edit.mapping.form.writeType')}>
                 <Radio.Group onChange={onWriteTypeChange} value={writeType}>
                   <Radio value={1}>{t('job.edit.mapping.writeType.insert')}</Radio>
-                  <Radio value={2}>{t('job.edit.mapping.writeType.upsert')}</Radio>
+                  {supportUpsert && <Radio value={2}>{t('job.edit.mapping.writeType.upsert')}</Radio>}
                 </Radio.Group>
               </Form.Item>
             </Col>
