@@ -445,7 +445,8 @@
         "secretKey": "Secret Key",
         "bucket": "Bucket",
         "region": "Region",
-        "pathStyleAccess": "Path Style Access"
+        "pathStyleAccess": "Path Style Access",
+        "connectorVersion": "Connector Version"
       },
       "placeholder": {
         "name": "Please enter connection name",
@@ -468,7 +469,8 @@
         "secretKey": "Please enter secret access key",
         "bucket": "Please enter bucket name",
         "region": "Please select region or enter custom region name",
-        "pathStyleAccess": "Please select path style access"
+        "pathStyleAccess": "Please select path style access",
+        "connectorVersion": "Please select connector version"
       },
       "option": {
         "enabled": "Enabled",

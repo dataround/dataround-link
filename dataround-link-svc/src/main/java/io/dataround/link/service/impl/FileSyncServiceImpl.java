@@ -105,8 +105,8 @@ public class FileSyncServiceImpl implements FileSyncService {
         Connector sourceDbConnector = connectorService.getConnector(sourceConn.getConnector());
         Connector targetDbConnector = connectorService.getConnector(targetConn.getConnector());
         // Find the connector with matching name
-        Param sourceParam = ParamParser.from(sourceConn, sourceDbConnector);
-        Param targetParam = ParamParser.from(targetConn, targetDbConnector);
+        Param sourceParam = ParamParser.from(sourceConn, sourceDbConnector, null);
+        Param targetParam = ParamParser.from(targetConn, targetDbConnector, null);
         List<String> sourceFiles = getSourceFiles(sourceParam, sourcePath, filePattern, includeSubdirectories);
         AtomicLong readCount = new AtomicLong(0);
         AtomicLong writeCount = new AtomicLong(0);

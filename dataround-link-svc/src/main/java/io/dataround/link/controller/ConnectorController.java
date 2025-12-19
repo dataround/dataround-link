@@ -20,13 +20,16 @@ package io.dataround.link.controller;
 import io.dataround.link.common.Result;
 import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.ConnectorVersion;
 import io.dataround.link.service.ConnectorService;
+import io.dataround.link.service.ConnectorVersionService;
 import io.dataround.link.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -49,6 +52,8 @@ public class ConnectorController extends BaseController {
 
     @Autowired
     private ConnectorService connectorService;
+    @Autowired
+    private ConnectorVersionService connectorVersionService;
 
     @GetMapping("/")
     public Result<Map<String, List<String>>> listConnector(Boolean supportSource, Boolean supportSink, Boolean isStream,
@@ -77,5 +82,12 @@ public class ConnectorController extends BaseController {
         TreeMap<String, List<String>> treeMap = new TreeMap<>(map);
         // return
         return Result.success(treeMap);
+    }
+
+
+    @GetMapping("/versions")
+    public Result<List<ConnectorVersion>> getVersionsByDatabaseType(@RequestParam String connector) {
+        List<ConnectorVersion> versions = connectorVersionService.getByConnector(connector);
+        return Result.success(versions);
     }
 }

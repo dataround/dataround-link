@@ -17,15 +17,17 @@
             <artifactId>dataround-link-connector-base</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- HikariCP for connection pooling -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
         <!-- Database Drivers -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.32</version>
+        </dependency>
+        <!-- for mysql 5.6 and earlier compatibility -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.49</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -35,9 +37,21 @@
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
         </dependency>
+        <!-- for sql server 2012 and later compatibility -->
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
+            <version>12.6.1.jre11</version>
+        </dependency>
+        <!-- for sql server 2008 and earlier compatibility -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>6.4.0.jre8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver18</artifactId>
         </dependency>
         <!-- Lombok -->
         <dependency>
@@ -87,6 +101,42 @@
                             <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
                             <includeScope>runtime</includeScope>
                             <excludeArtifactIds>lombok</excludeArtifactIds>
+                        </configuration>
+                    </execution>
+                    <!-- because of multi-versions exists, so copy them manually -->
+                    <execution>
+                        <id>copy-dependencies-manually</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>mysql</groupId>
+                                    <artifactId>mysql-connector-java</artifactId>
+                                    <version>5.1.49</version>
+                                    <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>mysql</groupId>
+                                    <artifactId>mysql-connector-java</artifactId>
+                                    <version>8.0.32</version>
+                                    <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.microsoft.sqlserver</groupId>
+                                    <artifactId>mssql-jdbc</artifactId>
+                                    <version>12.6.1.jre11</version>
+                                    <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.microsoft.sqlserver</groupId>
+                                    <artifactId>mssql-jdbc</artifactId>
+                                    <version>6.4.0.jre8</version>
+                                    <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>

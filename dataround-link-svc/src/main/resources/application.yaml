@@ -24,7 +24,9 @@ dataround:
   seatunnel:
     api:
       # Supports adding multiple URLs for seatunnel cluster mode, separated by commas.
-      base-url: http://localhost:8080
+      base-url: ${SEATUNNEL_API_URL:http://localhost:8080}
+
+       
 
 logging:
   level:

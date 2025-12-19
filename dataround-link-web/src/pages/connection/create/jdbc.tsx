@@ -19,10 +19,12 @@
  * @author: yuehan124@gmail.com
  * @date: 2026-09-26
  */
-import { Form, Input, Popover, Radio } from "antd";
+import { Form, Input, Radio, Select } from "antd";
 import FormItem from "antd/es/form/FormItem";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import useRequest from "../../../hooks/useRequest";
+import { getConnectorVersions } from "../../../api/connection";
 
 interface IProps {
   selectedConnector?: string;
@@ -31,6 +33,7 @@ interface IProps {
 
 const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm }) => {
   const { t } = useTranslation();
+  const [connectorVersions, setConnectorVersions] = useState<object[]>([]);
 
   const generateUrl = (e: any) => {
     const values = parentForm.getFieldsValue();
@@ -59,7 +62,7 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
         break;
       case "SQLServer":
         driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-        jdbcUrl = `jdbc:sqlserver://${host}:${port};databaseName=${database};trustServerCertificate=true`;
+          jdbcUrl = `jdbc:sqlserver://${host}:${port};databaseName=${database};trustServerCertificate=true`;
         break;
       default:
         driver = "com.mysql.cj.jdbc.Driver";
@@ -68,6 +71,20 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
     }
     parentForm.setFieldsValue({ url: jdbcUrl, "driver": driver });
   };
+
+  const reqConnectorVersions = useRequest(getConnectorVersions, {
+    wrapperFun: (res: any) => {
+       // build connector versions
+       const arr: object[] = res.map((v: any) => ({ label: v.label, value: v.value }));
+       setConnectorVersions(arr);
+    }
+  });
+
+  useEffect(() => {
+    if (selectedConnector) {
+      reqConnectorVersions.caller(selectedConnector);
+    }
+  }, [selectedConnector]);
 
   return (
     <>
@@ -95,6 +112,15 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
         <Form.Item name="database" label={t('connection.create.form.database')}>
           <Input placeholder={t('connection.create.placeholder.database')} onChange={generateUrl} />
         </Form.Item>
+      )}
+      {connectorVersions.length > 0 && (
+        <Form.Item name="connectorVersionId" label={t('connection.create.form.connectorVersion')} rules={[{ required: false }]}>
+        <Select 
+          placeholder={t('connection.create.placeholder.connectorVersion')} 
+          options={connectorVersions}
+        >
+        </Select>
+      </Form.Item>
       )}
       <Form.Item name="url" label={t('connection.create.form.jdbcUrl')} rules={[{ required: true }]}>
         <Input placeholder={t('connection.create.placeholder.jdbcUrl')} />

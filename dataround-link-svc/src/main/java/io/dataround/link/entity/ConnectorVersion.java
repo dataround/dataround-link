@@ -18,43 +18,31 @@
 package io.dataround.link.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import io.dataround.link.typehandler.JsonTypeHandler;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
- * Entity class representing a database connection configuration.
- * Contains connection details such as host, port, credentials and plugin information.
+ * Entity class representing a connector version.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @date 2025-12-16
  */
 @Data
-@TableName("connection")
-public class Connection {
-
+@TableName("connector_version")
+public class ConnectorVersion {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long projectId;
-    private String name;
     private String connector;
-    private Long connectorVersionId;
-    private String host;
-    private Integer port;
-    @TableField("\"user\"")
-    private String user;
-    private String passwd;
-    @TableField(typeHandler = JsonTypeHandler.class)
-    private Map<String, String> config;
+    private String label;
+    private String value;
+    private Boolean isDefault;
     private String description;
     private Long createBy;
     private Long updateBy;
     private Date createTime;
     private Date updateTime;
-}
+} 

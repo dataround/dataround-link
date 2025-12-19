@@ -44,7 +44,7 @@ public class HiveConnectorTest {
         connector = new HiveConnector();
         param = new Param();
         Map<String, String> config = new HashMap<>();
-        config.put("metastore_uri", "thrift://192.168.10.68:30083");
+        config.put("metastore_uri", "thrift://vm2.test.com:9083");
         param.setConfig(config);
         connector.initialize(param);
     }

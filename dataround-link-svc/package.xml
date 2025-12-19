@@ -8,10 +8,10 @@
     
     <!-- Copy connector modules and their filtered dependencies -->
     <fileSets>
-        <!-- Copy JDBC connector JAR -->
+        <!-- Copy JDBC connector JAR, JDBC dependencies already included in parent pom.xml -->
         <fileSet>
             <directory>../dataround-link-connector/dataround-link-connector-jdbc/target</directory>
-            <outputDirectory>lib/connector/jdbc</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>dataround-link-connector-jdbc-*.jar</include>
             </includes>
@@ -21,12 +21,73 @@
             </excludes>
         </fileSet>
         
-        <!-- Copy JDBC dependencies -->
+        <!-- Copy SQL Server 2005-2008 compatible JDBC dependencies -->
         <fileSet>
             <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
-            <outputDirectory>lib/connector/jdbc</outputDirectory>
+            <outputDirectory>lib/connector/sqlserver2012</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>mssql-jdbc-12.6.1.jre11.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/sqlserver2008</outputDirectory>
+            <includes>
+                <include>mssql-jdbc-6.4.0.jre8.jar</include>
+            </includes>
+        </fileSet>
+        
+        <!-- Copy MySQL v5.7 dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/mysql5.6</outputDirectory>
+            <includes>
+                <include>mysql-connector-java-5.1.49.jar</include>
+            </includes>
+        </fileSet>
+        
+        <!-- Copy MySQL v8.0 dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/mysql8.0</outputDirectory>
+            <includes>
+                <include>mysql-connector-j-8.0.32.jar</include>
+            </includes>
+        </fileSet>
+    
+        <!-- Copy Oracle ojdbc8 dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/oracle_ojdbc8</outputDirectory>
+            <includes>
+                <include>ojdbc8-*.jar</include>
+            </includes>
+        </fileSet>
+        
+        <!-- Copy PostgreSQL v9.6 dependencies -->
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/postgresql</outputDirectory>
+            <includes>
+                <include>postgresql-*.jar</include>
+                <include>checker-qual-*.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/dm</outputDirectory>
+            <includes>
+                <include>DmJdbcDriver18-*.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <outputDirectory>lib/connector/tidb</outputDirectory>
+            <includes>
+                <include>mysql-connector-java-5.1.49.jar</include>
             </includes>
         </fileSet>
         

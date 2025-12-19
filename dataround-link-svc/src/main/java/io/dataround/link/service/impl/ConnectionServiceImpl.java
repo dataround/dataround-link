@@ -30,6 +30,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.ConnectorVersion;
 import io.dataround.link.common.connector.Param;
 import io.dataround.link.connector.ConnectorFactory;
 import io.dataround.link.connector.TableField;
@@ -40,6 +41,7 @@ import io.dataround.link.mapper.ConnectionMapper;
 import io.dataround.link.mapper.VirtualTableMapper;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
+import io.dataround.link.service.ConnectorVersionService;
 import io.dataround.link.service.VirtualFieldService;
 import io.dataround.link.utils.ParamParser;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +66,8 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
     private VirtualFieldService virtualFieldService;
     @Autowired
     private ConnectorService connectorService;
+    @Autowired
+    private ConnectorVersionService connectorVersionService;
 
     @Override
     public Map<Long, String> listNameByIds(Set<Long> connectionIds) {
@@ -76,7 +80,8 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
     @Override
     public boolean testConnection(Connection connection) {
         Connector connector = connectorService.getConnector(connection.getConnector());
-        Param param = ParamParser.from(connection, connector);
+        ConnectorVersion connectorVersion = connectorVersionService.getByIdOrDefault(connection.getConnectorVersionId(), connector.getName());
+        Param param = ParamParser.from(connection, connector, connectorVersion);
         try {
             return ConnectorFactory.createConnector(param).testConnectivity();
         } catch (Throwable e) {
@@ -93,8 +98,9 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
     public List<String> getDatabases(Long connectionId) {
         Connection connection = connectionMapper.selectById(connectionId);
         Connector connector = connectorService.getConnector(connection.getConnector());
+        ConnectorVersion connectorVersion = connectorVersionService.getByIdOrDefault(connection.getConnectorVersionId(), connector.getName());
         if (!connector.getVirtualTable()) {
-            Param param = ParamParser.from(connection, connector);
+            Param param = ParamParser.from(connection, connector, connectorVersion);
             // if classLoaderRestore() not execute, strange error msg: load class is error
             return ConnectorFactory.createTableConnector(param).getDatabases();
         }
@@ -108,14 +114,9 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
     public List<String> getTableNames(Long connectionId, String databaseName, String filterName, Integer size) {
         Connection connection = connectionMapper.selectById(connectionId);
         Connector connector = connectorService.getConnector(connection.getConnector());
+        ConnectorVersion connectorVersion = connectorVersionService.getByIdOrDefault(connection.getConnectorVersionId(), connector.getName());
         if (!connector.getVirtualTable()) {
-            Param param = ParamParser.from(connection, connector);
-            // if (size != null) {
-            //     configMap.put("size", size.toString());
-            // }
-            // if (filterName != null) {
-            //     configMap.put("filterName", filterName);
-            // }
+            Param param = ParamParser.from(connection, connector, connectorVersion);
             return ConnectorFactory.createTableConnector(param).getTables(databaseName);
         }
         return virtualTableMapper.getTablesByConnectionIdAndDatabase(connectionId, databaseName);
@@ -124,8 +125,9 @@ public class ConnectionServiceImpl extends ServiceImpl<ConnectionMapper, Connect
     public List<TableField> getTableFields(Long connectionId, String databaseName, String tableName) {
         Connection connection = connectionMapper.selectById(connectionId);
         Connector connector = connectorService.getConnector(connection.getConnector());
+        ConnectorVersion connectorVersion = connectorVersionService.getByIdOrDefault(connection.getConnectorVersionId(), connector.getName());
         if (!connector.getVirtualTable()) {
-            Param param = ParamParser.from(connection, connector);
+            Param param = ParamParser.from(connection, connector, connectorVersion);
             return ConnectorFactory.createTableConnector(param).getTableFields(databaseName, tableName);
         }
         VirtualTable virtualTable = virtualTableMapper.getVirtualTable(connectionId, databaseName, tableName);

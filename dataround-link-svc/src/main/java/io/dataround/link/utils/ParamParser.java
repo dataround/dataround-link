@@ -20,6 +20,7 @@ package io.dataround.link.utils;
 import io.dataround.link.common.connector.Param;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.ConnectorVersion;
 
 /**
  * Param parser, parse the connection entity to Param.
@@ -29,7 +30,7 @@ import io.dataround.link.entity.Connector;
  */
 public class ParamParser {
 
-    public static Param from(Connection connection, Connector connector) {
+    public static Param from(Connection connection, Connector connector, ConnectorVersion connectorVersion) {
         Param param = new Param();
         param.setName(connection.getConnector());
         param.setHost(connection.getHost());
@@ -40,9 +41,13 @@ public class ParamParser {
         if (connector != null) {
             param.setType(connector.getType());
         }
-        // JDBC connector's libDir is jdbc, otherwise use connector's name as libDir
+        // If connectorVersion is not null, use name_version as libDir, otherwise use connector_name as libDir
         if (connector != null) {
-            param.setLibDir(connector.getPluginName().startsWith("JDBC") ? "jdbc" : connector.getName().toLowerCase());
+            String libDir = connector.getName();           
+            if (connectorVersion != null) {
+                libDir = connectorVersion.getValue();
+            }
+            param.setLibDir(libDir);
         }
         return param;
     }

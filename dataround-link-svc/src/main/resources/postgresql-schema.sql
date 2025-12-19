@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.connection (
     project_id int8 NOT NULL,
     "name" varchar(255) NOT NULL,
     connector varchar(50) NOT NULL,
+    connector_version_id int8 NULL,
     host varchar(255) NULL,
     port int4 NULL,
     "user" varchar(255) NULL,
@@ -102,12 +103,13 @@ CREATE SEQUENCE IF NOT EXISTS connector_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.connector (
     id BIGINT PRIMARY KEY DEFAULT nextval('connector_id_seq'),
     name VARCHAR(50) NOT NULL UNIQUE,
-    type VARCHAR(50) NOT NULL,
+    type VARCHAR(50) NOT NULL,    
     plugin_name VARCHAR(50) NOT NULL,
     support_source BOOLEAN NOT NULL DEFAULT FALSE,
     support_sink BOOLEAN NOT NULL DEFAULT FALSE,
     is_stream BOOLEAN NOT NULL DEFAULT FALSE,
     virtual_table BOOLEAN NOT NULL DEFAULT FALSE,
+    support_upsert BOOLEAN NOT NULL DEFAULT TRUE,
     properties JSONB NOT NULL,
     create_by int8 NOT NULL,
     update_by int8 NOT NULL,
@@ -116,27 +118,53 @@ CREATE TABLE IF NOT EXISTS public.connector (
 );
 ALTER SEQUENCE connector_id_seq OWNED BY connector.id;
 
+CREATE SEQUENCE IF NOT EXISTS connector_version_id_seq START WITH 10000;
+CREATE TABLE IF NOT EXISTS public.connector_version (
+    id BIGINT PRIMARY KEY DEFAULT nextval('connector_version_id_seq'),
+    connector varchar(50) NOT NULL,
+    label VARCHAR(50) NOT NULL,
+    value VARCHAR(50) NOT NULL,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    description VARCHAR(255) NULL,
+    create_by int8 NOT NULL,
+    update_by int8 NOT NULL,
+    create_time timestamp with time zone NOT NULL,
+    update_time timestamp with time zone NOT NULL,
+    UNIQUE(connector, label)
+);
+ALTER SEQUENCE connector_version_id_seq OWNED BY connector_version.id;
+
 -- Insert database connectors
-INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by, create_time, update_time) VALUES
-('MySQL', 'Database', 'JDBC-MYSQL', true, true, false, false, '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 1000, 1000, now(), now()),
-('PostgreSQL', 'Database', 'JDBC-POSTGRES', true, true, false, false, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 1000, 1000, now(), now()),
-('Oracle', 'Database', 'JDBC-ORACLE', true, true, false, false, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 1000, 1000, now(), now()),
-('SQLServer', 'Database', 'JDBC-SQLSERVER', true, true, false, false, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 1000, 1000, now(), now()),
-('Tidb', 'Database', 'JDBC-TIDB', true, true, false, false, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 1000, 1000, now(), now()),
-('Hive', 'Database', 'Hive', true, true, false, false, '{}', 10000, 10000, now(), now())
+INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) VALUES
+('MySQL', 'Database', 'JDBC-MYSQL', true, true, false, false, true, '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 1000, 1000, now(), now()),
+('PostgreSQL', 'Database', 'JDBC-POSTGRES', true, true, false, false, true, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 1000, 1000, now(), now()),
+('Oracle', 'Database', 'JDBC-ORACLE', true, true, false, false, true, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 1000, 1000, now(), now()),
+('SQLServer', 'Database', 'JDBC-SQLSERVER', true, true, false, false, true, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 1000, 1000, now(), now()),
+('Tidb', 'Database', 'JDBC-TIDB', true, true, false, false, true, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 1000, 1000, now(), now()),
+('Hive', 'Database', 'Hive', true, true, false, false, false, '{}', 10000, 10000, now(), now())
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert CDC connectors
-INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by, create_time, update_time) VALUES
-('MySQL-CDC', 'Database', 'MYSQL-CDC', true, false, true, false, '{"driver":"com.mysql.jdbc.Driver","url":"jdbc:mysql://mysql:3306"}', 10000, 10000, now(), now()),
-('SQLServer-CDC', 'Database', 'SQLServer-CDC', true, false, true, false, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","url":"jdbc:sqlserver://sqlserver:1433"}', 10000, 10000, now(), now())
+INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) VALUES
+('MySQL-CDC', 'Database', 'MYSQL-CDC', true, false, true, false, false, '{"driver":"com.mysql.jdbc.Driver","url":"jdbc:mysql://mysql:3306"}', 10000, 10000, now(), now()),
+('SQLServer-CDC', 'Database', 'SQLServer-CDC', true, false, true, false, false, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","url":"jdbc:sqlserver://sqlserver:1433"}', 10000, 10000, now(), now())
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert nonstructural connectors
-INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, properties, create_by, update_by, create_time, update_time) VALUES
-('Kafka', 'MQ', 'KAFKA', true, true, true, true, '{"bootstrap.servers":"localhost:9092","topics":"topic1"}', 10000, 10000, now(), now()),
-('FTP', 'File', 'FTP', 't', 't', 'f', 'f', '{}', 10000, 10000, '2025-07-18 17:28:17', '2025-07-18 17:28:20'),
-('S3', 'File', 'S3', 't', 't', 'f', 'f', '{}', 10000, 10000, '2025-07-20 21:14:22', '2025-07-20 21:14:25'),
-('LocalFile', 'File', 'Local', 't', 't', 'f', 'f', '{}', 10000, 10000, '2025-07-22 10:59:37', '2025-07-22 10:59:40'),
-('SFTP', 'File', 'SFTP', 't', 't', 'f', 'f', '{}', 10000, 10000, '2025-07-27 08:40:38', '2025-07-27 08:40:41')
+INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) VALUES
+('Kafka', 'MQ', 'KAFKA', true, true, true, true, false, '{"bootstrap.servers":"localhost:9092","topics":"topic1"}', 10000, 10000, now(), now()),
+('FTP', 'File', 'FTP', true, true, false, false, false, '{}', 10000, 10000, now(), now()),
+('S3', 'File', 'S3', true, true, false, false, false, '{}', 10000, 10000, now(), now()),
+('LocalFile', 'File', 'Local', true, true, false, false, false, '{}', 10000, 10000, now(), now()),
+('SFTP', 'File', 'SFTP', true, true, false, false, false, '{}', 10000, 10000, now(), now())
 ON CONFLICT (name) DO NOTHING;
+
+-- Insert connector versions
+INSERT INTO public.connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
+('MySQL', 'MySQL 5.x', 'mysql5.6', 'false', 'MySQL 5.6 or earlier version', 10000, 10000, now(), now()),
+('MySQL', 'MySQL 8.x', 'mysql8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
+('SQLServer', 'SQLServer 2008', 'sqlserver2008', 'false', 'SQLServer 2008 R2 or earlier version', 10000, 10000, now(), now()),
+('SQLServer', 'SQLServer 2012+', 'sqlserver2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now()),
+('MySQL-CDC', 'MySQL 8.x', 'mysql8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
+('SQLServer-CDC', 'SQLServer 2012+', 'sqlserver2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now())
+ON CONFLICT (connector, label) DO NOTHING;

@@ -68,7 +68,6 @@ public class HiveConnector extends AbstractTableConnector {
         return this.name;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void doInitialize() throws Exception {
         Map<String, String> props = getParam().getConfig();

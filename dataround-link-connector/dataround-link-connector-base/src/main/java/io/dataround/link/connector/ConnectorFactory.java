@@ -88,9 +88,10 @@ public class ConnectorFactory {
         String name = param.getName();
         try {
             // get or create ClassLoader
-            URLClassLoader classLoader = classLoaderCache.computeIfAbsent(name, k -> {
+            String libDir = param.getLibDir();
+            URLClassLoader classLoader = classLoaderCache.computeIfAbsent(libDir, k -> {
                 try {
-                    String connectorPath = getConnectorPath(param.getLibDir());
+                    String connectorPath = getConnectorPath(libDir);
                     // Create custom classloader for this connector
                     File connectorDir = new File(connectorPath);
                     URL[] parentUrls = getJarUrls(connectorDir.getParentFile());
@@ -151,16 +152,17 @@ public class ConnectorFactory {
         throw new IllegalStateException("No connector found with name: " + param.getName());
     }
 
-    private static String getConnectorPath(String name) {
+    private static String getConnectorPath(String libDir) {
         String homeDir = System.getProperty(HOME_DIR_PROPERTY);
         if (homeDir == null || homeDir.trim().isEmpty()) {
             log.warn("System property '" + HOME_DIR_PROPERTY + "' is not set, use default path: " + HOME_DIR_DEFAULT_PATH);
             homeDir = HOME_DIR_DEFAULT_PATH;
         }
         StringBuilder pathBuilder = new StringBuilder(homeDir);
-        pathBuilder.append(File.separator).append(CONNECTOR_LIB_DIR).append(File.separator).append(name);
+        pathBuilder.append(File.separator).append(CONNECTOR_LIB_DIR).append(File.separator).append(libDir);
         File connectorDir = new File(pathBuilder.toString());
         if (!connectorDir.exists()) {
+            log.warn("Connector directory not found: {}, please check", connectorDir.getAbsolutePath());
             connectorDir.mkdirs();
         }
         return connectorDir.getAbsolutePath();

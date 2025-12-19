@@ -445,7 +445,8 @@
         "secretKey": "安全密钥",
         "bucket": "存储桶",
         "region": "区域",
-        "pathStyleAccess": "路径样式访问"
+        "pathStyleAccess": "路径样式访问",
+        "connectorVersion": "连接器版本"
       },
       "placeholder": {
         "name": "请输入连接名",
@@ -468,7 +469,8 @@
         "secretKey": "请输入安全访问密钥",
         "bucket": "请输入存储桶名称",
         "region": "请选择区域或直接输入自定义区域名称",
-        "pathStyleAccess": "请选择路径样式访问方式"
+        "pathStyleAccess": "请选择路径样式访问方式",
+        "connectorVersion": "请选择连接器版本"
       },
       "option": {
         "enabled": "启用",

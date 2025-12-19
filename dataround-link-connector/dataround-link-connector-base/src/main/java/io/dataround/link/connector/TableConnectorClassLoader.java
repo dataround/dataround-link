@@ -68,7 +68,7 @@ public class TableConnectorClassLoader extends URLClassLoader {
             if (loadedClass != null) {
                 return loadedClass;
             }
-            log.info("name:{} currentClassLoader:{}", name, Thread.currentThread().getContextClassLoader().toString());
+            log.debug("name:{} currentClassLoader:{}", name, Thread.currentThread().getContextClassLoader().toString());
             return findClass(name);
         } catch (ClassNotFoundException e1) {
             try {

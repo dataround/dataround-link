@@ -66,6 +66,12 @@ export const getConnector = (params: any) => {
   return http.get(baseAPI + "/connector/" + reqParams);
 }
 
+export const getConnectorVersions = (connector: string) => {
+  let reqParams = "?connector=" + connector;
+  return http.get(baseAPI + "/connector/versions" + reqParams);
+}
+
+
 /**
  * Upload a file to Hazelcast cache
  * @param file The file to upload
