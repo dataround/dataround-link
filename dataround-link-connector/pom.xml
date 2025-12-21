@@ -10,9 +10,15 @@
     <modules>
         <module>dataround-link-connector-base</module>
         <module>dataround-link-connector-hive</module>
-        <module>dataround-link-connector-jdbc</module>
         <module>dataround-link-connector-kafka</module>
         <module>dataround-link-connector-file</module>
+        <module>dataround-link-connector-mysql</module>
+        <module>dataround-link-connector-postgres</module>
+        <module>dataround-link-connector-oracle</module>
+        <module>dataround-link-connector-sqlserver</module>
+        <module>dataround-link-connector-dm</module>
+        <module>dataround-link-connector-kingbase</module>
+        <module>dataround-link-connector-tidb</module>
     </modules>
     <packaging>pom</packaging>
 

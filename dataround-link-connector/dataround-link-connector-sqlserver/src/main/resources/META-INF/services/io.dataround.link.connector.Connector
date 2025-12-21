@@ -1,0 +1,2 @@
+io.dataround.link.connector.SQLServerJdbcConnector
+io.dataround.link.connector.SQLServerCDCJdbcConnector

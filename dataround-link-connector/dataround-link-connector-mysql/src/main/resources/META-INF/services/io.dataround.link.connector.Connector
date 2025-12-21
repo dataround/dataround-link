@@ -1,0 +1,2 @@
+io.dataround.link.connector.MySQLJdbcConnector
+io.dataround.link.connector.MySQLCDCJdbcConnector

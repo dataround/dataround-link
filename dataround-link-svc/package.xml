@@ -8,86 +8,80 @@
     
     <!-- Copy connector modules and their filtered dependencies -->
     <fileSets>
-        <!-- Copy JDBC connector JAR, JDBC dependencies already included in parent pom.xml -->
-        <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target</directory>
-            <outputDirectory>lib</outputDirectory>
-            <includes>
-                <include>dataround-link-connector-jdbc-*.jar</include>
-            </includes>
-            <excludes>
-                <exclude>*-sources.jar</exclude>
-                <exclude>*-javadoc.jar</exclude>
-            </excludes>
-        </fileSet>
         
-        <!-- Copy SQL Server 2005-2008 compatible JDBC dependencies -->
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
-            <outputDirectory>lib/connector/sqlserver2012</outputDirectory>
+            <directory>../dataround-link-connector/dataround-link-connector-sqlserver/target</directory>
+            <outputDirectory>lib/connector/sqlserver_2012</outputDirectory>
             <includes>
+                <include>dataround-link-connector-*.jar</include>
                 <include>mssql-jdbc-12.6.1.jre11.jar</include>
             </includes>
         </fileSet>
 
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
-            <outputDirectory>lib/connector/sqlserver2008</outputDirectory>
+            <directory>../dataround-link-connector/dataround-link-connector-sqlserver/target</directory>
+            <outputDirectory>lib/connector/sqlserver_2008</outputDirectory>
             <includes>
+                <include>dataround-link-connector-*.jar</include>
                 <include>mssql-jdbc-6.4.0.jre8.jar</include>
             </includes>
         </fileSet>
         
-        <!-- Copy MySQL v5.7 dependencies -->
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
-            <outputDirectory>lib/connector/mysql5.6</outputDirectory>
+            <directory>../dataround-link-connector/dataround-link-connector-mysql/target</directory>
+            <outputDirectory>lib/connector/mysql_5.6</outputDirectory>
             <includes>
+                <include>dataround-link-connector-*.jar</include>
                 <include>mysql-connector-java-5.1.49.jar</include>
             </includes>
         </fileSet>
         
-        <!-- Copy MySQL v8.0 dependencies -->
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
-            <outputDirectory>lib/connector/mysql8.0</outputDirectory>
+            <directory>../dataround-link-connector/dataround-link-connector-mysql/target</directory>
+            <outputDirectory>lib/connector/mysql_8.0</outputDirectory>
             <includes>
+                <include>dataround-link-connector-*.jar</include>
                 <include>mysql-connector-j-8.0.32.jar</include>
             </includes>
         </fileSet>
     
-        <!-- Copy Oracle ojdbc8 dependencies -->
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <directory>../dataround-link-connector/dataround-link-connector-oracle/target</directory>
             <outputDirectory>lib/connector/oracle_ojdbc8</outputDirectory>
             <includes>
-                <include>ojdbc8-*.jar</include>
+                <include>*.jar</include>
             </includes>
         </fileSet>
         
-        <!-- Copy PostgreSQL v9.6 dependencies -->
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <directory>../dataround-link-connector/dataround-link-connector-postgres/target</directory>
             <outputDirectory>lib/connector/postgresql</outputDirectory>
             <includes>
-                <include>postgresql-*.jar</include>
-                <include>checker-qual-*.jar</include>
+                <include>*.jar</include>
             </includes>
         </fileSet>
 
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <directory>../dataround-link-connector/dataround-link-connector-dm/target</directory>
             <outputDirectory>lib/connector/dm</outputDirectory>
             <includes>
-                <include>DmJdbcDriver18-*.jar</include>
+                <include>*.jar</include>
             </includes>
         </fileSet>
 
         <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-jdbc/target/connector-lib</directory>
+            <directory>../dataround-link-connector/dataround-link-connector-tidb/target</directory>
             <outputDirectory>lib/connector/tidb</outputDirectory>
             <includes>
-                <include>mysql-connector-java-5.1.49.jar</include>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../dataround-link-connector/dataround-link-connector-kingbase/target</directory>
+            <outputDirectory>lib/connector/kingbase</outputDirectory>
+            <includes>
+                <include>*.jar</include>
             </includes>
         </fileSet>
         
@@ -96,21 +90,12 @@
             <directory>../dataround-link-connector/dataround-link-connector-hive/target</directory>
             <outputDirectory>lib/connector/hive</outputDirectory>
             <includes>
-                <include>dataround-link-connector-hive-*.jar</include>
+                <include>*.jar</include>
             </includes>
             <excludes>
                 <exclude>*-sources.jar</exclude>
                 <exclude>*-javadoc.jar</exclude>
             </excludes>
-        </fileSet>
-        
-        <!-- Copy Hive dependencies -->
-        <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-hive/target/connector-lib</directory>
-            <outputDirectory>lib/connector/hive</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
         </fileSet>
         
         <!-- Copy Kafka connector JAR -->
@@ -118,21 +103,12 @@
             <directory>../dataround-link-connector/dataround-link-connector-kafka/target</directory>
             <outputDirectory>lib/connector/kafka</outputDirectory>
             <includes>
-                <include>dataround-link-connector-kafka-*.jar</include>
+                <include>*.jar</include>
             </includes>
             <excludes>
                 <exclude>*-sources.jar</exclude>
                 <exclude>*-javadoc.jar</exclude>
             </excludes>
-        </fileSet>
-        
-        <!-- Copy Kafka dependencies -->
-        <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-kafka/target/connector-lib</directory>
-            <outputDirectory>lib/connector/kafka</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
         </fileSet>
 
         <!-- SeaTunnel complete distribution -->

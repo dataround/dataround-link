@@ -66,6 +66,7 @@ public abstract class ConnectionVo extends BaseVo{
     private String name;
     private String description;
     private String connector;
+    private Long connectorVersionId;
     private String host;
     private Integer port;
     private String user;
@@ -85,6 +86,7 @@ public abstract class ConnectionVo extends BaseVo{
         connection.setName(getName());
         connection.setDescription(getDescription());
         connection.setConnector(this.connector);
+        connection.setConnectorVersionId(connectorVersionId);        
         connection.setHost(host);
         connection.setPort(port);
         connection.setUser(user);

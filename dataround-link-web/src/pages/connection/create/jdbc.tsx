@@ -75,7 +75,7 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
   const reqConnectorVersions = useRequest(getConnectorVersions, {
     wrapperFun: (res: any) => {
        // build connector versions
-       const arr: object[] = res.map((v: any) => ({ label: v.label, value: v.value }));
+       const arr: object[] = res.map((v: any) => ({ label: v.label, value: v.id }));
        setConnectorVersions(arr);
     }
   });
@@ -109,7 +109,7 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
           </FormItem>
         </>
       ) : (
-        <Form.Item name="database" label={t('connection.create.form.database')}>
+        <Form.Item name="database" label={t('connection.create.form.database')} rules={[{ required: true }]}>
           <Input placeholder={t('connection.create.placeholder.database')} onChange={generateUrl} />
         </Form.Item>
       )}

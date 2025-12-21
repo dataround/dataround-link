@@ -161,10 +161,10 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Insert connector versions
 INSERT INTO public.connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('MySQL', 'MySQL 5.x', 'mysql5.6', 'false', 'MySQL 5.6 or earlier version', 10000, 10000, now(), now()),
-('MySQL', 'MySQL 8.x', 'mysql8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
-('SQLServer', 'SQLServer 2008', 'sqlserver2008', 'false', 'SQLServer 2008 R2 or earlier version', 10000, 10000, now(), now()),
-('SQLServer', 'SQLServer 2012+', 'sqlserver2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now()),
-('MySQL-CDC', 'MySQL 8.x', 'mysql8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
-('SQLServer-CDC', 'SQLServer 2012+', 'sqlserver2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now())
+('MySQL', 'MySQL 5.x', 'mysql_5.6', 'false', 'MySQL 5.6 or earlier version', 10000, 10000, now(), now()),
+('MySQL', 'MySQL 8.x', 'mysql_8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
+('SQLServer', 'SQLServer 2008', 'sqlserver_2008', 'false', 'SQLServer 2008 R2 or earlier version', 10000, 10000, now(), now()),
+('SQLServer', 'SQLServer 2012+', 'sqlserver_2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now()),
+('MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
+('SQLServer-CDC', 'SQLServer 2012+', 'sqlserver_2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now())
 ON CONFLICT (connector, label) DO NOTHING;
