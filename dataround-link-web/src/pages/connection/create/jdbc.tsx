@@ -45,7 +45,7 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
     let driver = "";
     switch (values.connector) {
       case "MySQL":
-        driver = "com.mysql.cj.jdbc.Driver";
+        driver = "com.mysql.jdbc.Driver";
         jdbcUrl = `jdbc:mysql://${host}:${port}/${database}?characterEncoding=utf-8&useSSL=false`;
         break;
       case "PostgreSQL":
@@ -65,7 +65,7 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
           jdbcUrl = `jdbc:sqlserver://${host}:${port};databaseName=${database};trustServerCertificate=true`;
         break;
       default:
-        driver = "com.mysql.cj.jdbc.Driver";
+        driver = "com.mysql.jdbc.Driver";
         jdbcUrl = `jdbc:mysql://${host}:${port}/${database}`;
         break;
     }
