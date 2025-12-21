@@ -77,8 +77,8 @@ public class JdbcConnector extends AbstractTableConnector {
         this.connectionTimeout = Integer.parseInt(props.getOrDefault("connectionTimeout", "5000"));
         this.idleTimeout = Integer.parseInt(props.getOrDefault("idleTimeout", "300000"));
         this.leakDetectionThreshold = Integer.parseInt(props.getOrDefault("leakDetectionThreshold", "60000"));
-        // Load JDBC driver
-        Class.forName(driver);
+        // Load JDBC driver, must be done in the context of the current thread's class loader
+        Class.forName(driver, true, Thread.currentThread().getContextClassLoader());
         // Initialize connection pool
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(driver);

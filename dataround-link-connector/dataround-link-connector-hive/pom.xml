@@ -67,7 +67,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/connector-lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                             <includeScope>runtime</includeScope>
                             <excludeArtifactIds>lombok</excludeArtifactIds>
                         </configuration>
