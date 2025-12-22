@@ -18,6 +18,7 @@
 package io.dataround.link.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -38,6 +39,7 @@ public class ConnectorVersion {
     private Long id;
     private String connector;
     private String label;
+    @TableField("\"value\"")
     private String value;
     private Boolean isDefault;
     private String description;

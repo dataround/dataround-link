@@ -58,7 +58,7 @@ echo "seatunnel cluster started with PID: $SEATUNNEL_PID"
 # Wait for seatunnel to start (check API availability)
 echo "Waiting for seatunnel to start..."
 for i in {1..10}; do
-    if curl -s -f http://localhost:$SEATUNNEL_API_PORT/ || [ $? -eq 0 ]; then
+    if curl -s -f http://localhost:$SEATUNNEL_API_PORT/ > /dev/null 2>&1 || [ $? -eq 0 ]; then
         echo "seatunnel is ready!"
         break
     fi

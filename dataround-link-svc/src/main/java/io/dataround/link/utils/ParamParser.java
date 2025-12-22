@@ -43,7 +43,7 @@ public class ParamParser {
         }
         // If connectorVersion is not null, use name_version as libDir, otherwise use connector_name as libDir
         if (connector != null) {
-            String libDir = connector.getName();           
+            String libDir = connector.getName().toLowerCase();       
             if (connectorVersion != null) {
                 libDir = connectorVersion.getValue();
             }

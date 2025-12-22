@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS connector_version (
     id BIGINT DEFAULT NEXT VALUE FOR connector_version_id_seq,
     connector VARCHAR(50) NOT NULL,
     label VARCHAR(50) NOT NULL,
-    value VARCHAR(50) NOT NULL,
+    "value" VARCHAR(50) NOT NULL,
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
     description VARCHAR(255) NULL,
     create_by BIGINT NOT NULL,
@@ -139,15 +139,15 @@ CREATE TABLE IF NOT EXISTS connector_version (
 
 -- Insert database connectors
 MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) 
-VALUES (10000, 'MySQL', 'Database', 'JDBC-MYSQL', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 1000, 1000, NOW(), NOW());
+VALUES (10000, 'MySQL', 'Database', 'JDBC-MYSQL', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 10000, 10000, NOW(), NOW());
 MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) 
-VALUES (10001, 'PostgreSQL', 'Database', 'JDBC-POSTGRES', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 1000, 1000, NOW(), NOW());
+VALUES (10001, 'PostgreSQL', 'Database', 'JDBC-POSTGRES', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 10000, 10000, NOW(), NOW());
 MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) 
-VALUES (10002, 'Oracle', 'Database', 'JDBC-ORACLE', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 1000, 1000, NOW(), NOW());
+VALUES (10002, 'Oracle', 'Database', 'JDBC-ORACLE', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 10000, 10000, NOW(), NOW());
 MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) 
-VALUES (10003, 'SQLServer', 'Database', 'JDBC-SQLSERVER', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 1000, 1000, NOW(), NOW());
+VALUES (10003, 'SQLServer', 'Database', 'JDBC-SQLSERVER', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 10000, 10000, NOW(), NOW());
 MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) 
-VALUES (10004, 'Tidb', 'Database', 'JDBC-TIDB', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 1000, 1000, NOW(), NOW());
+VALUES (10004, 'Tidb', 'Database', 'JDBC-TIDB', TRUE, TRUE, FALSE, FALSE, TRUE, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 10000, 10000, NOW(), NOW());
 MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) 
 VALUES (10005, 'Hive', 'Database', 'Hive', TRUE, TRUE, FALSE, FALSE, TRUE, '{}', 10000, 10000, NOW(), NOW());
 
@@ -170,15 +170,15 @@ MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink,
 VALUES (10012, 'SFTP', 'File', 'SFTP', TRUE, TRUE, FALSE, FALSE, FALSE, '{}', 10000, 10000, '2025-07-27 08:40:38', '2025-07-27 08:40:41');
 
 -- Insert connector versions
-MERGE INTO connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('MySQL', 'MySQL 5.x', 'mysql_5.6', 'false', 'MySQL 5.6 or earlier version', 10000, 10000, now(), now());
-MERGE INTO connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('MySQL', 'MySQL 8.x', 'mysql_8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now());
-MERGE INTO connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('SQLServer', 'SQLServer 2008', 'sqlserver_2008', 'false', 'SQLServer 2008 R2 or earlier version', 10000, 10000, now(), now());
-MERGE INTO connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('SQLServer', 'SQLServer 2012+', 'sqlserver_2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now());
-MERGE INTO connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now());
-MERGE INTO connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('SQLServer-CDC', 'SQLServer 2012+', 'sqlserver_2012', 'true', 'SQLServer 2012 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10000, 'MySQL', 'MySQL 5.x', 'mysql_5.6', FALSE, 'MySQL 5.6 or earlier version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10001, 'MySQL', 'MySQL 8.x', 'mysql_8.0', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10002, 'SQLServer', 'SQLServer 2008', 'sqlserver_2008', FALSE, 'SQLServer 2008 R2 or earlier version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10003, 'SQLServer', 'SQLServer 2012+', 'sqlserver_2012', TRUE, 'SQLServer 2012 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10004, 'MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10005, 'SQLServer-CDC', 'SQLServer 2012+', 'sqlserver_2012', TRUE, 'SQLServer 2012 or later version', 10000, 10000, now(), now());

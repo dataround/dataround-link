@@ -136,11 +136,11 @@ ALTER SEQUENCE connector_version_id_seq OWNED BY connector_version.id;
 
 -- Insert database connectors
 INSERT INTO public.connector (name, type, plugin_name, support_source, support_sink, is_stream, virtual_table, support_upsert, properties, create_by, update_by, create_time, update_time) VALUES
-('MySQL', 'Database', 'JDBC-MYSQL', true, true, false, false, true, '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 1000, 1000, now(), now()),
-('PostgreSQL', 'Database', 'JDBC-POSTGRES', true, true, false, false, true, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 1000, 1000, now(), now()),
-('Oracle', 'Database', 'JDBC-ORACLE', true, true, false, false, true, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 1000, 1000, now(), now()),
-('SQLServer', 'Database', 'JDBC-SQLSERVER', true, true, false, false, true, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 1000, 1000, now(), now()),
-('Tidb', 'Database', 'JDBC-TIDB', true, true, false, false, true, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 1000, 1000, now(), now()),
+('MySQL', 'Database', 'JDBC-MYSQL', true, true, false, false, true, '{"driver":"com.mysql.cj.jdbc.Driver","host":"localhost","port":3306,"url":"jdbc:mysql://localhost:3306/default?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8"}', 10000, 10000, now(), now()),
+('PostgreSQL', 'Database', 'JDBC-POSTGRES', true, true, false, false, true, '{"driver":"org.postgresql.Driver","host":"localhost","port":5432,"url":"jdbc:postgresql://localhost:5432/"}', 10000, 10000, now(), now()),
+('Oracle', 'Database', 'JDBC-ORACLE', true, true, false, false, true, '{"driver":"oracle.jdbc.OracleDriver","host":"localhost","port":1521,"url":"jdbc:oracle:thin:@localhost:1521:ORCL"}', 10000, 10000, now(), now()),
+('SQLServer', 'Database', 'JDBC-SQLSERVER', true, true, false, false, true, '{"driver":"com.microsoft.sqlserver.jdbc.SQLServerDriver","host":"localhost","port":1433,"url":"jdbc:sqlserver://localhost:1433;DatabaseName=seatunnel"}', 10000, 10000, now(), now()),
+('Tidb', 'Database', 'JDBC-TIDB', true, true, false, false, true, '{"driver":"com.mysql.jdbc.Driver","host":"localhost","port":4000,"url":"jdbc:mysql://localhost:4000/seatunnel"}', 10000, 10000, now(), now()),
 ('Hive', 'Database', 'Hive', true, true, false, false, false, '{}', 10000, 10000, now(), now())
 ON CONFLICT (name) DO NOTHING;
 
