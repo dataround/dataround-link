@@ -23,18 +23,10 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- for sql server 2012 and later compatibility -->
+        <!-- for sql server 2008 and later compatibility -->
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>12.6.1.jre11</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- for sql server 2008 and earlier compatibility -->
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>6.4.0.jre8</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -71,30 +63,6 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <includeScope>runtime</includeScope>
-                        </configuration>
-                    </execution>
-                    <!-- because of multi-versions exists, so copy them manually -->
-                    <execution>
-                        <id>copy-dependencies-manually</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.microsoft.sqlserver</groupId>
-                                    <artifactId>mssql-jdbc</artifactId>
-                                    <version>12.6.1.jre11</version>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.microsoft.sqlserver</groupId>
-                                    <artifactId>mssql-jdbc</artifactId>
-                                    <version>6.4.0.jre8</version>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>

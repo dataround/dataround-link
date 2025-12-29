@@ -14,7 +14,7 @@
             <outputDirectory>lib/connector/sqlserver_2012</outputDirectory>
             <includes>
                 <include>dataround-link-connector-*.jar</include>
-                <include>mssql-jdbc-12.6.1.jre11.jar</include>
+                <include>mssql-jdbc-10.2.0.jre11</include>
             </includes>
         </fileSet>
 
@@ -23,7 +23,7 @@
             <outputDirectory>lib/connector/sqlserver_2008</outputDirectory>
             <includes>
                 <include>dataround-link-connector-*.jar</include>
-                <include>mssql-jdbc-6.4.0.jre8.jar</include>
+                <include>mssql-jdbc-10.2.0.jre11</include>
             </includes>
         </fileSet>
         
