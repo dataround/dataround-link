@@ -175,10 +175,6 @@ MERGE INTO connector_version (id, connector, label, "value", is_default, descrip
 MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
 (10001, 'MySQL', 'MySQL 8.x', 'mysql_8.0', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
 MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10002, 'SQLServer', 'SQLServer 2008', 'sqlserver_2008', FALSE, 'SQLServer 2008 R2 or earlier version', 10000, 10000, now(), now());
-MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10003, 'SQLServer', 'SQLServer 2012+', 'sqlserver_2012', TRUE, 'SQLServer 2012 or later version', 10000, 10000, now(), now());
-MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
 (10004, 'MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
 MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10005, 'SQLServer-CDC', 'SQLServer 2012+', 'sqlserver_2012', TRUE, 'SQLServer 2012 or later version', 10000, 10000, now(), now());
+(10005, 'SQLServer-CDC', 'SQLServer', 'sqlserver', TRUE, 'SQLServer 2008 or later version', 10000, 10000, now(), now());

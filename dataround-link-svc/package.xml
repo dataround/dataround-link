@@ -11,16 +11,7 @@
         
         <fileSet>
             <directory>../dataround-link-connector/dataround-link-connector-sqlserver/target</directory>
-            <outputDirectory>lib/connector/sqlserver_2012</outputDirectory>
-            <includes>
-                <include>dataround-link-connector-*.jar</include>
-                <include>mssql-jdbc-*.jar</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <directory>../dataround-link-connector/dataround-link-connector-sqlserver/target</directory>
-            <outputDirectory>lib/connector/sqlserver_2008</outputDirectory>
+            <outputDirectory>lib/connector/sqlserver</outputDirectory>
             <includes>
                 <include>dataround-link-connector-*.jar</include>
                 <include>mssql-jdbc-*.jar</include>
