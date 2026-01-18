@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS connector_version (
     connector VARCHAR(50) NOT NULL,
     label VARCHAR(50) NOT NULL,
     "value" VARCHAR(50) NOT NULL,
+    driver VARCHAR(50) NULL,
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
     description VARCHAR(255) NULL,
     create_by BIGINT NOT NULL,
@@ -170,11 +171,11 @@ MERGE INTO connector (id, name, type, plugin_name, support_source, support_sink,
 VALUES (10012, 'SFTP', 'File', 'SFTP', TRUE, TRUE, FALSE, FALSE, FALSE, '{}', 10000, 10000, '2025-07-27 08:40:38', '2025-07-27 08:40:41');
 
 -- Insert connector versions
-MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10000, 'MySQL', 'MySQL 5.x', 'mysql_5.6', FALSE, 'MySQL 5.6 or earlier version', 10000, 10000, now(), now());
-MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10001, 'MySQL', 'MySQL 8.x', 'mysql_8.0', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
-MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10004, 'MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
-MERGE INTO connector_version (id, connector, label, "value", is_default, description, create_by, update_by, create_time, update_time) VALUES
-(10005, 'SQLServer-CDC', 'SQLServer', 'sqlserver', TRUE, 'SQLServer 2008 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", driver, is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10000, 'MySQL', 'MySQL 5.x', 'mysql_5.6', 'com.mysql.jdbc.Driver', FALSE, 'MySQL 5.6 or earlier version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", driver, is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10001, 'MySQL', 'MySQL 8.x', 'mysql_8.0', 'com.mysql.cj.jdbc.Driver', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", driver, is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10004, 'MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', 'com.mysql.cj.jdbc.Driver', TRUE, 'MySQL 5.7 or later version', 10000, 10000, now(), now());
+MERGE INTO connector_version (id, connector, label, "value", driver, is_default, description, create_by, update_by, create_time, update_time) VALUES
+(10005, 'SQLServer-CDC', 'SQLServer', 'sqlserver', 'com.microsoft.sqlserver.jdbc.SQLServerDriver', TRUE, 'SQLServer 2008 or later version', 10000, 10000, now(), now());

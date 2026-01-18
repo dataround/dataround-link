@@ -54,7 +54,7 @@ public class CdcJobConfigGenerator extends AbstractJobConfigGenerator {
 
         for (TableMapping table : tableMappings) {
             JSONObject source = new JSONObject();
-            source.put("plugin_name", context.getSourceConnector().getPluginName());
+            source.put("plugin_name", context.getSourceConnectorDto().getConnector().getPluginName());
             // rename url to base-url, user to username
             source.put("base-url", sourceMap.get("url"));
             source.put("username", sourceMap.get("user"));

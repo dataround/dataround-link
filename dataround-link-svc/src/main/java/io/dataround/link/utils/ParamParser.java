@@ -20,17 +20,17 @@ package io.dataround.link.utils;
 import io.dataround.link.common.connector.Param;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.Connector;
-import io.dataround.link.entity.ConnectorVersion;
+import io.dataround.link.entity.dto.ConnectorDto;
 
 /**
  * Param parser, parse the connection entity to Param.
  *
  * @author yuehan124@gmail.com
- * @date 2025-07-28
+ * @since 2025-07-28
  */
 public class ParamParser {
 
-    public static Param from(Connection connection, Connector connector, ConnectorVersion connectorVersion) {
+    public static Param from(Connection connection, ConnectorDto connectorDto) {
         Param param = new Param();
         param.setName(connection.getConnector());
         param.setHost(connection.getHost());
@@ -38,14 +38,15 @@ public class ParamParser {
         param.setUser(connection.getUser());
         param.setPassword(connection.getPasswd());
         param.setConfig(connection.getConfig());
+        Connector connector = connectorDto.getConnector();
         if (connector != null) {
             param.setType(connector.getType());
         }
         // If connectorVersion is not null, use name_version as libDir, otherwise use connector_name as libDir
         if (connector != null) {
             String libDir = connector.getName().toLowerCase();       
-            if (connectorVersion != null) {
-                libDir = connectorVersion.getValue();
+            if (connectorDto.getConnectorVersion() != null) {
+                libDir = connectorDto.getConnectorVersion().getValue();
             }
             param.setLibDir(libDir);
         }

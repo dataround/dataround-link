@@ -51,6 +51,7 @@ import io.dataround.link.connection.ConnectionFactory;
 import io.dataround.link.connector.TableField;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.VirtualTable;
+import io.dataround.link.entity.dto.ConnectorDto;
 import io.dataround.link.entity.vo.ConnectionVo;
 import io.dataround.link.service.ConnectionService;
 import io.dataround.link.service.ConnectorService;
@@ -119,8 +120,8 @@ public class ConnectionController extends BaseController {
 
     @PostMapping("/saveOrUpdate")
     public Result<Boolean> saveOrUpdate(@RequestBody ConnectionVo connectionVo) {
-        Connector connector = connectorService.getConnector(connectionVo.getConnector());
-        Connection connection = connectionVo.buildConnection(connector, getCurrentUserId(), getCurrentProjectId());
+        ConnectorDto connectorDto = connectorService.getConnectorDto(connectionVo.getConnector(), connectionVo.getConnectorVersionId());  
+        Connection connection = connectionVo.buildConnection(connectorDto, getCurrentUserId(), getCurrentProjectId());
         boolean bool = connectionService.saveOrUpdate(connection);
         return Result.success(bool);
     }
@@ -149,8 +150,8 @@ public class ConnectionController extends BaseController {
 
     @PostMapping("/test")
     public Result<Boolean> testConnection(@RequestBody ConnectionVo connectionVo) {
-        Connector connector = connectorService.getConnector(connectionVo.getConnector());
-        Connection connection = connectionVo.buildConnection(connector, getCurrentUserId(), getCurrentProjectId());
+        ConnectorDto connectorDto = connectorService.getConnectorDto(connectionVo.getConnector(), connectionVo.getConnectorVersionId());
+        Connection connection = connectionVo.buildConnection(connectorDto, getCurrentUserId(), getCurrentProjectId());
         boolean bool = connectionService.testConnection(connection);
         return bool ? Result.success(MessageUtils.getMessage("connection.test.success")) : Result.error(MessageUtils.getMessage("connection.test.failed"));
     }

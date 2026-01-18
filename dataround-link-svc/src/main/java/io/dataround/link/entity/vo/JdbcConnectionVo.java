@@ -27,14 +27,13 @@ import lombok.Setter;
  * Jdbc connection value object
  * 
  * @author yuehan124@gmail.com
- * @date 2025-09-26
+ * @since 2025-09-26
  */
 @Getter
 @Setter
 public class JdbcConnectionVo extends ConnectionVo {
 
     private String url;
-    private String driver;
     private String database;
     // oracle sid or svc name
     private String svcType;
@@ -43,7 +42,6 @@ public class JdbcConnectionVo extends ConnectionVo {
     public void extractProperties(Connection connection) {
         Map<String, String> config = connection.getConfig();
         config.put("url", url);
-        config.put("driver", driver);
         config.put("database", database);
         if (svcType != null) {
             config.put("svcType", svcType);
@@ -53,12 +51,10 @@ public class JdbcConnectionVo extends ConnectionVo {
     @Override
     public void fillProperties(Map<String, String> config) {
         setUrl(config.get("url"));
-        setDriver(config.get("driver"));
         setDatabase(config.get("database"));
         setSvcType(config.get("svcType"));
         // remove config items, other items was used to show extra param for web page
         config.remove("url");
-        config.remove("driver");
         config.remove("database");
         config.remove("svcType");
     }

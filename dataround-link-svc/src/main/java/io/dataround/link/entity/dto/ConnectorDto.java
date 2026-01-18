@@ -15,36 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link.service;
+package io.dataround.link.entity.dto;
 
-import java.util.List;
-
-import com.baomidou.mybatisplus.extension.service.IService;
-
+import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.ConnectorVersion;
+import lombok.Data;
 
-/**
- * Service interface for ConnectorVersion.
- *
+/** 
+ * ConnectorDto is the data transfer object for connector and connector version.
+ * 
  * @author yuehan124@gmail.com
- * @date 2025-12-17
+ * @since 2026-01-17
  */
-public interface ConnectorVersionService extends IService<ConnectorVersion> {
+@Data
+public class ConnectorDto {
+    
+    private Connector connector;
+    private ConnectorVersion connectorVersion;
 
-    /**
-     * Get connector version by id, if not exists return default connector version.
-     *
-     * @param id the connector version id
-     * @param connector the connector name
-     * @return the connector version
-     */
-    ConnectorVersion getByIdOrDefault(Long id, String connector);
-
-    /**
-     * Get connector versions by connector name.
-     *
-     * @param connector the connector name
-     * @return the list of connector versions
-     */
-    List<ConnectorVersion> getByConnector(String connector);
+    public ConnectorDto(Connector connector, ConnectorVersion connectorVersion) {
+        this.connector = connector;
+        this.connectorVersion = connectorVersion;
+    }
 }

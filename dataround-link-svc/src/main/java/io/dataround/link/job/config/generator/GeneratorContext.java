@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.dataround.link.entity.Connection;
-import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.dto.ConnectorDto;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.utils.BeanConvertor;
 import lombok.Getter;
@@ -38,21 +38,21 @@ public class GeneratorContext {
     @Getter
     private Connection sourceConnection;
     @Getter
-    private Connector sourceConnector;
+    private ConnectorDto sourceConnectorDto;
     @Getter
     private Connection targetConnection;
     @Getter
-    private Connector targetConnector;
+    private ConnectorDto targetConnectorDto;
 
     private Map<String, String> tableNameMap = new HashMap<>();
 
-    public GeneratorContext(JobRes jobVo, Connection sourceConnection, Connector sourceConnector,
-            Connection targetConnection, Connector targetConnector) {
+    public GeneratorContext(JobRes jobVo, Connection sourceConnection, ConnectorDto sourceConnectorDto,
+            Connection targetConnection, ConnectorDto targetConnectorDto) {
         this.jobVo = jobVo;
         this.sourceConnection = sourceConnection;
-        this.sourceConnector = sourceConnector;
+        this.sourceConnectorDto = sourceConnectorDto;
         this.targetConnection = targetConnection;
-        this.targetConnector = targetConnector;
+        this.targetConnectorDto = targetConnectorDto;
     }
 
     public Map<String, String> getSourceConnectionMap() {

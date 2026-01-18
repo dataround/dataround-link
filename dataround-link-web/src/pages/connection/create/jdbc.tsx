@@ -42,18 +42,14 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
     const database = values.database;
     const svcType = values.svcType;
     let jdbcUrl = "";
-    let driver = "";
     switch (values.connector) {
       case "MySQL":
-        driver = "com.mysql.jdbc.Driver";
         jdbcUrl = `jdbc:mysql://${host}:${port}/${database}?characterEncoding=utf-8&useSSL=false`;
         break;
       case "PostgreSQL":
-        driver = "org.postgresql.Driver";
         jdbcUrl = `jdbc:postgresql://${host}:${port}/${database}`;
         break;
       case "Oracle":
-        driver = "oracle.jdbc.OracleDriver";
         if (svcType === "SID") {
           jdbcUrl = `jdbc:oracle:thin:@${host}:${port}:${database}`;
         } else {
@@ -61,15 +57,13 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
         }
         break;
       case "SQLServer":
-        driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
           jdbcUrl = `jdbc:sqlserver://${host}:${port};databaseName=${database};trustServerCertificate=true`;
         break;
       default:
-        driver = "com.mysql.jdbc.Driver";
         jdbcUrl = `jdbc:mysql://${host}:${port}/${database}`;
         break;
     }
-    parentForm.setFieldsValue({ url: jdbcUrl, "driver": driver });
+    parentForm.setFieldsValue({ url: jdbcUrl});
   };
 
   const reqConnectorVersions = useRequest(getConnectorVersions, {
@@ -124,9 +118,6 @@ const JdbcConnectionForm: FC<IProps> = ({ selectedConnector, form: parentForm })
       )}
       <Form.Item name="url" label={t('connection.create.form.jdbcUrl')} rules={[{ required: true }]}>
         <Input placeholder={t('connection.create.placeholder.jdbcUrl')} />
-      </Form.Item>
-      <Form.Item name="driver" style={{ display: 'none' }}>
-        <Input />
       </Form.Item>
       <Form.Item name="user" label={t('connection.create.form.username')} rules={[{ required: true }]}>
         <Input placeholder={t('connection.create.placeholder.username')} autoComplete="off" />

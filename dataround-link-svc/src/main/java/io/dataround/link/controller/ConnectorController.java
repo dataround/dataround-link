@@ -22,7 +22,6 @@ import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.ConnectorVersion;
 import io.dataround.link.service.ConnectorService;
-import io.dataround.link.service.ConnectorVersionService;
 import io.dataround.link.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,8 +51,6 @@ public class ConnectorController extends BaseController {
 
     @Autowired
     private ConnectorService connectorService;
-    @Autowired
-    private ConnectorVersionService connectorVersionService;
 
     @GetMapping("/")
     public Result<Map<String, List<String>>> listConnector(Boolean supportSource, Boolean supportSink, Boolean isStream,
@@ -87,7 +84,7 @@ public class ConnectorController extends BaseController {
 
     @GetMapping("/versions")
     public Result<List<ConnectorVersion>> getVersionsByDatabaseType(@RequestParam String connector) {
-        List<ConnectorVersion> versions = connectorVersionService.getByConnector(connector);
+        List<ConnectorVersion> versions = connectorService.getByConnectorName(connector);
         return Result.success(versions);
     }
 }

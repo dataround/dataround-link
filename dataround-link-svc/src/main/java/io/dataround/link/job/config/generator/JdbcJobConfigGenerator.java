@@ -63,7 +63,7 @@ public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
             source.put("connection_check_timeout_sec", 30);
             source.put("parallelism", 1);
             source.put("result_table_name", context.sourceResultTableName(table.getSourceTable()));
-            source.put("query", generateSourceQuery(table, context.getSourceConnector().getName()));
+            source.put("query", generateSourceQuery(table, context.getSourceConnectorDto().getConnector().getName()));
             sources.add(source);
         }
 
@@ -89,7 +89,7 @@ public class JdbcJobConfigGenerator extends AbstractJobConfigGenerator {
             // jdbc connector support upsert by primary key
             if (doUpsert(table)) {
                 sink.put("primary_keys", primaryKeys.toArray());
-                sink.put("enable_upsert", !primaryKeys.isEmpty() ? true : false);
+                sink.put("enable_upsert", !primaryKeys.isEmpty());
             } else {
                 // can speed up the job by disabling upsert
                 sink.put("enable_upsert", false);

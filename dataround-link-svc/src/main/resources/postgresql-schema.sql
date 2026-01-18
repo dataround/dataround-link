@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS public.connector_version (
     connector varchar(50) NOT NULL,
     label VARCHAR(50) NOT NULL,
     value VARCHAR(50) NOT NULL,
+    driver VARCHAR(50) NULL,
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
     description VARCHAR(255) NULL,
     create_by int8 NOT NULL,
@@ -160,9 +161,9 @@ INSERT INTO public.connector (name, type, plugin_name, support_source, support_s
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert connector versions
-INSERT INTO public.connector_version (connector, label, value, is_default, description, create_by, update_by, create_time, update_time) VALUES
-('MySQL', 'MySQL 5.x', 'mysql_5.6', 'false', 'MySQL 5.6 or earlier version', 10000, 10000, now(), now()),
-('MySQL', 'MySQL 8.x', 'mysql_8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
-('MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
-('SQLServer-CDC', 'SQLServer', 'sqlserver', 'true', 'SQLServer 2008 or later version', 10000, 10000, now(), now())
+INSERT INTO public.connector_version (connector, label, value, driver, is_default, description, create_by, update_by, create_time, update_time) VALUES
+('MySQL', 'MySQL 5.x', 'mysql_5.6', 'com.mysql.jdbc.Driver', 'false', 'MySQL 5.6 or earlier version', 10000, 10000, now(), now()),
+('MySQL', 'MySQL 8.x', 'mysql_8.0', 'com.mysql.cj.jdbc.Driver', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
+('MySQL-CDC', 'MySQL 8.x', 'mysql_8.0', 'com.mysql.cj.jdbc.Driver', 'true', 'MySQL 5.7 or later version', 10000, 10000, now(), now()),
+('SQLServer-CDC', 'SQLServer', 'sqlserver', 'com.microsoft.sqlserver.jdbc.SQLServerDriver', 'true', 'SQLServer 2008 or later version', 10000, 10000, now(), now())
 ON CONFLICT (connector, label) DO NOTHING;

@@ -27,6 +27,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.ConnectorVersion;
+import io.dataround.link.entity.dto.ConnectorDto;
 import io.dataround.link.common.utils.ConnectorNameConstants;
 import io.dataround.link.entity.Connection;
 import lombok.Getter;
@@ -80,7 +82,7 @@ public abstract class ConnectionVo extends BaseVo{
     private String createUser;
     private String updateUser;
     
-    public Connection buildConnection(Connector connector, Long userId, Long projectId) {
+    public Connection buildConnection(ConnectorDto connectorDto, Long userId, Long projectId) {
         Connection connection = new Connection();
         connection.setId(getId());
         connection.setName(getName());
@@ -103,6 +105,9 @@ public abstract class ConnectionVo extends BaseVo{
             connection.setCreateTime(now);
         }
         connection.setProjectId(projectId);
+        // assigin driver class to connection
+        assignDriverClass(connection, connectorDto);
+        // extract properties to connection
         extractProperties(connection);
         return connection;
     }
@@ -115,5 +120,24 @@ public abstract class ConnectionVo extends BaseVo{
     public abstract void extractProperties(Connection connection);
 
     public abstract void fillProperties(Map<String, String> config);
+
+    private void assignDriverClass(Connection connection, ConnectorDto connectorDto) {
+        String driverClass = null;
+        // priority: connector version > connector properties
+        ConnectorVersion connectorVersion = connectorDto.getConnectorVersion();
+        if (connectorVersion != null) {
+            driverClass = connectorVersion.getDriver();
+        } 
+        // if connector version is not set, use connector properties
+        if (driverClass == null) {
+            Connector connector = connectorDto.getConnector();
+            if (connector.getProperties().containsKey("driver")) {
+                driverClass = connector.getProperties().get("driver");
+            } 
+        }
+        if (driverClass != null) {
+            connection.getConfig().put("driver", driverClass);
+        }
+    }
  
 }

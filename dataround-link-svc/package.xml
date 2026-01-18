@@ -128,12 +128,13 @@
         </fileSet>
 
         <!-- Seatunnel lib-->
+        <!-- Note: MySQL 8.0 driver is backward compatible with 5.6, so only 8.0 driver is needed here -->
         <fileSet>
             <directory>${project.basedir}/target/seatunnel-connectors</directory>
             <outputDirectory>seatunnel/lib</outputDirectory>
             <includes>
                 <include>seatunnel-hadoop*.jar</include>
-                <include>mysql-connector-j*.jar</include>
+                <include>mysql-connector-j-*.jar</include>
                 <include>postgresql-*.jar</include>
                 <include>ojdbc8*.jar</include>
                 <include>mssql-jdbc*.jar</include>

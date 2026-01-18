@@ -44,8 +44,8 @@ import io.dataround.link.common.connector.Param;
 import io.dataround.link.connector.ConnectorFactory;
 import io.dataround.link.connector.FileConnector;
 import io.dataround.link.entity.Connection;
-import io.dataround.link.entity.Connector;
 import io.dataround.link.entity.JobInstance;
+import io.dataround.link.entity.dto.ConnectorDto;
 import io.dataround.link.entity.enums.JobInstanceStatusEnum;
 import io.dataround.link.entity.res.JobRes;
 import io.dataround.link.service.ConnectionService;
@@ -102,11 +102,11 @@ public class FileSyncServiceImpl implements FileSyncService {
         // Initialize the connector with properties
         Connection sourceConn = connectionService.getById(sourceConnId);
         Connection targetConn = connectionService.getById(targetConnId);
-        Connector sourceDbConnector = connectorService.getConnector(sourceConn.getConnector());
-        Connector targetDbConnector = connectorService.getConnector(targetConn.getConnector());
+        ConnectorDto sourceConnectorDto = connectorService.getConnectorDto(sourceConn);
+        ConnectorDto targetConnectorDto = connectorService.getConnectorDto(targetConn);
         // Find the connector with matching name
-        Param sourceParam = ParamParser.from(sourceConn, sourceDbConnector, null);
-        Param targetParam = ParamParser.from(targetConn, targetDbConnector, null);
+        Param sourceParam = ParamParser.from(sourceConn, sourceConnectorDto);
+        Param targetParam = ParamParser.from(targetConn, targetConnectorDto);
         List<String> sourceFiles = getSourceFiles(sourceParam, sourcePath, filePattern, includeSubdirectories);
         AtomicLong readCount = new AtomicLong(0);
         AtomicLong writeCount = new AtomicLong(0);

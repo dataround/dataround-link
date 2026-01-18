@@ -41,6 +41,7 @@ public class ConnectorVersion {
     private String label;
     @TableField("\"value\"")
     private String value;
+    private String driver;
     private Boolean isDefault;
     private String description;
     private Long createBy;

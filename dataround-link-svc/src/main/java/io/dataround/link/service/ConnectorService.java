@@ -19,7 +19,10 @@ package io.dataround.link.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import io.dataround.link.entity.Connection;
 import io.dataround.link.entity.Connector;
+import io.dataround.link.entity.ConnectorVersion;
+import io.dataround.link.entity.dto.ConnectorDto;
 
 import java.util.List;
 
@@ -27,7 +30,7 @@ import java.util.List;
  * Service interface for managing database connectors.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 public interface ConnectorService extends IService<Connector> {
 
@@ -51,4 +54,27 @@ public interface ConnectorService extends IService<Connector> {
      * @return list of plugin names
      */
     List<String> getPluginNames(String type);
+
+    /**
+     * Get connector dto by connector name and connector version id
+     * @param connector the connector name
+     * @param connectorVersionId the connector version id
+     * @return the connector dto
+     */
+    ConnectorDto getConnectorDto(String connector, Long connectorVersionId);
+
+    /**
+     * Get connector dto by connection
+     * @param connection the connection
+     * @return the connector dto
+     */
+    ConnectorDto getConnectorDto(Connection connection);
+
+    /**
+     * Get connector versions by connector name.
+     *
+     * @param connectorName the connector name
+     * @return the list of connector versions
+     */
+    List<ConnectorVersion> getByConnectorName(String connectorName);
 }
