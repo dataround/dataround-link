@@ -21,12 +21,13 @@ dataround:
   link:
     scheduler:
       threadPoolSize: 10
+    acl:
+      enabled: true
+    
   seatunnel:
     api:
       # Supports adding multiple URLs for seatunnel cluster mode, separated by commas.
       base-url: ${SEATUNNEL_API_URL:http://localhost:8080}
-
-       
 
 logging:
   level:

@@ -37,9 +37,9 @@ import org.quartz.simpl.RAMJobStore;
 import org.quartz.simpl.SimpleThreadPool;
 import org.quartz.spi.JobStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.dataround.link.common.config.WebConfig;
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.enums.JobScheduleTypeEnum;
 import io.dataround.link.service.JobService;
@@ -56,11 +56,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class SchedulerService {
 
-    @Value("${dataround.link.scheduler.threadPoolSize:10}")
-    private Integer threadCount;
     private final String schedulerName = "dataroundScheduler";
     private final String schedulerInstanceId = "dataroundInstance";
 
+    @Autowired
+    private WebConfig webConfig;
     @Autowired
     private JobService jobService;
     private DirectSchedulerFactory sf = DirectSchedulerFactory.getInstance();
@@ -79,7 +79,7 @@ public class SchedulerService {
                 // scheduler not exists, ignore exception
                 log.debug("No existing scheduler found: {}", e.getMessage());
             }
-            
+            int threadCount = webConfig.getThreadPoolSize();
             JobStore jobStore = new RAMJobStore();
             SimpleThreadPool threadPool = new SimpleThreadPool(threadCount, Thread.NORM_PRIORITY);
             sf.createScheduler(schedulerName, schedulerInstanceId, threadPool, jobStore);

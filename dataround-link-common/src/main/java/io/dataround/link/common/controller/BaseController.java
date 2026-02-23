@@ -17,9 +17,13 @@
 
 package io.dataround.link.common.controller;
 
+import io.dataround.link.common.config.WebConfig;
 import io.dataround.link.common.entity.res.UserResponse;
+import io.dataround.link.common.exception.LinkException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -33,24 +37,35 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class BaseController {
 
-    private UserResponse mockUser = new UserResponse();
-
-    public BaseController() {
-        mockUser.setUserId(10000L);
-        mockUser.setUserName("admin");
-        mockUser.setProjectId(10000L);
-    }
-
+    @Autowired
+    private WebConfig webConfig;
+     
     public UserResponse getCurrentUser() {
-        return mockUser;
+        if (webConfig.isAclEnabled()) {
+            String uid = getRequest().getHeader("uid");
+            String pid = getRequest().getHeader("pid");
+            if (uid == null || pid == null) {
+                throw new LinkException("User ID or Project ID is required, please login again");
+            }            
+            UserResponse currentUser = new UserResponse();
+            currentUser.setUserId(Long.parseLong(uid));
+            currentUser.setProjectId(Long.parseLong(pid));
+            return currentUser;
+        } else {
+            UserResponse mockUser = new UserResponse();
+            mockUser.setUserId(10000L);
+            mockUser.setUserName("admin");
+            mockUser.setProjectId(10000L);
+            return mockUser;
+        }
     }
 
     public Long getCurrentUserId() {
-        return mockUser.getUserId();
+        return getCurrentUser().getUserId();
     }
 
     public Long getCurrentProjectId() {
-        return mockUser.getProjectId();
+        return getCurrentUser().getProjectId();
     }
 
     public HttpServletRequest getRequest() {
