@@ -29,7 +29,7 @@ import org.apache.ibatis.annotations.Param;
  * Provides database operations for user management.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
@@ -40,5 +40,5 @@ public interface UserMapper extends BaseMapper<User> {
         left join project p on pu.project_id=p.id
         where pu.selected=true and u.name = #{name} and passwd = #{passwd}
         """)
-    UserResponse login(@Param("name") String name, @Param("passwd") String passwd);
+    UserResponse login(String name, String passwd);
 }

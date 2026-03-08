@@ -39,7 +39,7 @@ import org.quartz.spi.JobStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.dataround.link.common.config.WebConfig;
+import io.dataround.link.config.WebConfig;
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.enums.JobScheduleTypeEnum;
 import io.dataround.link.service.JobService;
@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
  * Provides methods to schedule, pause, resume, and delete jobs.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Slf4j
 @Component

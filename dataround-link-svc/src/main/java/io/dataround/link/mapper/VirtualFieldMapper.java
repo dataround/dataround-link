@@ -28,7 +28,7 @@ import org.apache.ibatis.annotations.Param;
  * Provides database operations for virtual fields.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Mapper
 public interface VirtualFieldMapper extends BaseMapper<VirtualField> {

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link;
+package io.dataround.link.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

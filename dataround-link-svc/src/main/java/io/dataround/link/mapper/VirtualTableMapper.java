@@ -30,7 +30,7 @@ import java.util.List;
  * Provides database operations for virtual tables.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Mapper
 public interface VirtualTableMapper extends BaseMapper<VirtualTable> {

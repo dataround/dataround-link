@@ -20,20 +20,24 @@
  * @auth: tiandengji
  * @date: 2025/5/15
  **/
-import { Col, Layout, Menu, MenuProps, Row } from 'antd';
-import { FC, memo, useState } from 'react';
+import { CheckOutlined, FolderOutlined, PoweroffOutlined, ProjectOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Col, Dropdown, Layout, Menu, MenuProps, Row, Space } from 'antd';
+import { SubMenuType } from 'antd/es/menu/interface';
+import { FC, memo, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './index.less';
+import { doLogout } from '../../api/login';
+import { getMyProjects, updateSelected } from '../../api/user';
+import { getMenuItems, MenuItem } from '../../api/menu';
+import useRequest from '../../hooks/useRequest';
 import logoImage from '../../assets/logo.v20251009.png';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import './index.less';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IProps { }
 
 const { Header: AntHeader } = Layout;
-
-type MenuItem = Required<MenuProps>['items'][number];
 
 const H: FC<IProps> = () => {
   const navigate = useNavigate();
@@ -41,24 +45,90 @@ const H: FC<IProps> = () => {
   const { t } = useTranslation();
   let selected = '/batch/job';
   const [current, setCurrent] = useState(selected);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
-  const items: MenuItem[] = [
-    {
-      label: t('menu.dataIntegration'),
-      key: '/'
-    },
-    {
-      label: t('menu.doc'),
-      key: 'doc'
-    }
-  ];
+  useEffect(() => {
+    getMenuItems().then((res) => {
+      if (res?.data?.items) {
+        setMenuItems(res.data.items);
+      }
+    }).catch((err) => {
+      console.error('Failed to fetch menu items:', err);
+    });
+  }, []);
+
+  const items: MenuProps['items'] = menuItems.map((item) => ({
+    label: t(item.labelKey),
+    key: item.key,
+  })) as MenuProps['items'];
 
   const onClick: MenuProps['onClick'] = (e) => {
     setCurrent(e.key);
-    console.log(e.key);
-    if (e.key === 'doc')
-      window.open('https://dataround.io/', '_blank');
+    const menuItem = menuItems.find((item) => item.key === e.key);
+    if (menuItem?.external && menuItem.url) {
+      window.open(menuItem.url, '_blank');
+    } else if (menuItem?.url) {
+      window.location.href = menuItem.url;
+    }
   };
+  
+  useEffect(() => {
+    projectReq.caller();
+  }, [])
+
+  const logoutReq = useRequest(doLogout, {
+    wrapperFun: (resp: any) => {
+      sessionStorage.removeItem('info');
+      navigate('/login', { replace: true })
+    }
+  });
+
+  const logout = () => {
+    logoutReq.caller();
+  }
+
+  const userItemOptions: MenuProps['items'] = [
+    {
+      key: '1',
+      label: '',
+      children: [],
+      onClick: (e: any) => {
+        updateSelected(e.key).then((resp: any) => {
+          window.location.reload();
+        })
+      }
+    },
+    {
+      key: 'divider1',
+      type: 'divider'
+    },
+    {
+      key: '2',
+      label: <><PoweroffOutlined style={{ color: '#ff4d4f' }} />  {t('menu.logout')}</>,
+      onClick: () => logout()
+    },
+  ]
+
+  const [userItems, setUserItems] = useState(userItemOptions);
+  const projectReq = useRequest(getMyProjects, {
+    wrapperFun: (data: any) => {
+      const projects = new Array();
+      let selectedProject = '';
+      data.forEach((item: any) => {
+        if (item.selected) {
+          selectedProject = item.name;
+        };
+        projects.push({
+          key: item.id,
+          label: <>{item.selected ? <CheckOutlined style={{ marginLeft: 8, color: '#1890ff' }} /> : <span style={{ marginLeft: 8, width: 16, display: 'inline-block' }}></span>} &nbsp;&nbsp;{item.name}&nbsp;&nbsp;&nbsp;&nbsp; </>
+        });
+      })
+      const item0 = userItemOptions[0] as SubMenuType;
+      item0.label = <><FolderOutlined style={{ color: '#1890ff' }} />  {t('menu.project')}: {selectedProject}</>;
+      item0.children = projects;
+      setUserItems(userItemOptions);
+    }
+  });
 
   return (
     <AntHeader className="layout-header" style={{ padding: 0 }}>
@@ -71,7 +141,17 @@ const H: FC<IProps> = () => {
           </Menu>
         </Col>
         <Col span={8} style={{ textAlign: 'right', paddingRight: '20px' }}>
-          <LanguageSwitcher />
+          <div style={{float: 'right', marginRight: 35}}>
+            <Dropdown menu={{ items: userItems }} overlayStyle={{ width: 210 }} placement="bottomRight" trigger={['hover']}>
+              <span style={{ cursor: 'pointer', display: 'inline-block' }}>
+                <Space align="center">
+                  <UserOutlined />
+                  <label>{t(`menu.user`)} </label>
+                </Space>
+              </span>
+            </Dropdown>
+          </div>       
+          <LanguageSwitcher />    
         </Col>
       </Row>
     </AntHeader>

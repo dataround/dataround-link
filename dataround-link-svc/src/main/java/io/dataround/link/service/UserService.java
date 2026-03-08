@@ -18,20 +18,24 @@
 package io.dataround.link.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import io.dataround.link.common.entity.res.UserResponse;
 import io.dataround.link.entity.User;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Service interface for managing user operations.
  * Provides methods for handling user-related operations including retrieving user names by IDs.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 public interface UserService extends IService<User> {
 
-    Map<Long, String> listNameByIds(Collection<? extends Serializable> userIds);
+    public UserResponse login(String name, String passwd);
+
+    Map<Long, String> listNameByIds(Set<Long> userIds);
 }

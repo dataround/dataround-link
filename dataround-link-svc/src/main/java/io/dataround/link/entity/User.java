@@ -17,9 +17,13 @@
 
 package io.dataround.link.entity;
 
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * Entity class representing a user in the system.
@@ -29,16 +33,34 @@ import lombok.Data;
  * @date 2025-05-06
  */
 @Data
+@TableName("public.user")
 public class User {
 
+    @TableId(type = IdType.AUTO)
     private Long id;
     private String name;
     private String email;
     private String cellphone;
     private String passwd;
-    private Boolean disabled;
-    private Long createBy;
-    private Long updateBy;
+    // Profile picture URL
+    private String avatar;
+    private String gender;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date birthday;
+    // Department name
+    private String department;
+    // Job position
+    private String position;
+    // Address
+    private String address;
+    private String wechat;
+    // Status: 1-Normal, 2-Disabled, 3-Locked
+    private Integer status;
+    private String remark;
+    private String lastLoginIp;
+    private String lastLoginTime;
+    private Long creatorId;
+    private Long updaterId;
     private Date createTime;
     private Date updateTime;
 }

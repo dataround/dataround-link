@@ -24,11 +24,18 @@ import {
   DatabaseOutlined, FolderOutlined, FileOutlined,
   SwapOutlined, SwapRightOutlined,
   RadiusBottomrightOutlined,
-  RedoOutlined
+  RedoOutlined,
+  UserOutlined,
+  TeamOutlined,
+  SettingOutlined,
+  LockOutlined
 } from "@ant-design/icons";
 import AppLayout from "../layout/index";
 import { lazyReactElement } from "../utils/index";
 import { useTranslation } from "react-i18next";
+import { AuthRouter } from "./authRouter";
+import LoginLayout from "../layout/login";
+import { hasPermission, useStore } from "../store";
 
 export interface IMenu {
   name?: string;
@@ -37,18 +44,21 @@ export interface IMenu {
   icon?: ReactNode;
   element?: ReactNode | null;
   hidden?: boolean;
-  type?: string;
+  permissionKey?: string;  // Resource key for permission check
 }
 
 const fallback = <div>loading</div>;
 
 export const useRoutes = () => {
   const { t } = useTranslation();
+  useStore();  // Subscribe to store changes for re-render
 
   const routes: IMenu[] = [
     {
       element: (
-        <AppLayout />
+        <AuthRouter>
+          <AppLayout />
+        </AuthRouter>
       ),
       children: [
         {
@@ -188,9 +198,84 @@ export const useRoutes = () => {
             },
           ]
         },
+        {
+          name: "settings",
+          path: "/settings",
+          element: lazyReactElement(() => import("../pages/home"), fallback),
+          children: [
+            {
+              path: "/settings/project",
+              name: t('menu.projectManagement'),
+              icon: <FolderOutlined />,
+              element: lazyReactElement(() => import("../pages/project"), fallback),
+              permissionKey: 'menu:project',
+            },
+            {
+              path: "/settings/projectMember",
+              name: t('menu.projectMember'),
+              icon: <UserOutlined />,
+              element: lazyReactElement(() => import("../pages/projectMember"), fallback),
+              permissionKey: 'menu:projectMember',
+            },
+            {
+              path: "/settings/user",
+              name: t('menu.userManagement'),
+              icon: <TeamOutlined />,
+              element: lazyReactElement(() => import("../pages/user/"), fallback),
+              permissionKey: 'menu:user',
+            },
+            {
+              path: "/settings/myInfo",
+              name: t('menu.myAccount'),
+              icon: <SettingOutlined />,
+              element: lazyReactElement(
+                () => import("../pages/myInfo"),
+                fallback
+              ),
+              // No permission key - always visible
+            },
+            {
+              path: "/settings/permission",
+              name: t('menu.permission'),
+              icon: <LockOutlined />,
+              element: lazyReactElement(() => import("../pages/permission"), fallback),
+              permissionKey: 'menu:permission',
+            }
+          ]
+        }
       ],
+    },
+    {
+      element: <LoginLayout />,
+      path: "/login",
     }
   ];
 
-  return routes;
+  // Filter routes by permission
+  return filterMenusByPermission(routes);
+};
+
+/**
+ * Filter menus by user permission
+ */
+const filterMenusByPermission = (menus: IMenu[]): IMenu[] => {
+  return menus
+    .filter(menu => {
+      // No permission key means always visible
+      if (!menu.permissionKey) {
+        return true;
+      }
+      return hasPermission(menu.permissionKey);
+    })
+    .map(menu => {
+      if (menu.children) {
+        const filteredChildren = filterMenusByPermission(menu.children);
+        // Hide parent menu if all children are filtered out
+        if (filteredChildren.length === 0 && menu.permissionKey) {
+          return { ...menu, hidden: true };
+        }
+        return { ...menu, children: filteredChildren };
+      }
+      return menu;
+    });
 };

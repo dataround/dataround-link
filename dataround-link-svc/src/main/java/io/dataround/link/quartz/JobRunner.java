@@ -26,7 +26,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import io.dataround.link.SpringContextUtil;
+import io.dataround.link.utils.SpringContextUtil;
 import io.dataround.link.entity.Job;
 import io.dataround.link.entity.JobInstance;
 import io.dataround.link.entity.enums.JobInstanceStatusEnum;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  * Handles job execution and error handling.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Slf4j
 public class JobRunner extends QuartzJobBean {

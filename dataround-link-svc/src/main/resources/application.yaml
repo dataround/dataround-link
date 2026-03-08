@@ -21,8 +21,14 @@ dataround:
   link:
     scheduler:
       threadPoolSize: 10
-    acl:
-      enabled: true
+    menu:
+      items:
+        - key: '/'
+          labelKey: 'menu.dataIntegration'
+        - key: 'doc'
+          labelKey: 'menu.doc'
+          url: 'https://dataround.io/'
+          external: true
     
   seatunnel:
     api:

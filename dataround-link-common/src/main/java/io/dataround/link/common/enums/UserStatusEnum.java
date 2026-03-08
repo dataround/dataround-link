@@ -3,13 +3,16 @@
  *
  * This repository is licensed under the Dataround Open Source License
  */
-package io.dataround.admin.common.enums;
+package io.dataround.link.common.enums;
+
+import lombok.Getter;
 
 /**
  * User status enum
  * @author yuehan124@gmail.com
  * @since 2026-02-19
  */
+@Getter
 public enum UserStatusEnum {
 
     //Status: 1-Normal, 2-Disabled, 3-Locked
@@ -23,11 +26,4 @@ public enum UserStatusEnum {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

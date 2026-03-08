@@ -19,7 +19,7 @@ package io.dataround.link.entity.vo;
 
 import java.util.Map;
 
-import io.dataround.link.SpringContextUtil;
+import io.dataround.link.utils.SpringContextUtil;
 import io.dataround.link.entity.Connection;
 import io.dataround.link.service.HazelcastCacheService;
 import io.dataround.link.utils.JobConfigParamConstants;

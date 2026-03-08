@@ -3,7 +3,7 @@
  *
  * This repository is licensed under the Dataround Open Source License
  */
-package io.dataround.admin.common;
+package io.dataround.link.common.exception;
 
 /**
  * JwtTokenException

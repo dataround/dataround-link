@@ -3,7 +3,7 @@
  *
  * This repository is licensed under the Dataround Open Source License
  */
-package io.dataround.link;
+package io.dataround.link.common.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import io.dataround.link.common.entity.res.UserResponse;

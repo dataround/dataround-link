@@ -22,7 +22,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.postgresql.util.PGobject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.dataround.link.SpringContextUtil;
+import io.dataround.link.utils.SpringContextUtil;
 import io.dataround.link.config.DatabaseConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +39,7 @@ import java.util.Map;
  * Provides conversion between Java Map<String, Object> and database JSON/JSONB type.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2025-05-06
  */
 @Slf4j
 public class JsonTypeHandler extends BaseTypeHandler<Map<String, Object>> {

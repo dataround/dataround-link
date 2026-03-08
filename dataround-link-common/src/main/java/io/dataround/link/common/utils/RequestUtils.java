@@ -17,6 +17,8 @@
 
 package io.dataround.link.common.utils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -83,6 +85,23 @@ public class RequestUtils {
             schema = schema.substring(0, schema.indexOf(","));
         }
         return schema;
+    }
+
+    public static String getLoginUrl(HttpServletRequest request) {
+        StringBuilder builder = new StringBuilder();
+        String schema = getRequestSchema(request);
+        builder.append(schema).append("://").append(getDomain(request));
+        if (!isDefaultPort(request)) {
+            builder.append(":").append(getRequestPort(request));
+        }
+        StringBuilder redirectUrl = new StringBuilder(builder).append(request.getRequestURI());
+        if (request.getQueryString() != null) {
+            redirectUrl.append("?").append(request.getQueryString());
+        }
+        // redirect parameter must be encoded
+        String encodedRedirectUrl = URLEncoder.encode(redirectUrl.toString(), StandardCharsets.UTF_8);
+        builder.append(request.getContextPath()).append("/login?redirect=").append(encodedRedirectUrl);
+        return builder.toString();
     }
 
     public static boolean isAjaxRequest(HttpServletRequest request) {
