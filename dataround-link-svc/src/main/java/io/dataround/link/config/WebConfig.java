@@ -15,31 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link;
+package io.dataround.link.common.config;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.lang.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Data;
+
 /**
- * Utility class for accessing Spring application context.
- * Provides methods to retrieve Spring beans from the application context.
- *
+ * Link configuration properties
+ * 
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2026-02-23
  */
+@Data
 @Component
-public class SpringContextUtil implements ApplicationContextAware {
-    private static ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(@NonNull ApplicationContext ac) throws BeansException {
-        applicationContext = ac;
-    }
-
-    public static <T> T getBean(Class<T> clazz) {
-        return applicationContext.getBean(clazz);
-    }
+public class WebConfig {
+    
+    @Value("${dataround.link.scheduler.threadPoolSize:10}")
+    private Integer threadPoolSize;
 }
