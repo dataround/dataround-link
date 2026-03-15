@@ -25,7 +25,6 @@ import {
   SwapOutlined, SwapRightOutlined,
   RadiusBottomrightOutlined,
   RedoOutlined,
-  UserOutlined,
   TeamOutlined,
   SettingOutlined,
   LockOutlined
@@ -154,9 +153,8 @@ export const useRoutes = () => {
                 },
               ]
             },
-            // System Management Category
             {
-              name: t('menu.systemManagement'),
+              name: t('menu.connectionAndTable'),
               type: 'group',
               children: [
                 {
@@ -194,28 +192,28 @@ export const useRoutes = () => {
                     () => import("../pages/virtualtable/create"),
                     fallback
                   )
-                },
-                {
-                  path: "/settings/project",
-                  name: t('menu.projectManagement'),
-                  icon: <FolderOutlined />,
-                  element: lazyReactElement(() => import("../pages/project"), fallback),
-                  permissionKey: 'menu:project',
-                },
-                {
-                  path: "/settings/projectMember",
-                  name: t('menu.projectMember'),
-                  icon: <UserOutlined />,
-                  element: lazyReactElement(() => import("../pages/projectMember"), fallback),
-                  permissionKey: 'menu:projectMember',
-                },
+                },                
+              ]
+            },
+            // System Management Category
+            {
+              name: t('menu.systemManagement'),
+              type: 'group',
+              children: [                
                 {
                   path: "/settings/user",
                   name: t('menu.userManagement'),
                   icon: <TeamOutlined />,
                   element: lazyReactElement(() => import("../pages/user/"), fallback),
                   permissionKey: 'menu:user',
-                },                
+                },           
+                {
+                  path: "/settings/project",
+                  name: t('menu.projectManagement'),
+                  icon: <FolderOutlined />,
+                  element: lazyReactElement(() => import("../pages/project"), fallback),
+                  permissionKey: 'menu:project',
+                },     
                 {
                   path: "/settings/permission",
                   name: t('menu.permissionManagement'),

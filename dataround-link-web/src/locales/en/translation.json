@@ -36,6 +36,7 @@
     "user": "User",
     "logout": "Logout",
     "project": "Project",
+    "connectionAndTable": "Connection & Virtual Table",
     "systemManagement": "System Management",
     "permissionManagement": "Permission Management",
     "roleManagement": "Role Management",

@@ -36,6 +36,7 @@
     "user": "用户",
     "logout": "退出登录",
     "project": "项目",
+    "connectionAndTable": "连接与虚拟表",
     "systemManagement": "系统管理",
     "permissionManagement": "权限管理",    
     "roleManagement": "角色管理",
