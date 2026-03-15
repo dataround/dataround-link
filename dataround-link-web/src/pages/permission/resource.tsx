@@ -22,7 +22,6 @@ import { memo, useState, useEffect, forwardRef, useImperativeHandle } from "reac
 import {
   deleteResource,
   getAllResources,
-  getResourceTree,
   saveOrUpdateResource
 } from "../../api/permission";
 import useRequest from "../../hooks/useRequest";
@@ -164,7 +163,7 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
     return treeData;
   };
 
-  const treeRequest = useRequest(getResourceTree, {
+  const treeRequest = useRequest(getAllResources, {
     wrapperFun: formatData,
   });
 

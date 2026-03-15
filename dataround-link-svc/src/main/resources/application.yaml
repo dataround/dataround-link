@@ -21,6 +21,8 @@ dataround:
   link:
     scheduler:
       threadPoolSize: 10
+    login:
+      escape: "/api/login, /api/logout, /api/captcha, /error, /static/**, /**/*.css, /**/*.js, /**/*.html, /**/*.png, /**/*.jpg, /**/*.gif, /**/*.svg, /**/*.woff, /**/*.woff2, /**/*.ttf, /**/*.ico"
     menu:
       items:
         - key: '/'

@@ -15,27 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.dataround.link.utils;
+package io.dataround.link.common.utils;
 
 /**
- * Utility class containing constant values used throughout the application.
- * Includes constants for user session, job instance status, host status, and plugin names.
- *
+ * Common constants.
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @since 2026-03-15
  */
-public class Constants {
-
-    public static final Integer DEFAULT_LOG_RETURN_ROWS = 100;
-
-    public static String PlUGIN_NAME_MYSQL_CDC = "MYSQL-CDC";
-
-    // field mapping
-    public static int FIELD_MAPPING_MATCH_BY_SORT = 1;
-    public static int FIELD_MAPPING_MATCH_BY_NAME = 2;
-
-    public static String CONNECTION_TYPE_DATABASE = "Database";
-    public static String CONNECTION_TYPE_FILE = "File";
-
-    public static String CONNECTOR_TYPE_FILE = "File";
+public class CommonConstants {
+    /**
+     * Current user key in request attribute.
+     */
+    public static final String CURRENT_USER = "currentUser";
 }

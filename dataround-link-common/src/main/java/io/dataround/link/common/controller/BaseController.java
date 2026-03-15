@@ -18,7 +18,7 @@
 package io.dataround.link.common.controller;
 
 import io.dataround.link.common.entity.res.UserResponse;
-import io.dataround.link.common.exception.LinkException;
+import io.dataround.link.common.utils.CommonConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -36,14 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class BaseController {
      
     public UserResponse getCurrentUser() {
-        String uid = getRequest().getHeader("uid");
-        String pid = getRequest().getHeader("pid");
-        if (uid == null || pid == null) {
-            throw new LinkException("User ID or Project ID is required, please login again");
-        }
-        UserResponse currentUser = new UserResponse();
-        currentUser.setUserId(Long.parseLong(uid));
-        currentUser.setProjectId(Long.parseLong(pid));
+        UserResponse currentUser = (UserResponse) getRequest().getAttribute(CommonConstants.CURRENT_USER);
         return currentUser;
     }
 

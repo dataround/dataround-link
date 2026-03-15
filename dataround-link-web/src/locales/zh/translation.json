@@ -36,7 +36,8 @@
     "user": "用户",
     "logout": "退出登录",
     "project": "项目",
-    "permission": "系统权限",
+    "systemManagement": "系统管理",
+    "permissionManagement": "权限管理",    
     "roleManagement": "角色管理",
     "userRole": "用户角色",
     "resourceManagement": "资源管理",
@@ -239,22 +240,6 @@
       }
     }
   },
-  "user": {
-    "login": {
-      "success": "登录成功",
-      "failed": "登录失败",
-      "title": "登录",
-      "username": "用户名",
-      "password": "密码",
-      "rememberMe": "记住我",
-      "forgotPassword": "忘记密码？"
-    },
-    "profile": {
-      "title": "个人资料",
-      "changePassword": "修改密码",
-      "logout": "退出登录"
-    }
-  },
   "link": {
     "create": {
       "success": "链接创建成功",
@@ -271,10 +256,6 @@
     "notFound": "链接未找到",
     "invalid": "无效的链接",
     "expired": "链接已过期"
-  },
-  "language": {
-    "en": "英文",
-    "zh": "简体中文"
   },
   "instance": {
     "title": "运行实例",
@@ -570,6 +551,20 @@
     }
   },
   "user": {
+    "login": {
+      "success": "登录成功",
+      "failed": "登录失败",
+      "title": "登录",
+      "username": "用户名",
+      "password": "密码",
+      "rememberMe": "记住我",
+      "forgotPassword": "忘记密码？"
+    },
+    "profile": {
+      "title": "个人资料",
+      "changePassword": "修改密码",
+      "logout": "退出登录"
+    },
     "title": "用户管理",
     "listTitle": "用户列表",
     "newUser": "新建用户",

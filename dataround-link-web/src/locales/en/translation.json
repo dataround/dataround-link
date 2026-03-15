@@ -36,7 +36,8 @@
     "user": "User",
     "logout": "Logout",
     "project": "Project",
-    "permission": "System Permission",
+    "systemManagement": "System Management",
+    "permissionManagement": "Permission Management",
     "roleManagement": "Role Management",
     "userRole": "User Role",
     "resourceManagement": "Resource Management",
@@ -239,22 +240,6 @@
       }
     }
   },
-  "user": {
-    "login": {
-      "success": "Login successful",
-      "failed": "Login failed",
-      "title": "Login",
-      "username": "Username",
-      "password": "Password",
-      "rememberMe": "Remember me",
-      "forgotPassword": "Forgot password?"
-    },
-    "profile": {
-      "title": "Profile",
-      "changePassword": "Change Password",
-      "logout": "Logout"
-    }
-  },
   "link": {
     "create": {
       "success": "Link created successfully",
@@ -271,10 +256,6 @@
     "notFound": "Link not found",
     "invalid": "Invalid link",
     "expired": "Link has expired"
-  },
-  "language": {
-    "en": "English",
-    "zh": "Chinese"
   },
   "instance": {
     "title": "Running Instance",
@@ -570,6 +551,20 @@
     }
   },
   "user": {
+    "login": {
+      "success": "Login successful",
+      "failed": "Login failed",
+      "title": "Login",
+      "username": "Username",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?"
+    },
+    "profile": {
+      "title": "Profile",
+      "changePassword": "Change Password",
+      "logout": "Logout"
+    },
     "title": "User",
     "listTitle": "User List",
     "newUser": "New User",

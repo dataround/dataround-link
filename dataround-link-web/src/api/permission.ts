@@ -35,17 +35,8 @@ export const assignRoleResources = (roleId: string, resourceIds: string[]) => {
 
 // ============ Resource APIs ============
 
-export const getResourceList = (params: any) => {
-  let reqParams = params ? "?" + Object.keys(params).map(key => key + "=" + params[key]).join("&") : "";
-  return http.get(baseAPI + "/resource/list" + reqParams);
-};
-
 export const getAllResources = () => {
   return http.get(baseAPI + "/resource/all");
-};
-
-export const getResourceTree = () => {
-  return http.get(baseAPI + "/resource/tree");
 };
 
 export const getUserResources = () => {

@@ -44,6 +44,7 @@ export interface IMenu {
   icon?: ReactNode;
   element?: ReactNode | null;
   hidden?: boolean;
+  type?: string;
   permissionKey?: string;  // Resource key for permission check
 }
 
@@ -153,11 +154,29 @@ export const useRoutes = () => {
                 },
               ]
             },
-            // Tables & Connections Category
+            // System Management Category
             {
-              name: t('menu.tablesAndConnections'),
+              name: t('menu.systemManagement'),
               type: 'group',
               children: [
+                {
+                  path: "/connection",
+                  name: t('menu.connectionManagement'),
+                  icon: <DatabaseOutlined />,
+                  element: lazyReactElement(
+                    () => import("../pages/connection"),
+                    fallback
+                  )
+                },
+                {
+                  path: "/connection/create",
+                  name: t('menu.createConnection'),
+                  hidden: true,
+                  element: lazyReactElement(
+                    () => import("../pages/connection/create"),
+                    fallback
+                  )
+                },
                 {
                   path: "/vtable",
                   name: t('menu.virtualTable'),
@@ -177,72 +196,47 @@ export const useRoutes = () => {
                   )
                 },
                 {
-                  path: "/connection",
-                  name: t('menu.connectionManagement'),
-                  icon: <DatabaseOutlined />,
-                  element: lazyReactElement(
-                    () => import("../pages/connection"),
-                    fallback
-                  )
+                  path: "/settings/project",
+                  name: t('menu.projectManagement'),
+                  icon: <FolderOutlined />,
+                  element: lazyReactElement(() => import("../pages/project"), fallback),
+                  permissionKey: 'menu:project',
                 },
                 {
-                  path: "/connection/create",
-                  name: t('menu.createConnection'),
-                  hidden: true,
+                  path: "/settings/projectMember",
+                  name: t('menu.projectMember'),
+                  icon: <UserOutlined />,
+                  element: lazyReactElement(() => import("../pages/projectMember"), fallback),
+                  permissionKey: 'menu:projectMember',
+                },
+                {
+                  path: "/settings/user",
+                  name: t('menu.userManagement'),
+                  icon: <TeamOutlined />,
+                  element: lazyReactElement(() => import("../pages/user/"), fallback),
+                  permissionKey: 'menu:user',
+                },                
+                {
+                  path: "/settings/permission",
+                  name: t('menu.permissionManagement'),
+                  icon: <LockOutlined />,
+                  element: lazyReactElement(() => import("../pages/permission"), fallback),
+                  permissionKey: 'menu:permission',
+                },
+                {
+                  path: "/settings/myInfo",
+                  name: t('menu.myAccount'),
+                  icon: <SettingOutlined />,
                   element: lazyReactElement(
-                    () => import("../pages/connection/create"),
+                    () => import("../pages/myInfo"),
                     fallback
-                  )
+                  ),
+                  // No permission key - always visible
                 },
               ]
-            },
+            }            
           ]
         },
-        {
-          name: "settings",
-          path: "/settings",
-          element: lazyReactElement(() => import("../pages/home"), fallback),
-          children: [
-            {
-              path: "/settings/project",
-              name: t('menu.projectManagement'),
-              icon: <FolderOutlined />,
-              element: lazyReactElement(() => import("../pages/project"), fallback),
-              permissionKey: 'menu:project',
-            },
-            {
-              path: "/settings/projectMember",
-              name: t('menu.projectMember'),
-              icon: <UserOutlined />,
-              element: lazyReactElement(() => import("../pages/projectMember"), fallback),
-              permissionKey: 'menu:projectMember',
-            },
-            {
-              path: "/settings/user",
-              name: t('menu.userManagement'),
-              icon: <TeamOutlined />,
-              element: lazyReactElement(() => import("../pages/user/"), fallback),
-              permissionKey: 'menu:user',
-            },
-            {
-              path: "/settings/myInfo",
-              name: t('menu.myAccount'),
-              icon: <SettingOutlined />,
-              element: lazyReactElement(
-                () => import("../pages/myInfo"),
-                fallback
-              ),
-              // No permission key - always visible
-            },
-            {
-              path: "/settings/permission",
-              name: t('menu.permission'),
-              icon: <LockOutlined />,
-              element: lazyReactElement(() => import("../pages/permission"), fallback),
-              permissionKey: 'menu:permission',
-            }
-          ]
-        }
       ],
     },
     {

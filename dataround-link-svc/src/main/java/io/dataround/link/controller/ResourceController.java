@@ -18,7 +18,6 @@
 package io.dataround.link.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.dataround.link.common.Result;
 import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Resource;
@@ -52,15 +51,9 @@ public class ResourceController extends BaseController {
     @Autowired
     private ResourceService resourceService;
 
-    @GetMapping("/list")
-    public Result<Page<Resource>> list(Page<Resource> params) {
-        LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByAsc(Resource::getPid);
-        wrapper.orderByAsc(Resource::getId);
-        Page<Resource> page = resourceService.page(params, wrapper);
-        return Result.success(page);
-    }
-
+    /**
+     * Get all resources (ordered by pid, id)
+     */
     @GetMapping("/all")
     public Result<List<Resource>> all() {
         LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
@@ -70,12 +63,9 @@ public class ResourceController extends BaseController {
         return Result.success(resources);
     }
 
-    @GetMapping("/tree")
-    public Result<List<Resource>> tree() {
-        List<Resource> resources = resourceService.list();
-        return Result.success(resources);
-    }
-
+    /**
+     * Get resources for current user
+     */
     @GetMapping("/user")
     public Result<List<Resource>> userResources() {
         Long userId = getCurrentUserId();

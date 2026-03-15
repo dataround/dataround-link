@@ -34,4 +34,7 @@ public class WebConfig {
     
     @Value("${dataround.link.scheduler.threadPoolSize:10}")
     private Integer threadPoolSize;
+
+    @Value("${dataround.link.login.escape}")
+    private String loginEscape;
 }

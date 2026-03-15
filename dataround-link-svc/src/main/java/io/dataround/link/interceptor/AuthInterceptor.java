@@ -6,10 +6,10 @@
 
 package io.dataround.link.interceptor;
 
+import io.dataround.link.common.utils.CommonConstants;
 import io.dataround.link.common.utils.CookieUtils;
 import io.dataround.link.common.utils.JwtUtil;
 import io.dataround.link.common.entity.res.UserResponse;
-import io.dataround.link.utils.Constants;
 import io.dataround.link.common.utils.RequestUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 CookieUtils.addUidCookie(JwtUtil.genToken(user), request, response);
             }
             // login success and continue
-            request.setAttribute(Constants.CURRENT_USER, user);
+            request.setAttribute(CommonConstants.CURRENT_USER, user);
             return true;
         } catch (Exception e) {
             log.error("authentication exception", e);

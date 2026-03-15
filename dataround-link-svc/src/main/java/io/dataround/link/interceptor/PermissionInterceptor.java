@@ -7,7 +7,7 @@
 package io.dataround.link.interceptor;
 
 import io.dataround.link.common.entity.res.UserResponse;
-import io.dataround.link.utils.Constants;
+import io.dataround.link.common.utils.CommonConstants;
 import io.dataround.link.entity.Resource;
 import io.dataround.link.service.ResourceService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,7 +54,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
         }
 
         // Get current user from request attribute (set by AuthInterceptor)
-        UserResponse currentUser = (UserResponse) request.getAttribute(Constants.CURRENT_USER);
+        UserResponse currentUser = (UserResponse) request.getAttribute(CommonConstants.CURRENT_USER);
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return false;
