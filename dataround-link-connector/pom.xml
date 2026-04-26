@@ -19,6 +19,8 @@
         <module>dataround-link-connector-dm</module>
         <module>dataround-link-connector-kingbase</module>
         <module>dataround-link-connector-tidb</module>
+        <module>dataround-link-connector-doris</module>
+        <module>dataround-link-connector-clickhouse</module>
     </modules>
     <packaging>pom</packaging>
 

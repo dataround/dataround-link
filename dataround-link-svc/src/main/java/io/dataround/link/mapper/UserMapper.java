@@ -22,7 +22,6 @@ import io.dataround.link.common.entity.res.UserResponse;
 import io.dataround.link.entity.User;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper interface for User entity.

@@ -17,28 +17,28 @@
 
 package io.dataround.link.utils;
 
+import org.junit.jupiter.api.Test;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * Utility class containing constant values used throughout the application.
- * Includes constants for user session, job instance status, host status, and plugin names.
+ * Test class for SHA256Util.
+ * Tests SHA-256 hashing functionality with salt.
  *
  * @author yuehan124@gmail.com
- * @date 2025-05-06
+ * @date 2026-04-25
  */
-public class Constants {
+@Slf4j
+public class SHA256UtilTest {
 
-    public static final Integer DEFAULT_LOG_RETURN_ROWS = 100;
-
-    public static String PlUGIN_NAME_MYSQL_CDC = "MYSQL-CDC";
-
-    // field mapping
-    public static int FIELD_MAPPING_MATCH_BY_SORT = 1;
-    public static int FIELD_MAPPING_MATCH_BY_NAME = 2;
-
-    public static String CONNECTION_TYPE_DATABASE = "Database";
-    public static String CONNECTION_TYPE_FILE = "File";
-
-    public static String CONNECTOR_TYPE_FILE = "File";
-
-    // default project name
-    public static final String DEFAULT_PROJECT_NAME = "default";
+    @Test
+    public void testGetSHA256WithNormalInput() {
+        String input = "dataround.io";
+        String hash = SHA256Util.getSHA256(input);
+        
+        assertNotNull(hash);
+        log.info("SHA-256 hash of '{}': {}", input, hash);
+    }
 }

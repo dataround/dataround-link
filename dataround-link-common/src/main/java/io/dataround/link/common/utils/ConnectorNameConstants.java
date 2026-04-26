@@ -32,6 +32,8 @@ public class ConnectorNameConstants {
     public static final String POSTGRESQL = "PostgreSQL";
     public static final String SQLSERVER = "SQLServer";
     public static final String TIDB = "Tidb";
+    public static final String DORIS = "Doris";
+    public static final String CLICKHOUSE = "ClickHouse";
     public static final String MYSQL_CDC = "MySQL-CDC";
     public static final String SQLSERVER_CDC = "SQLServer-CDC";
     public static final String JDBC = "JDBC";

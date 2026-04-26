@@ -38,4 +38,13 @@ public interface UserService extends IService<User> {
     public UserResponse login(String name, String passwd);
 
     Map<Long, String> listNameByIds(Set<Long> userIds);
+
+    /**
+     * Save or update user, and automatically add to default project when creating new user.
+     * 
+     * @param user the user entity to save
+     * @param currentUserId the ID of current logged-in user (creator/updater)
+     * @return true if save success, false otherwise
+     */
+    boolean saveUserWithDefaultProject(User user, Long currentUserId);
 }

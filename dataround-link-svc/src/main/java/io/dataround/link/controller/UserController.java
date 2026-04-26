@@ -94,20 +94,7 @@ public class UserController extends BaseController {
     @PostMapping("/saveOrUpdate")
     public Result<Boolean> saveOrUpdate(@RequestBody User user) {
         Long currentUserId = getCurrentUserId();
-        Date now = new Date();
-        if (user.getId() == null) {
-            user.setCreatorId(currentUserId);
-            user.setCreateTime(now);
-        } 
-        if (user.getStatus() == null) {
-            user.setStatus(UserStatusEnum.NORMAL.getCode());
-        }
-        if (StringUtils.isNotBlank(user.getPasswd())) {
-            user.setPasswd(SHA256Util.getSHA256(user.getPasswd().trim()));
-        }
-        user.setUpdaterId(currentUserId);
-        user.setUpdateTime(now);
-        boolean bool = userService.saveOrUpdate(user);
+        boolean bool = userService.saveUserWithDefaultProject(user, currentUserId);
         return Result.success(bool);
     } 
 
