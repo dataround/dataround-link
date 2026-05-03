@@ -76,15 +76,14 @@ const H: FC<IProps> = () => {
     projectReq.caller();
   }, [])
 
-  const logoutReq = useRequest(doLogout, {
-    wrapperFun: (resp: any) => {
-      sessionStorage.removeItem('info');
-      navigate('/login', { replace: true })
-    }
-  });
+  const logoutReq = useRequest(doLogout);
 
   const logout = () => {
-    logoutReq.caller();
+    logoutReq.caller().then(() => {
+      sessionStorage.removeItem('info');
+      sessionStorage.removeItem('resources');
+      navigate('/login', { replace: true })
+    });
   }
 
   const userItemOptions: MenuProps['items'] = [

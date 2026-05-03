@@ -136,7 +136,7 @@ public class LoginController extends BaseController {
     public Result<String> logout(HttpServletRequest request, HttpServletResponse response) {
         // clean cookies
         CookieUtils.cleanAllCookies(request, response);
-        return Result.success("logout successful");
+        return Result.success(MessageUtils.getMessage("logout.successful"));
     }
 
     @GetMapping("/captcha")
