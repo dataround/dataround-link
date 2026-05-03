@@ -42,9 +42,8 @@ public interface UserService extends IService<User> {
     /**
      * Save or update user, and automatically add to default project when creating new user.
      * 
-     * @param user the user entity to save
-     * @param currentUserId the ID of current logged-in user (creator/updater)
+     * @param user the user entity to save or update
      * @return true if save success, false otherwise
      */
-    boolean saveUserWithDefaultProject(User user, Long currentUserId);
+    boolean saveOrUpdateWithDefaultProject(User user);
 }

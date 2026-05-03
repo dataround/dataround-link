@@ -94,7 +94,12 @@ public class UserController extends BaseController {
     @PostMapping("/saveOrUpdate")
     public Result<Boolean> saveOrUpdate(@RequestBody User user) {
         Long currentUserId = getCurrentUserId();
-        boolean bool = userService.saveUserWithDefaultProject(user, currentUserId);
+        // Set creator and updater info
+        if (user.getId() == null) {
+            user.setCreatorId(currentUserId);
+        }
+        user.setUpdaterId(currentUserId);
+        boolean bool = userService.saveOrUpdateWithDefaultProject(user);
         return Result.success(bool);
     } 
 

@@ -63,14 +63,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public boolean saveUserWithDefaultProject(User user, Long currentUserId) {
+    @Transactional
+    public boolean saveOrUpdateWithDefaultProject(User user) {
         Date now = new Date();
         boolean isNewUser = (user.getId() == null);
         
         // Set common fields
         if (isNewUser) {
-            user.setCreatorId(currentUserId);
             user.setCreateTime(now);
         }
         if (user.getStatus() == null) {
@@ -79,7 +78,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (StringUtils.isNotBlank(user.getPasswd())) {
             user.setPasswd(SHA256Util.getSHA256(user.getPasswd().trim()));
         }
-        user.setUpdaterId(currentUserId);
         user.setUpdateTime(now);
         
         // Save or update user
