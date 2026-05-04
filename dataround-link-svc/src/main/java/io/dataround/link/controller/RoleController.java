@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.dataround.link.common.Result;
 import io.dataround.link.common.controller.BaseController;
-import io.dataround.link.entity.Resource;
 import io.dataround.link.entity.Role;
+import io.dataround.link.entity.res.ResouceRes;
 import io.dataround.link.service.ResourceService;
 import io.dataround.link.service.RoleResourceService;
 import io.dataround.link.service.RoleService;
@@ -89,8 +89,8 @@ public class RoleController extends BaseController {
     }
 
     @GetMapping("/{id}/resources")
-    public Result<List<Resource>> getRoleResources(@PathVariable Long id) {
-        List<Resource> resources = resourceService.getResourcesByRoleId(id);
+    public Result<List<ResouceRes>> getRoleResources(@PathVariable Long id) {
+        List<ResouceRes> resources = resourceService.getResourcesByRoleId(id);
         return Result.success(resources);
     }
 

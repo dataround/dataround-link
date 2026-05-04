@@ -3,7 +3,7 @@
  * @since: 2026/02/21
  * Resource Management Component
  **/
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -16,6 +16,8 @@ import {
   Spin,
   Table,
   TableProps,
+  Tag,
+  Tooltip,
   message
 } from "antd";
 import { memo, useState, useEffect, forwardRef, useImperativeHandle } from "react";
@@ -27,15 +29,19 @@ import {
 import useRequest from "../../hooks/useRequest";
 import { t } from "i18next";
 
+interface ResourceApiType {
+  id?: string;
+  path: string;
+  method: string;
+}
+
 interface ResourceDataType {
   key: string;
   pid: string;
+  i18nName: string;
   name: string;
-  enName: string;
-  type: string;
   resKey: string;
-  method: string;
-  description: string;
+  resourceApis?: ResourceApiType[];
   createTime: string;
   children?: ResourceDataType[];
 }
@@ -60,7 +66,13 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
   useImperativeHandle(ref, () => ({
     newResource: () => {
       setModalTitle(t('permission.newResource'));
-      form.setFieldsValue({ id: '', pid: '0', name: '', enName: '', type: 'ui', resKey: '', method: '', description: '' });
+      form.setFieldsValue({ 
+        id: '', 
+        pid: '0', 
+        i18nName: '', 
+        resKey: '',
+        resourceApis: [{ path: '', method: '' }]
+      });
       setIsModalOpen(true);
     }
   }));
@@ -72,30 +84,30 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
       key: "name",
     },
     {
-      title: t('permission.resourceEnName'),
-      dataIndex: "enName",
-      key: "enName",
-    },
-    {
-      title: t('permission.resourceType'),
-      dataIndex: "type",
-      key: "type",
-      render: (type: string) => type === 'ui' ? t('permission.typeUi') : t('permission.typeApi'),
-    },
-    {
       title: t('permission.resourceKey'),
       dataIndex: "resKey",
       key: "resKey",
     },
     {
-      title: t('permission.resourceMethod'),
-      dataIndex: "method",
-      key: "method",
-    },
-    {
-      title: t('permission.resourceDesc'),
-      dataIndex: "description",
-      key: "description",
+      title: 'APIs',
+      key: "resourceApis",
+      width: 400,
+      render: (_, record) => {
+        const apis = record.resourceApis || [];
+        if (apis.length === 0) return '-';
+        const display = apis.map(api => `${api.method} ${api.path}`).join(', ');
+        const tags = apis.map((api, idx) => (
+          <Tag key={idx} style={{ marginBottom: 2 }}>
+            <span style={{ color: api.method === 'GET' ? '#52c41a' : api.method === 'POST' ? '#1890ff' : api.method === 'PUT' ? '#faad14' : '#ff4d4f', fontWeight: 500 }}>{api.method}</span>
+            <span style={{ marginLeft: 4, maxWidth: 160, display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'bottom' }}>{api.path}</span>
+          </Tag>
+        ));
+        return (
+          <Tooltip title={<span style={{ fontSize: 12 }}>{display}</span>}>
+            <div style={{ maxWidth: 380, overflow: 'hidden' }}>{tags}</div>
+          </Tooltip>
+        );
+      },
     },
     {
       title: t('permission.createTime'),
@@ -124,12 +136,10 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
       const node: ResourceDataType = {
         key: String(item.id),
         pid: String(item.pid),
-        name: item.name,
-        enName: item.enName,
-        type: item.type,
+        i18nName: item.i18nName,
+        name: item.name || item.i18nName,
         resKey: item.resKey,
-        method: item.method,
-        description: item.description,
+        resourceApis: item.resourceApis || [],
         createTime: item.createTime,
       };
       map.set(node.key, node);
@@ -193,15 +203,18 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
 
   const handleEdit = (record: ResourceDataType) => {
     setModalTitle(t('permission.editResource'));
+    
+    // Ensure resourceApis has at least one empty item if empty
+    const resourceApis = record.resourceApis && record.resourceApis.length > 0 
+      ? record.resourceApis 
+      : [{ path: '', method: '' }];
+    
     form.setFieldsValue({
       id: record.key,
       pid: record.pid,
-      name: record.name,
-      enName: record.enName,
-      type: record.type,
+      i18nName: record.i18nName,
       resKey: record.resKey,
-      method: record.method,
-      description: record.description,
+      resourceApis: resourceApis,
     });
     setIsModalOpen(true);
   };
@@ -219,7 +232,15 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
 
   const onFinish = () => {
     form.validateFields().then((values) => {
-      saveRequest.caller(values);
+      // Convert form data to ResourceRequest format
+      const requestData = {
+        id: values.id || null,
+        pid: values.pid,
+        i18nName: values.i18nName,
+        resKey: values.resKey,
+        resourceApis: values.resourceApis || []
+      };
+      saveRequest.caller(requestData);
     });
   };
 
@@ -265,31 +286,50 @@ const ResourceManagement = forwardRef<ResourceRef, ResourceProps>(({ visible }, 
             <Form.Item label={t('permission.parentResource')} name="pid">
               <Select options={parentOptions} placeholder={t('permission.selectParent')} />
             </Form.Item>
-            <Form.Item label={t('permission.resourceName')} name="name" rules={[{ required: true, message: t('permission.resourceNamePlaceholder') }]}>
-              <Input placeholder={t('permission.resourceNamePlaceholder')} />
-            </Form.Item>
-            <Form.Item label={t('permission.resourceEnName')} name="enName">
-              <Input placeholder={t('permission.resourceEnNamePlaceholder')} />
-            </Form.Item>
-            <Form.Item label={t('permission.resourceType')} name="type" rules={[{ required: true, message: t('permission.resourceTypePlaceholder') }]}>
-              <Select placeholder={t('permission.resourceTypePlaceholder')}>
-                <Select.Option value="ui">{t('permission.typeUi')}</Select.Option>
-                <Select.Option value="api">{t('permission.typeApi')}</Select.Option>
-              </Select>
+            <Form.Item label={t('permission.resourceI18nName')} name="i18nName" rules={[{ required: true, message: t('permission.resourceI18nNamePlaceholder') }]}>
+              <Input placeholder={t('permission.resourceI18nNamePlaceholder')} />
             </Form.Item>
             <Form.Item label={t('permission.resourceKey')} name="resKey" rules={[{ required: true, message: t('permission.resourceKeyPlaceholder') }]}>
               <Input placeholder={t('permission.resourceKeyPlaceholder')} />
             </Form.Item>
-            <Form.Item label={t('permission.resourceMethod')} name="method">
-              <Select placeholder={t('permission.resourceMethodPlaceholder')} allowClear>
-                <Select.Option value="GET">GET</Select.Option>
-                <Select.Option value="POST">POST</Select.Option>
-                <Select.Option value="PUT">PUT</Select.Option>
-                <Select.Option value="DELETE">DELETE</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label={t('permission.resourceDesc')} name="description">
-              <Input.TextArea placeholder={t('permission.resourceDescPlaceholder')} />
+            <Form.Item label={t('permission.apiList')}>
+              <Form.List name="resourceApis" rules={[{ validator: async (_, value) => {
+                if (!value || value.length === 0) {
+                  return Promise.reject(new Error('At least one API is required'));
+                }
+              }}]}>
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space key={key} style={{ display: 'flex', marginBottom: 4 }} align="baseline">
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'path']}
+                          rules={[{ required: true, message: 'API Path is required' }]}
+                          style={{ width: 250 }}
+                        >
+                          <Input placeholder="/api/user/list" />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'method']}
+                          rules={[{ required: true, message: 'Method is required' }]}
+                          style={{ width: 120 }}
+                        >
+                          <Select placeholder="Method">
+                            <Select.Option value="GET">GET</Select.Option>
+                            <Select.Option value="POST">POST</Select.Option>
+                            <Select.Option value="PUT">PUT</Select.Option>
+                            <Select.Option value="DELETE">DELETE</Select.Option>
+                          </Select>
+                        </Form.Item>
+                        {fields.length > 1 && <MinusOutlined onClick={() => remove(name)} />}
+                        <PlusOutlined onClick={() => add()} />
+                      </Space>
+                    ))}
+                  </>
+                )}
+              </Form.List>
             </Form.Item>
           </Form>
         </Card>

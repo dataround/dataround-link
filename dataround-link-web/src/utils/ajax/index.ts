@@ -23,6 +23,7 @@ import axios from 'axios';
 import asyncErrorHandle from './asyncErrorHandle';
 import CancelToken from './CancelToken';
 import { message } from 'antd';
+import i18n from '../../i18n';
 
 // http request interceptors
 axios.interceptors.request.use(
@@ -37,6 +38,9 @@ axios.interceptors.request.use(
       }
     }
     config.headers['X-Requested-With'] = 'xmlhttprequest';
+    // Send current language to backend via Accept-Language header
+    const lang = i18n.language || 'en';
+    config.headers['Accept-Language'] = lang === 'zh' ? 'zh-CN' : 'en-US';
     return config;
   },
   (error: any) => Promise.reject(error),

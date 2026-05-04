@@ -263,13 +263,19 @@ CREATE SEQUENCE IF NOT EXISTS resource_id_seq START WITH 10000;
 CREATE TABLE IF NOT EXISTS public.resource (
 	id BIGINT PRIMARY KEY DEFAULT nextval('resource_id_seq'),
 	pid int8 NOT NULL,
-	"name" varchar(255) NOT NULL,
-	en_name varchar(255) NOT NULL,
-	type varchar(20) NOT NULL DEFAULT 'ui',
+	i18n_name varchar(255) NOT NULL,
 	res_key varchar(255) NOT NULL,
-	method varchar(50) NULL,
 	description varchar(500),
 	create_time timestamp with time zone NOT NULL
+);
+
+CREATE SEQUENCE IF NOT EXISTS resource_api_id_seq START WITH 10000;
+CREATE TABLE IF NOT EXISTS public.resource_api (
+	id BIGINT PRIMARY KEY DEFAULT nextval('resource_api_id_seq'),
+	resource_id int8 NOT NULL,
+	method varchar(10) NULL,
+	path varchar(255) NOT NULL,
+	UNIQUE(resource_id, method, path)
 );
 
 -- Insert default admin role
@@ -284,43 +290,81 @@ ON CONFLICT (user_id, role_id) DO NOTHING;
 
 -- Insert default resources for admin role
 -- UI Resources (menus and buttons)
-INSERT INTO public.resource(id, pid, name, en_name, type, res_key, method, description, create_time) VALUES
-(10000, 0, '菜单权限', 'Menu Permission', 'ui', '', NULL, '菜单权限', now()),
-(10002, 10000, '项目管理', 'Project Management', 'ui', 'menu:project', NULL, '项目管理菜单', now()),
-(10003, 10000, '项目成员', 'Project Member', 'ui', 'menu:projectMember', NULL, '项目成员菜单', now()),
-(10004, 10000, '用户管理', 'User Management', 'ui', 'menu:user', NULL, '用户管理菜单', now()),
-(10005, 10000, '系统权限', 'System Permission', 'ui', 'menu:permission', NULL, '系统权限菜单', now()),
-(10006, 10000, '我的账号', 'My Account', 'ui', 'menu:myAccount', NULL, '我的账号菜单', now()),
+INSERT INTO public.resource(id, pid, i18n_name, res_key, description, create_time) VALUES
+(10000, 0, 'resource.menu.permission', '', '', now()),
+(10002, 10000, 'resource.menu.project', 'menu:project', '', now()),
+(10003, 10000, 'resource.menu.projectMember', 'menu:projectMember', '', now()),
+(10004, 10000, 'resource.menu.user', 'menu:user', '', now()),
+(10005, 10000, 'resource.menu.permission', 'menu:permission', '', now()),
+(10006, 10000, 'resource.menu.myAccount', 'menu:myAccount', '', now()),
 
-(10007, 10004, '新增用户', 'Add User', 'ui', 'btn:user:add', NULL, '新增用户按钮', now()),
-(10008, 10004, '编辑用户', 'Edit User', 'ui', 'btn:user:edit', NULL, '编辑用户按钮', now()),
-(10009, 10004, '删除用户', 'Delete User', 'ui', 'btn:user:delete', NULL, '删除用户按钮', now()),
-(10010, 10004, '修改状态', 'Change Status', 'ui', 'btn:user:status', NULL, '修改状态按钮', now()),
+(10007, 10004, 'resource.btn.user.add', 'btn:user:add', '', now()),
+(10008, 10004, 'resource.btn.user.edit', 'btn:user:edit', '', now()),
+(10009, 10004, 'resource.btn.user.delete', 'btn:user:delete', '', now()),
+(10010, 10004, 'resource.btn.user.status', 'btn:user:status', '', now()),
 
-(10011, 10005, '角色管理', 'Role Management', 'ui', 'menu:role', NULL, '角色管理菜单', now()),
-(10012, 10005, '用户角色', 'User Role', 'ui', 'menu:userRole', NULL, '用户角色菜单', now()),
-(10013, 10005, '资源管理', 'Resource Management', 'ui', 'menu:resource', NULL, '资源管理菜单', now())
+(10011, 10005, 'resource.menu.role', 'menu:role', '', now()),
+(10012, 10005, 'resource.menu.userRole', 'menu:userRole', '', now()),
+(10013, 10005, 'resource.menu.resource', 'menu:resource', '', now())
 ON CONFLICT (id) DO NOTHING;
 
--- API Resources
-INSERT INTO public.resource(id, pid, name, en_name, type, res_key, method, description, create_time) VALUES
-(10100, 0, 'API权限', 'API Permission', 'api', '/api', NULL, 'API权限', now()),
-(10101, 10100, '项目API', 'Project API', 'api', '/api/project', NULL, '项目权限', now()),
-(10102, 10100, '项目成员API', 'Project Member API', 'api', '/api/projectMember', NULL, '项目成员权限', now()),
-(10103, 10100, '用户API', 'User API', 'api', '/api/user', NULL, '用户权限', now()),
-(10104, 10100, '系统权限API', 'System Permission API', 'api', '/api/permission', NULL, '系统权限', now()),
-(10105, 10100, '角色API', 'Role API', 'api', '/api/role', NULL, '角色权限', now()),
-(10106, 10100, '资源API', 'Resource API', 'api', '/api/resource', NULL, '资源权限', now()),
-(10107, 10100, '用户角色API', 'User Role API', 'api', '/api/userRole', NULL, '用户角色权限', now()),
+-- Insert API resources for each menu
+INSERT INTO public.resource_api(id, resource_id, method, path) VALUES
+-- Project Management APIs
+(10000, 10002, 'GET', '/api/project/all'),
+(10001, 10002, 'GET', '/api/project/my'),
+(10002, 10002, 'POST', '/api/project/saveOrUpdate'),
+(10003, 10002, 'DELETE', '/api/project/{id}'),
+(10004, 10002, 'GET', '/api/project/member/list'),
+(10005, 10002, 'POST', '/api/project/member/save'),
+(10006, 10002, 'DELETE', '/api/project/member/{id}'),
 
-(10108, 10101, '项目API', 'Project API', 'api', '/api/project/all', 'GET', '所有项目', now()),
-(10109, 10101, '项目API', 'Project API', 'api', '/api/project/saveOrUpdate', 'POST', '保存项目', now()),
-(10110, 10101, '项目API', 'Project API', 'api', '/api/project/{id}', 'DELETE', '删除项目', now()),
+-- Project Member APIs
+(10007, 10003, 'GET', '/api/project/member/list'),
+(10008, 10003, 'POST', '/api/project/member/save'),
+(10009, 10003, 'DELETE', '/api/project/member/{id}'),
 
-(10111, 10105, '角色API', 'Role API', 'api', '/api/role/saveOrUpdate', 'POST', '保存角色', now()),
-(10112, 10105, '角色API', 'Role API', 'api', '/api/role/{id}', 'DELETE', '删除角色', now()),
-(10114, 10105, '角色API', 'Role API', 'api', '/api/role/{id}/resources', 'GET', '获取角色资源', now()),
-(10115, 10105, '角色API', 'Role API', 'api', '/api/role/{id}/resources', 'POST', '分配角色资源', now())
+-- User Management APIs
+(10010, 10004, 'GET', '/api/user/list'),
+(10011, 10004, 'GET', '/api/user/info'),
+(10012, 10004, 'POST', '/api/user/saveOrUpdate'),
+(10013, 10004, 'POST', '/api/user/updatePasswd'),
+
+-- System Permission APIs
+(10014, 10005, 'GET', '/api/role/list'),
+(10015, 10005, 'GET', '/api/role/all'),
+(10016, 10005, 'POST', '/api/role/saveOrUpdate'),
+(10017, 10005, 'DELETE', '/api/role/{id}'),
+(10018, 10005, 'GET', '/api/role/{id}/resources'),
+(10019, 10005, 'POST', '/api/role/{id}/resources'),
+(10020, 10005, 'GET', '/api/resource/all'),
+(10021, 10005, 'GET', '/api/resource/user'),
+(10022, 10005, 'POST', '/api/resource/saveOrUpdate'),
+(10023, 10005, 'DELETE', '/api/resource/{id}'),
+(10024, 10005, 'GET', '/api/userRole/list'),
+(10025, 10005, 'POST', '/api/userRole/assign'),
+
+-- My Account APIs
+(10026, 10006, 'GET', '/api/user/info'),
+(10027, 10006, 'POST', '/api/user/updatePasswd'),
+
+-- Role Management APIs
+(10028, 10011, 'GET', '/api/role/list'),
+(10029, 10011, 'GET', '/api/role/all'),
+(10030, 10011, 'POST', '/api/role/saveOrUpdate'),
+(10031, 10011, 'DELETE', '/api/role/{id}'),
+(10032, 10011, 'GET', '/api/role/{id}/resources'),
+(10033, 10011, 'POST', '/api/role/{id}/resources'),
+
+-- User Role APIs
+(10034, 10012, 'GET', '/api/userRole/list'),
+(10035, 10012, 'POST', '/api/userRole/assign'),
+
+-- Resource Management APIs
+(10036, 10013, 'GET', '/api/resource/all'),
+(10037, 10013, 'GET', '/api/resource/user'),
+(10038, 10013, 'POST', '/api/resource/saveOrUpdate'),
+(10039, 10013, 'DELETE', '/api/resource/{id}')
 ON CONFLICT (id) DO NOTHING;
 
 -- Assign all resources to admin role

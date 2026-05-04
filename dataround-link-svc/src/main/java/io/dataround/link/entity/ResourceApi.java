@@ -11,26 +11,22 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
- * Resource entity
+ * Resource API entity - stores API paths and methods for each resource
  * 
  * @author yuehan124@gmail.com
- * @since 2025/02/19
+ * @since 2026/05/03
  */
 @Data
-@TableName("public.resource")
-public class Resource {
+@TableName("public.resource_api")
+public class ResourceApi {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    // Parent resource ID, 0 for root
-    private Long pid;
-    // i18n name
-    private String i18nName;
-    // resource key (e.g., menu:user, btn:user:add)
-    private String resKey;
-    private String description;
-    private Date createTime;
+    // Parent resource ID
+    private Long resourceId;
+    // HTTP method (GET/POST/PUT/DELETE)
+    private String method;
+    // API path (e.g., /api/user/list)
+    private String path;
 }

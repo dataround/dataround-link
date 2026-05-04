@@ -8,17 +8,17 @@ package io.dataround.link.interceptor;
 
 import io.dataround.link.common.entity.res.UserResponse;
 import io.dataround.link.common.utils.CommonConstants;
-import io.dataround.link.entity.Resource;
+import io.dataround.link.entity.ResourceApi;
 import io.dataround.link.service.ResourceService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,15 +60,18 @@ public class PermissionInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // Get user's API resources
+        // Get user's API resources from resource_api table
         Set<String> userApis = userApiCache.get(currentUser.getUserId());
         if (userApis == null) {
-            List<Resource> resources = resourceService.getResourcesByUserId(currentUser.getUserId());
-            userApis = resources.stream()
-                .filter(r -> "api".equals(r.getType()))
-                .map(r -> buildApiKey(r.getResKey(), r.getMethod()))
-                .filter(Objects::nonNull) // Filter out null keys
-                .collect(java.util.stream.Collectors.toSet());
+            List<ResourceApi> resourceApis = resourceService.getApisByUserId(currentUser.getUserId());
+            userApis = new HashSet<>();
+            for (ResourceApi api : resourceApis) {
+                // Build API key: path:method or just path if method is null
+                String apiKey = api.getMethod() != null ? 
+                    api.getPath() + ":" + api.getMethod() : 
+                    api.getPath();
+                userApis.add(apiKey);
+            }
             userApiCache.put(currentUser.getUserId(), userApis);
         }
 

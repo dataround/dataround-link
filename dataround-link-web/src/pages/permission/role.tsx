@@ -41,12 +41,8 @@ interface RoleDataType {
 interface ResourceType {
   id: string;
   pid: string;
-  name: string;
-  enName: string;
-  type: string;
+  name?: string;
   resKey: string;
-  method: string;
-  description: string;
   createTime: string;
 }
 
@@ -195,10 +191,9 @@ const RoleManagement = forwardRef<RoleRef, RoleProps>(({ visible }, ref) => {
     const roots: any[] = [];
     
     resources.forEach(r => {
-      const typeLabel = r.type === 'ui' ? '[UI]' : '[API]';
       map.set(String(r.id), {
         key: String(r.id),
-        title: `${typeLabel} ${r.name} (${r.resKey || ''})`,
+        title: r.name + ` (${r.resKey})`,
         children: [],
       });
     });

@@ -19,6 +19,8 @@ package io.dataround.link.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.dataround.link.entity.Resource;
+import io.dataround.link.entity.ResourceApi;
+import io.dataround.link.entity.res.ResouceRes;
 
 import java.util.List;
 
@@ -33,10 +35,30 @@ public interface ResourceService extends IService<Resource> {
     /**
      * Get resources by user ID (through user's roles)
      */
-    List<Resource> getResourcesByUserId(Long userId);
+    List<ResouceRes> getResourcesByUserId(Long userId);
 
     /**
      * Get resources by role ID
      */
-    List<Resource> getResourcesByRoleId(Long roleId);
+    List<ResouceRes> getResourcesByRoleId(Long roleId);
+    
+    /**
+     * Get all resources with their APIs and resolved names (ordered by pid, id)
+     */
+    List<ResouceRes> getResourcesWithApis();
+    
+    /**
+     * Get API paths by user ID (from resource_api table)
+     */
+    List<ResourceApi> getApisByUserId(Long userId);
+    
+    /**
+     * Save or update resource with its APIs (in one transaction)
+     */
+    boolean saveResourceWithApis(Resource resource, List<ResourceApi> resourceApis);
+    
+    /**
+     * Delete resource and its APIs (in one transaction)
+     */
+    boolean deleteResourceWithApis(Long resourceId);
 }

@@ -17,10 +17,12 @@
 
 package io.dataround.link.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.dataround.link.common.Result;
 import io.dataround.link.common.controller.BaseController;
 import io.dataround.link.entity.Resource;
+import io.dataround.link.entity.ResourceApi;
+import io.dataround.link.entity.req.ResourceRequest;
+import io.dataround.link.entity.res.ResouceRes;
 import io.dataround.link.service.ResourceService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,11 +56,8 @@ public class ResourceController extends BaseController {
      * Get all resources (ordered by pid, id)
      */
     @GetMapping("/all")
-    public Result<List<Resource>> all() {
-        LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByAsc(Resource::getPid);
-        wrapper.orderByAsc(Resource::getId);
-        List<Resource> resources = resourceService.list(wrapper);
+    public Result<List<ResouceRes>> all() {
+        List<ResouceRes> resources = resourceService.getResourcesWithApis();
         return Result.success(resources);
     }
 
@@ -67,24 +65,34 @@ public class ResourceController extends BaseController {
      * Get resources for current user
      */
     @GetMapping("/user")
-    public Result<List<Resource>> userResources() {
+    public Result<List<ResouceRes>> userResources() {
         Long userId = getCurrentUserId();
-        List<Resource> resources = resourceService.getResourcesByUserId(userId);
+        List<ResouceRes> resources = resourceService.getResourcesByUserId(userId);
         return Result.success(resources);
     }
 
     @PostMapping("/saveOrUpdate")
-    public Result<Boolean> saveOrUpdate(@RequestBody Resource resource) {
-        if (resource.getId() == null) {
-            resource.setCreateTime(new Date());
-        }
-        boolean result = resourceService.saveOrUpdate(resource);
+    public Result<Boolean> saveOrUpdate(@RequestBody ResourceRequest request) {
+        // Convert ResourceRequest to Resource
+        Resource resource = new Resource();
+        resource.setId(request.getId());
+        resource.setPid(request.getPid());
+        resource.setI18nName(request.getI18nName());
+        resource.setResKey(request.getResKey());
+        resource.setDescription(request.getDescription());
+        
+        List<ResourceApi> resourceApis = request.getResourceApis();
+        
+        // Save resource and APIs in one transaction
+        boolean result = resourceService.saveResourceWithApis(resource, resourceApis);
+        
         return Result.success(result);
     }
 
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
-        boolean result = resourceService.removeById(id);
+        // Delete resource and APIs in one transaction
+        boolean result = resourceService.deleteResourceWithApis(id);
         return Result.success(result);
     }
 }

@@ -19,13 +19,11 @@ package io.dataround.link.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -35,25 +33,14 @@ import java.util.Locale;
  * @date 2025-05-06
  */
 @Configuration
-public class LocaleConfig implements WebMvcConfigurer {
+public class LocaleConfig {
 
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+        AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
         localeResolver.setDefaultLocale(Locale.US);
+        List<Locale> supportedLocales = Arrays.asList(Locale.US, Locale.SIMPLIFIED_CHINESE);
+        localeResolver.setSupportedLocales(supportedLocales);
         return localeResolver;
-    }
-
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        // Switch the language via URL parameters, for example: ?lang=zh_CN
-        interceptor.setParamName("lang"); 
-        return interceptor;
-    }
-
-    @Override
-    public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(localeChangeInterceptor());
     }
 } 
