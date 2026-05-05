@@ -288,83 +288,98 @@ INSERT INTO public.user_role(user_id, role_id, create_time)
 VALUES (10000, 10000, now()) 
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
--- Insert default resources for admin role
--- UI Resources (menus and buttons)
+-- Initialize default resources
 INSERT INTO public.resource(id, pid, i18n_name, res_key, description, create_time) VALUES
-(10000, 0, 'resource.menu.permission', '', '', now()),
-(10002, 10000, 'resource.menu.project', 'menu:project', '', now()),
-(10003, 10000, 'resource.menu.projectMember', 'menu:projectMember', '', now()),
-(10004, 10000, 'resource.menu.user', 'menu:user', '', now()),
-(10005, 10000, 'resource.menu.permission', 'menu:permission', '', now()),
-(10006, 10000, 'resource.menu.myAccount', 'menu:myAccount', '', now()),
-
-(10007, 10004, 'resource.btn.user.add', 'btn:user:add', '', now()),
-(10008, 10004, 'resource.btn.user.edit', 'btn:user:edit', '', now()),
-(10009, 10004, 'resource.btn.user.delete', 'btn:user:delete', '', now()),
-(10010, 10004, 'resource.btn.user.status', 'btn:user:status', '', now()),
-
-(10011, 10005, 'resource.menu.role', 'menu:role', '', now()),
-(10012, 10005, 'resource.menu.userRole', 'menu:userRole', '', now()),
-(10013, 10005, 'resource.menu.resource', 'menu:resource', '', now())
+-- Job Management group
+(10100, 0, 'resource.jobManagement', 'menu:jobManagement', '', now()),
+(10101, 10100, 'resource.batchJob', 'menu:batchJob', '', now()),
+(10102, 10100, 'resource.streamJob', 'menu:streamJob', '', now()),
+(10103, 10100, 'resource.fileSync', 'menu:fileSync', '', now()),
+-- Running Instances group
+(10110, 0, 'resource.runningInstances', 'menu:runningInstances', '', now()),
+(10111, 10110, 'resource.batchInstance', 'menu:batchInstance', '', now()),
+(10112, 10110, 'resource.streamInstance', 'menu:streamInstance', '', now()),
+(10113, 10110, 'resource.fileSyncInstance', 'menu:fileSyncInstance', '', now()),
+-- Connection & Virtual Table group
+(10120, 0, 'resource.connectionAndTable', 'menu:connectionAndTable', '', now()),
+(10121, 10120, 'resource.connectionManagement', 'menu:connectionManagement', '', now()),
+(10122, 10120, 'resource.virtualTable', 'menu:virtualTable', '', now()),
+-- System Management group
+(10130, 0, 'resource.systemManagement', 'menu:systemManagement', '', now()),
+(10131, 10130, 'resource.userManagement', 'menu:userManagement', '', now()),
+(10132, 10130, 'resource.projectManagement', 'menu:projectManagement', '', now()),
+(10133, 10130, 'resource.permissionManagement', 'menu:permissionManagement', '', now()),
+(10134, 10130, 'resource.myAccount', 'menu:myAccount', '', now())
 ON CONFLICT (id) DO NOTHING;
 
--- Insert API resources for each menu
+-- Insert API resources for each menu, TODO: need to be updated based on the actual API paths
 INSERT INTO public.resource_api(id, resource_id, method, path) VALUES
--- Project Management APIs
-(10000, 10002, 'GET', '/api/project/all'),
-(10001, 10002, 'GET', '/api/project/my'),
-(10002, 10002, 'POST', '/api/project/saveOrUpdate'),
-(10003, 10002, 'DELETE', '/api/project/{id}'),
-(10004, 10002, 'GET', '/api/project/member/list'),
-(10005, 10002, 'POST', '/api/project/member/save'),
-(10006, 10002, 'DELETE', '/api/project/member/{id}'),
+-- Job Management APIs (resource_id=10100)
+(20000, 10100, 'GET', '/api/job/list'),
+(20001, 10100, 'GET', '/api/job/{id}'),
+(20002, 10100, 'POST', '/api/job/saveOrUpdate'),
+(20003, 10100, 'DELETE', '/api/job/{id}'),
+(20004, 10100, 'POST', '/api/job/execute/{id}'),
 
--- Project Member APIs
-(10007, 10003, 'GET', '/api/project/member/list'),
-(10008, 10003, 'POST', '/api/project/member/save'),
-(10009, 10003, 'DELETE', '/api/project/member/{id}'),
+-- Running Instance APIs (resource_id=10110)
+(20010, 10110, 'POST', '/api/instance/list'),
+(20011, 10110, 'GET', '/api/instance/{id}'),
+(20012, 10110, 'POST', '/api/instance/saveOrUpdate'),
+(20013, 10110, 'DELETE', '/api/instance/{id}'),
+(20014, 10110, 'POST', '/api/instance/stop/{id}'),
 
--- User Management APIs
-(10010, 10004, 'GET', '/api/user/list'),
-(10011, 10004, 'GET', '/api/user/info'),
-(10012, 10004, 'POST', '/api/user/saveOrUpdate'),
-(10013, 10004, 'POST', '/api/user/updatePasswd'),
+-- Connection Management APIs (resource_id=10121)
+(20020, 10121, 'GET', '/api/connection/{id}'),
+(20021, 10121, 'GET', '/api/connection/list'),
+(20022, 10121, 'POST', '/api/connection/saveOrUpdate'),
+(20023, 10121, 'POST', '/api/connection/upload'),
+(20024, 10121, 'POST', '/api/connection/test'),
+(20025, 10121, 'DELETE', '/api/connection/{id}'),
+(20026, 10121, 'GET', '/api/connection/{id}/dbs'),
+(20027, 10121, 'GET', '/api/connection/{id}/{databaseName}/tables'),
+(20028, 10121, 'GET', '/api/connection/{id}/{databaseName}/{tableName}/columns'),
+(20029, 10121, 'GET', '/api/connection/connectors'),
+(20030, 10121, 'GET', '/api/connector/'),
+(20031, 10121, 'GET', '/api/connector/versions'),
 
--- System Permission APIs
-(10014, 10005, 'GET', '/api/role/list'),
-(10015, 10005, 'GET', '/api/role/all'),
-(10016, 10005, 'POST', '/api/role/saveOrUpdate'),
-(10017, 10005, 'DELETE', '/api/role/{id}'),
-(10018, 10005, 'GET', '/api/role/{id}/resources'),
-(10019, 10005, 'POST', '/api/role/{id}/resources'),
-(10020, 10005, 'GET', '/api/resource/all'),
-(10021, 10005, 'GET', '/api/resource/user'),
-(10022, 10005, 'POST', '/api/resource/saveOrUpdate'),
-(10023, 10005, 'DELETE', '/api/resource/{id}'),
-(10024, 10005, 'GET', '/api/userRole/list'),
-(10025, 10005, 'POST', '/api/userRole/assign'),
+-- Virtual Table APIs (resource_id=10122)
+(20040, 10122, 'GET', '/api/vtable/{id}'),
+(20041, 10122, 'GET', '/api/vtable/list'),
+(20042, 10122, 'POST', '/api/vtable/saveOrUpdate'),
+(20043, 10122, 'DELETE', '/api/vtable/{id}'),
 
--- My Account APIs
-(10026, 10006, 'GET', '/api/user/info'),
-(10027, 10006, 'POST', '/api/user/updatePasswd'),
+-- User Management APIs (resource_id=10131)
+(20050, 10131, 'GET', '/api/user/list'),
+(20051, 10131, 'GET', '/api/user/info'),
+(20052, 10131, 'POST', '/api/user/saveOrUpdate'),
+(20053, 10131, 'POST', '/api/user/updatePasswd'),
 
--- Role Management APIs
-(10028, 10011, 'GET', '/api/role/list'),
-(10029, 10011, 'GET', '/api/role/all'),
-(10030, 10011, 'POST', '/api/role/saveOrUpdate'),
-(10031, 10011, 'DELETE', '/api/role/{id}'),
-(10032, 10011, 'GET', '/api/role/{id}/resources'),
-(10033, 10011, 'POST', '/api/role/{id}/resources'),
+-- Project Management APIs (resource_id=10132)
+(20060, 10132, 'GET', '/api/project/all'),
+(20061, 10132, 'GET', '/api/project/my'),
+(20062, 10132, 'POST', '/api/project/saveOrUpdate'),
+(20063, 10132, 'DELETE', '/api/project/{id}'),
+(20064, 10132, 'GET', '/api/project/member/list'),
+(20065, 10132, 'POST', '/api/project/member/save'),
+(20066, 10132, 'DELETE', '/api/project/member/{id}'),
 
--- User Role APIs
-(10034, 10012, 'GET', '/api/userRole/list'),
-(10035, 10012, 'POST', '/api/userRole/assign'),
+-- Permission Management APIs (resource_id=10133)
+(20070, 10133, 'GET', '/api/role/list'),
+(20071, 10133, 'GET', '/api/role/all'),
+(20072, 10133, 'POST', '/api/role/saveOrUpdate'),
+(20073, 10133, 'DELETE', '/api/role/{id}'),
+(20074, 10133, 'GET', '/api/role/{id}/resources'),
+(20075, 10133, 'POST', '/api/role/{id}/resources'),
+(20076, 10133, 'GET', '/api/resource/all'),
+(20077, 10133, 'GET', '/api/resource/user'),
+(20078, 10133, 'POST', '/api/resource/saveOrUpdate'),
+(20079, 10133, 'DELETE', '/api/resource/{id}'),
+(20080, 10133, 'GET', '/api/userRole/list'),
+(20081, 10133, 'POST', '/api/userRole/assign'),
 
--- Resource Management APIs
-(10036, 10013, 'GET', '/api/resource/all'),
-(10037, 10013, 'GET', '/api/resource/user'),
-(10038, 10013, 'POST', '/api/resource/saveOrUpdate'),
-(10039, 10013, 'DELETE', '/api/resource/{id}')
+-- My Account APIs (resource_id=10134)
+(20090, 10134, 'GET', '/api/user/info'),
+(20091, 10134, 'POST', '/api/user/updatePasswd')
 ON CONFLICT (id) DO NOTHING;
 
 -- Assign all resources to admin role

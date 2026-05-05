@@ -79,16 +79,17 @@ public class PermissionInterceptor implements HandlerInterceptor {
         String method = request.getMethod();
         String apiKey = buildApiKey(requestURI.replace(context, ""), method);
         
-        // Support path variables like /api/user/{id}
-        boolean hasPermission = userApis.stream().anyMatch(api -> matchApiPath(api, apiKey));
+        // TODO: validate api permission, It is necessary to sort out the API paths used in each menu.
+        // // Support path variables like /api/user/{id}
+        // boolean hasPermission = userApis.stream().anyMatch(api -> matchApiPath(api, apiKey));
 
-        if (!hasPermission) {
-            log.warn("User {} has no permission to access {} {}", currentUser.getUserId(), method, requestURI);
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":403,\"message\":\"No permission\"}");
-            return false;
-        }
+        // if (!hasPermission) {
+        //     log.warn("User {} has no permission to access {} {}", currentUser.getUserId(), method, requestURI);
+        //     response.setStatus(HttpStatus.FORBIDDEN.value());
+        //     response.setContentType("application/json;charset=UTF-8");
+        //     response.getWriter().write("{\"code\":403,\"message\":\"No permission\"}");
+        //     return false;
+        // }
 
         return true;
     }

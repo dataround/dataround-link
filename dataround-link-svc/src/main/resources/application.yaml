@@ -5,6 +5,9 @@ server:
 spring:
   profiles:
     active: prod
+  # Set the default locale to en-US(messages.properties)
+  messages:
+    fallback-to-system-locale: false
 
   application:
     name: dataround-link

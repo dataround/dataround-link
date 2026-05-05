@@ -56,7 +56,7 @@
     "hdfsSync": "HDFS同步",
     "objectStorageSync": "对象存储同步",
     "createConnection": "创建连接",
-    "taskManagement": "作业管理",
+    "jobManagement": "作业管理",
     "runningInstances": "运行实例",
     "tablesAndConnections": "表&连接"
   },

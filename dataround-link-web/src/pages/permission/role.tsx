@@ -274,6 +274,7 @@ const RoleManagement = forwardRef<RoleRef, RoleProps>(({ visible }, ref) => {
         cancelText={t('common.cancel')}
         okText={t('common.confirm')}
         width="40%"
+        bodyStyle={{ minHeight: '380px' }}
       >
         <Spin spinning={allResourcesRequest.loading || roleResourcesRequest.loading}>
           <Tree

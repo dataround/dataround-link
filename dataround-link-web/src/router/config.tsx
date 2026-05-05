@@ -39,12 +39,12 @@ import { hasPermission, useStore } from "../store";
 export interface IMenu {
   name?: string;
   path?: string;
+  resKey?: string;
   children?: IMenu[];
   icon?: ReactNode;
   element?: ReactNode | null;
   hidden?: boolean;
   type?: string;
-  permissionKey?: string;  // Resource key for permission check
 }
 
 const fallback = <div>loading</div>;
@@ -66,14 +66,15 @@ export const useRoutes = () => {
           path: "/",
           element: lazyReactElement(() => import("../pages/home"), fallback),
           children: [
-            // Task Management Category
             {
-              name: t('menu.taskManagement'),
+              name: t('menu.jobManagement'),
+              resKey: 'menu:jobManagement',
               type: 'group',
               children: [
                 {
                   path: "/batch/job",
                   name: t('menu.batchJob'),
+                  resKey: 'menu:batchJob',  
                   icon: <FolderOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/job"),
@@ -83,6 +84,7 @@ export const useRoutes = () => {
                 {
                   path: "/stream/job",
                   name: t('menu.streamJob'),
+                  resKey: 'menu:streamJob',
                   icon: <SwapOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/job"),
@@ -92,6 +94,7 @@ export const useRoutes = () => {
                 {
                   path: "/fileSync/job",
                   name: t('menu.fileSync'),
+                  resKey: 'menu:fileSync',
                   icon: <FileOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/job"),
@@ -119,14 +122,15 @@ export const useRoutes = () => {
                 },
               ]
             },
-            // Running Instances Category
             {
               name: t('menu.runningInstances'),
+              resKey: 'menu:runningInstances',
               type: 'group',
               children: [
                 {
                   path: "/batch/instance",
                   name: t('menu.batchInstance'),
+                  resKey: 'menu:batchInstance',
                   icon: <RedoOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/instance"),
@@ -136,6 +140,7 @@ export const useRoutes = () => {
                 {
                   path: "/stream/instance",
                   name: t('menu.streamInstance'),
+                  resKey: 'menu:streamInstance',
                   icon: <SwapRightOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/instance"),
@@ -145,6 +150,7 @@ export const useRoutes = () => {
                 {
                   path: "/fileSync/instance",
                   name: t('menu.fileSyncInstance'),
+                  resKey: 'menu:fileSyncInstance',
                   icon: <FileOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/instance"),
@@ -155,11 +161,13 @@ export const useRoutes = () => {
             },
             {
               name: t('menu.connectionAndTable'),
+              resKey: 'menu:connectionAndTable',
               type: 'group',
               children: [
                 {
                   path: "/connection",
                   name: t('menu.connectionManagement'),
+                  resKey: 'menu:connectionManagement',
                   icon: <DatabaseOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/connection"),
@@ -178,6 +186,7 @@ export const useRoutes = () => {
                 {
                   path: "/vtable",
                   name: t('menu.virtualTable'),
+                  resKey: 'menu:virtualTable',
                   icon: <RadiusBottomrightOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/virtualtable"),
@@ -195,41 +204,41 @@ export const useRoutes = () => {
                 },                
               ]
             },
-            // System Management Category
             {
               name: t('menu.systemManagement'),
+              resKey: 'menu:systemManagement',
               type: 'group',
               children: [                
                 {
                   path: "/settings/user",
                   name: t('menu.userManagement'),
+                  resKey: 'menu:userManagement',
                   icon: <TeamOutlined />,
                   element: lazyReactElement(() => import("../pages/user/"), fallback),
-                  permissionKey: 'menu:user',
                 },           
                 {
                   path: "/settings/project",
                   name: t('menu.projectManagement'),
+                  resKey: 'menu:projectManagement',
                   icon: <FolderOutlined />,
                   element: lazyReactElement(() => import("../pages/project"), fallback),
-                  permissionKey: 'menu:project',
                 },     
                 {
                   path: "/settings/permission",
                   name: t('menu.permissionManagement'),
+                  resKey: 'menu:permissionManagement',
                   icon: <LockOutlined />,
                   element: lazyReactElement(() => import("../pages/permission"), fallback),
-                  permissionKey: 'menu:permission',
                 },
                 {
                   path: "/settings/myInfo",
                   name: t('menu.myAccount'),
+                  resKey: 'menu:myAccount',
                   icon: <SettingOutlined />,
                   element: lazyReactElement(
                     () => import("../pages/myInfo"),
                     fallback
                   ),
-                  // No permission key - always visible
                 },
               ]
             }            
@@ -249,21 +258,22 @@ export const useRoutes = () => {
 
 /**
  * Filter menus by user permission
+ * Menu is visible only if the user's resources contain the matching resKey
  */
 const filterMenusByPermission = (menus: IMenu[]): IMenu[] => {
   return menus
     .filter(menu => {
-      // No permission key means always visible
-      if (!menu.permissionKey) {
+      // No resKey means always visible (layout, hidden routes, etc.)
+      if (!menu.resKey) {
         return true;
       }
-      return hasPermission(menu.permissionKey);
+      return hasPermission(menu.resKey);
     })
     .map(menu => {
       if (menu.children) {
         const filteredChildren = filterMenusByPermission(menu.children);
         // Hide parent menu if all children are filtered out
-        if (filteredChildren.length === 0 && menu.permissionKey) {
+        if (filteredChildren.length === 0 && menu.resKey) {
           return { ...menu, hidden: true };
         }
         return { ...menu, children: filteredChildren };
